@@ -27,7 +27,8 @@ flavor_channels = { 'ee_os':0
                   }
 
 # ------------------------------------------------------------------------------
-def getFlavorChannel(event, pt_cut, eta_cut):
+def getFlavorChannel(event, pt_cut, eta_cut, verbose = False):
+    print '-----------------------------------'
     num_el = 0
     good_el_indices = []
 
@@ -37,26 +38,52 @@ def getFlavorChannel(event, pt_cut, eta_cut):
     charge_product = 1
 
     for el_it in xrange(event.el_n):
-        if event.el_pt.at(el_it) < pt_cut:
-            print 'electron %d failed pt cut (%f)' % (el_it, event.el_pt.at(el_it))
+        el_pt     = event.el_pt.at(el_it)
+        el_eta    = event.el_eta.at(el_it)
+        el_charge = event.el_charge.at(el_it)
+        if verbose:
+            print 'el[%d] -- pt: %f -- eta: %f -- charge: %d' % ( el_it
+                                                                , el_pt
+                                                                , el_eta
+                                                                , el_charge
+                                                                )
+
+        if el_pt < pt_cut:
+            if verbose:
+                print '  electron %d failed pt cut (%f < %f)' % (el_it, el_pt, pt_cut)
             continue
         if abs(event.el_eta.at(el_it)) > eta_cut:
-            print 'electron %d failed eta cut (%f)' % (el_it, event.el_eta.at(el_it))
+            if verbose:
+                print '  electron %d failed eta cut (|%f| > %f)' % (el_it, el_eta, eta_cut)
             continue
         num_el += 1
         good_el_indices.append(el_it)
-        charge_product *= event.el_charge.at(el_it)
+        charge_product *= el_charge
 
     for mu_it in xrange(event.mu_staco_n):
+        mu_pt     = event.mu_staco_pt.at(mu_it)
+        mu_eta    = event.mu_staco_eta.at(mu_it)
+        mu_charge = event.mu_staco_charge.at(mu_it)
+        if verbose:
+            print 'mu[%d] -- pt: %f -- eta: %f -- charge: %d' % ( mu_it
+                                                                , mu_pt
+                                                                , mu_eta
+                                                                , mu_charge
+                                                                )
+
         if event.mu_staco_pt.at(mu_it) < pt_cut:
-            print 'muon %d failed pt cut (%f)' % (mu_it, event.mu_staco_pt.at(mu_it))
+            if verbose:
+                print '  muon %d failed pt cut (%f < %f)' % (mu_it, mu_pt, pt_cut)
             continue
         if abs(event.mu_staco_eta.at(mu_it)) > eta_cut:
-            print 'muon %d failed eta cut (%f)' % (mu_it, event.mu_staco_eta.at(mu_it))
+            if verbose:
+                print '  muon %d failed eta cut (|%f| > %f)' % (mu_it, mu_eta, eta_cut)
             continue
         num_mu += 1
         good_mu_indices.append(mu_it)
-        charge_product *= event.mu_staco_charge.at(mu_it)
+        charge_product *= mu_charge
+        if verbose:
+            print '  adding to num_mu: %d  --  %s' % (num_mu, good_mu_indices)
 
     flavor_channel = 'none'
     if   num_el == 2 and num_mu == 0 and charge_product < 0:
@@ -82,9 +109,9 @@ def getFlavorChannel(event, pt_cut, eta_cut):
     elif num_el + num_mu > 3:
         flavor_channel = 'multi'
 
-    if flavor_channel == 'none' and num_el+num_mu > 0:
-        print 'WARNING: no flavor channel, but leptons'
-        print '    num el: %d  --  num mu: %d' % (num_el, num_mu)
+    if verbose and flavor_channel == 'none' and num_el+num_mu > 0:
+        print '  WARNING: no flavor channel, but leptons'
+        print '      num el: %d  --  num mu: %d' % (num_el, num_mu)
 
     return { 'channel':flavor_channel
            , 'el':good_el_indices
@@ -120,7 +147,9 @@ class hFlavorChannels(object):
         flavor_channel = getFlavorChannel( event
                                          , self.pt_cut
                                          , self.eta_cut
+                                         , True
                                          )
+        print flavor_channel
         bin_num = flavor_channels[flavor_channel['channel']]
         self.hist.Fill(bin_num)
 
@@ -147,7 +176,6 @@ class hPt(object):
 
         self.hist_0 = {}
         self.hist_1 = {}
-        self.hist_2 = {}
         for fc in flavor_channels:
             self.hist_0[fc] = ROOT.TH1F( '%s_%s_0' % (fc, name)
                                        , '%s - %s -- lepton 0;p_{T}^{0} [GeV]' % (title, fc)
@@ -170,20 +198,21 @@ class hPt(object):
         flavor_channel = getFlavorChannel( event
                                          , self.pt_cut
                                          , self.eta_cut
+                                         # , True
                                          )
-        print flavor_channel
+        # print flavor_channel
         if flavor_channel['channel'] == 'ee_os' or flavor_channel['channel'] == 'ee_ss':
             print 'found ee channel - getting pt values'
-            pt_0 = event.el_pt.at(flavor_channel['el'][0])/1000
-            pt_1 = event.el_pt.at(flavor_channel['el'][1])/1000
+            pt_0 = event.el_pt.at(flavor_channel['el'][0])/1000.
+            pt_1 = event.el_pt.at(flavor_channel['el'][1])/1000.
         elif flavor_channel['channel'] == 'mm_os' or flavor_channel['channel'] == 'mm_ss':
             print 'found mm channel - getting pt values'
-            pt_0 = event.mu_staco_pt.at(flavor_channel['mu'][0])/1000
-            pt_1 = event.mu_staco_pt.at(flavor_channel['mu'][1])/1000
+            pt_0 = event.mu_staco_pt.at(flavor_channel['mu'][0])/1000.
+            pt_1 = event.mu_staco_pt.at(flavor_channel['mu'][1])/1000.
         elif flavor_channel['channel'] == 'ee_os' or flavor_channel['channel'] == 'ee_ss':
             print 'found em channel - getting pt values'
-            pt_0 = event.el_pt.at(      flavor_channel['el'][0])/1000
-            pt_1 = event.mu_staco_pt.at(flavor_channel['mu'][0])/1000
+            pt_0 = event.el_pt.at(      flavor_channel['el'][0])/1000.
+            pt_1 = event.mu_staco_pt.at(flavor_channel['mu'][0])/1000.
         else:
             return
 
@@ -213,6 +242,16 @@ class hEta(object):
         x_min = -2.5
         x_max = 2.5
 
+        ### self.hist = {}
+        ### for fc in flavor_channels:
+        ###     num_lep = 2
+        ###     for lep_it in xrange(num_lep):
+        ###         self.hist.append( ROOT.TH1F( '%s_%s_%d' % (fc, name, lep_it)
+        ###                                    , '%s - %s -- lepton %d;#eta^{%d}' % (title, fc, lep_it, lep_it)
+        ###                                    , num_bins
+        ###                                    , x_min
+        ###                                    , x_max
+        ###                                    )
         self.hist_0 = {}
         self.hist_1 = {}
         for fc in flavor_channels:
@@ -237,8 +276,9 @@ class hEta(object):
         flavor_channel = getFlavorChannel( event
                                          , self.pt_cut
                                          , self.eta_cut
+                                         # , True
                                          )
-        print flavor_channel
+        # print flavor_channel
         if flavor_channel['channel'] == 'ee_os' or flavor_channel['channel'] == 'ee_ss':
             print 'found ee channel - getting pt values'
             eta_0 = event.el_eta.at(flavor_channel['el'][0])
@@ -297,21 +337,34 @@ def defineHists():
 # ------------------------------------------------------------------------------
 def plotTruth(tree):
     hists = {}
+    hists['channels']  = hFlavorChannels( name = 'channels'
+                                        , pt_cut = 0
+                                        , eta_cut = 3
+                                        )
     hists['channels_8']  = hFlavorChannels( name = 'channels_8'
                                           , pt_cut = 8000
                                           )
     hists['channels_10'] = hFlavorChannels( name = 'channels_10'
                                           , pt_cut = 10000
                                           )
+    hists['pt']    = hPt( name = 'pt'
+                        , pt_cut = 0
+                        , eta_cut = 3
+                        )
     hists['pt_8']  = hPt(name = 'pt_8' , pt_cut = 8000 )
     hists['pt_10'] = hPt(name = 'pt_10', pt_cut = 10000)
+    hists['eta']    = hEta( name = 'eta'
+                          , pt_cut = 0
+                          , eta_cut = 3
+                          )
     hists['eta_8']  = hEta(name = 'eta_8' , pt_cut = 8000 )
     hists['eta_10'] = hEta(name = 'eta_10', pt_cut = 10000)
 
     for event in tree:
+        print '======================================================'
         num_el = event.el_n
         num_mu = event.mu_staco_n
-        if num_el + num_mu <= 1: continue
+        # if num_el + num_mu <= 1: continue
 
         for h in hists:
             hists[h].fill(event)
