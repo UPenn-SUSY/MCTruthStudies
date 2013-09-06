@@ -147,15 +147,16 @@ class hPt(object):
 
         self.hist_0 = {}
         self.hist_1 = {}
+        self.hist_2 = {}
         for fc in flavor_channels:
             self.hist_0[fc] = ROOT.TH1F( '%s_%s_0' % (fc, name)
-                                       , '%s - %s -- leading;p_{T}^{lead} [GeV]' % (title, fc)
+                                       , '%s - %s -- lepton 0;p_{T}^{0} [GeV]' % (title, fc)
                                        , num_bins
                                        , x_min
                                        , x_max
                                        )
             self.hist_1[fc] = ROOT.TH1F( '%s_%s_1' % (fc, name)
-                                       , '%s - %s -- subleading;p_{T}^{sublead} [GeV]' % (title, fc)
+                                       , '%s - %s -- lepton 1;p_{T}^{1} [GeV]' % (title, fc)
                                        , num_bins
                                        , x_min
                                        , x_max
@@ -188,7 +189,7 @@ class hPt(object):
 
         self.hist_0[flavor_channel['channel']].Fill(pt_0)
         self.hist_1[flavor_channel['channel']].Fill(pt_1)
-        
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
         out_file.cd()
@@ -216,13 +217,13 @@ class hEta(object):
         self.hist_1 = {}
         for fc in flavor_channels:
             self.hist_0[fc] = ROOT.TH1F( '%s_%s_0' % (fc, name)
-                                       , '%s - %s -- leading;#eta^{lead}' % (title, fc)
+                                       , '%s - %s -- lepton 0;#eta^{0}' % (title, fc)
                                        , num_bins
                                        , x_min
                                        , x_max
                                        )
             self.hist_1[fc] = ROOT.TH1F( '%s_%s_1' % (fc, name)
-                                       , '%s - %s -- subleading;#eta^{sublead}' % (title, fc)
+                                       , '%s - %s -- lepton 1;#eta^{1}' % (title, fc)
                                        , num_bins
                                        , x_min
                                        , x_max
@@ -240,22 +241,22 @@ class hEta(object):
         print flavor_channel
         if flavor_channel['channel'] == 'ee_os' or flavor_channel['channel'] == 'ee_ss':
             print 'found ee channel - getting pt values'
-            eta_0 = event.el_eta.at(flavor_channel['el'][0])/1000
-            eta_1 = event.el_eta.at(flavor_channel['el'][1])/1000
+            eta_0 = event.el_eta.at(flavor_channel['el'][0])
+            eta_1 = event.el_eta.at(flavor_channel['el'][1])
         elif flavor_channel['channel'] == 'mm_os' or flavor_channel['channel'] == 'mm_ss':
             print 'found mm channel - getting pt values'
-            eta_0 = event.mu_staco_eta.at(flavor_channel['mu'][0])/1000
-            eta_1 = event.mu_staco_eta.at(flavor_channel['mu'][1])/1000
+            eta_0 = event.mu_staco_eta.at(flavor_channel['mu'][0])
+            eta_1 = event.mu_staco_eta.at(flavor_channel['mu'][1])
         elif flavor_channel['channel'] == 'ee_os' or flavor_channel['channel'] == 'ee_ss':
             print 'found em channel - getting pt values'
-            eta_0 = event.el_eta.at(      flavor_channel['el'][0])/1000
-            eta_1 = event.mu_staco_eta.at(flavor_channel['mu'][0])/1000
+            eta_0 = event.el_eta.at(      flavor_channel['el'][0])
+            eta_1 = event.mu_staco_eta.at(flavor_channel['mu'][0])
         else:
             return
 
         self.hist_0[flavor_channel['channel']].Fill(eta_0)
         self.hist_1[flavor_channel['channel']].Fill(eta_1)
-        
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
         out_file.cd()
@@ -321,16 +322,28 @@ def plotTruth(tree):
 
     return hists
 
+# ------------------------------------------------------------------------------
+def readInputs():
+    if len(sys.argv) != 3:
+        print 'Incorrect number of inputs'
+        print 'usage: '
+        print '  %s <input file name> <output file name>' % sys.argv[0]
+        return None
+
+    in_file = sys.argv[1]
+    out_file = sys.argv[2]
+
+    return {'in':in_file, 'out':out_file}
 
 # ------------------------------------------------------------------------------
 def main():
-    inputs = getInFile('/Users/bjackson/work/MCGenTesting/my.truth.ntup.root')
-    # inputs = getInFile('/afs/cern.ch/user/b/bjackson/work/public/MCGenTesting/144885/my.truth.ntup.root')
-    if inputs is None: return
-    print 'got in file'
-    hists = plotTruth(inputs['tree'])
+    configs = readInputs()
+    if configs is None: return
 
-    out_file = ROOT.TFile('out_hists.root', 'RECREATE')
+    input = getInFile(configs['in'])
+    hists = plotTruth(input['tree'])
+
+    out_file = ROOT.TFile(configs['out'], 'RECREATE')
     for h in hists:
         hists[h].writeToFile(out_file)
     out_file.Close()
