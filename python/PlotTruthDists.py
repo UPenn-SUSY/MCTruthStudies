@@ -61,7 +61,7 @@ class HistMerger(object):
             h.SetLineColor(fh.color)
             h.SetLineWidth(3)
 
-        self.canvas = ROOT.TCanvas('c_%s' % hist_name)
+        # self.canvas = ROOT.TCanvas('c_%s' % hist_name)
         title = '%s;%s;%s' % ( self.hists[0].GetTitle()
                              , self.hists[0].GetXaxis().GetTitle()
                              , self.hists[0].GetYaxis().GetTitle()
@@ -72,15 +72,27 @@ class HistMerger(object):
         leg_x2 = 0.98
         leg_y1 = 0.98
         leg_y2 = leg_y1-(0.06*len(self.hists))
+
+        big_leg_x1 = 0.05
+        big_leg_x2 = 0.95
+        big_leg_y1 = 0.98
+        big_leg_y2 = leg_y1-(0.08*len(self.hists))
+
         self.legend = ROOT.TLegend(leg_x1, leg_y1, leg_x2, leg_y2)
+        self.big_legend = ROOT.TLegend(big_leg_x1, big_leg_y1, big_leg_x2, big_leg_y2)
         for i, h in enumerate(self.hists):
             # self.stack.Add(h, 'P')
             # self.legend.AddEntry(h, self.file_names[i], 'P')
             self.stack.Add(h, 'HIST')
             self.legend.AddEntry(h, self.file_names[i], 'L')
+            self.big_legend.AddEntry(h, self.file_names[i], 'L')
 
+        self.canvas = ROOT.TCanvas('c_%s' % hist_name)
         self.stack.Draw('nostack')
         self.legend.Draw()
+
+        self.leg_canvas = ROOT.TCanvas('c_%s_leg' % hist_name)
+        self.big_legend.Draw()
 
 # ------------------------------------------------------------------------------
 def main():
@@ -154,7 +166,11 @@ def main():
     for loh in list_of_hists:
         print 'hist: %s' % loh
         hm = HistMerger( files, loh )
-        hm.canvas.Print('%s.png' % loh)
+        hm.canvas.Print('%s.eps' % loh)
+
+        if 'channel' in loh:
+            print 'leg: %s' % loh
+            hm.leg_canvas.Print('%s_leg.eps' % loh)
 
 # ==============================================================================
 if __name__ == '__main__':

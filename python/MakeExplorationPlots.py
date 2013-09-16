@@ -141,25 +141,56 @@ def getFlavorChannel(event, pt_cut, eta_cut, verbose = False):
            }
 
 # ------------------------------------------------------------------------------
-def getGoodJets(event, pt_cut = 20000, eta_cut = 2.4, verbose = False):
+def isOverlap(event, jet_eta, jet_phi, good_el_indices):
+    for gei in good_el_indices:
+        el_eta = event.el_eta.at(gei)
+        el_phi = event.el_phi.at(gei)
+
+        deta = jet_eta - el_eta
+        dphi = abs(jet_phi - el_phi)
+        while dphi > 3.14159:
+            # print ' dphi: %f -- subtracting 3.14159' % dphi
+            dphi -= 3.14159
+        # print ' dphi: %f' % dphi
+        dr = math.sqrt( deta*deta + dphi*dphi )
+
+        return (dr < 0.2)
+
+# ------------------------------------------------------------------------------
+def getGoodJets( event
+               , jet_pt_cut
+               , jet_eta_cut
+               , lep_pt_cut
+               , lep_eta_cut
+               , verbose = False
+               ):
     good_jet_indices = []
     good_jet_pt = []
+
+    flavor_channels = getFlavorChannel(event, lep_pt_cut, lep_eta_cut)
 
     for jet_it in xrange(event.jet_AntiKt4TruthJets_n):
         jet_pt  = event.jet_AntiKt4TruthJets_pt.at(jet_it)
         jet_eta = event.jet_AntiKt4TruthJets_eta.at(jet_it)
-        if jet_pt < pt_cut:
+        jet_phi = event.jet_AntiKt4TruthJets_phi.at(jet_it)
+
+        if jet_pt < jet_pt_cut:
             if verbose:
-                print '  Jet %d failed pt cut (%f < %f)' % (jet_it, jet_pt, pt_cut)
+                print '  Jet %d failed pt cut (%f < %f)' % (jet_it, jet_pt, jet_pt_cut)
             continue
-        if abs(jet_eta) > eta_cut:
+        if abs(jet_eta) > jet_eta_cut:
             if verbose:
-                print '  Jet %d failed eta cut (|%f| > %f)' % (jet_it, jet_eta, eta_cut)
+                print '  Jet %d failed eta cut (|%f| > %f)' % (jet_it, jet_eta, jet_eta_cut)
             continue
+        if isOverlap(event, jet_eta, jet_phi, flavor_channels['el']):
+            if verbose:
+                print '  Jet %d overlaps with electron' % jet_it
+            continue
+
         good_jet_indices.append(jet_it)
         good_jet_pt.append(jet_pt)
         if verbose:
-            print '  Adding to good jets: %d -- $s' (len(good_jet_indices), good_jet_indices)
+            print '  Adding to good jets: %d -- %s' % (len(good_jet_indices), good_jet_indices)
 
     if len(good_jet_indices) > 0:
         tups = zip(good_jet_pt, good_jet_indices)
@@ -168,6 +199,13 @@ def getGoodJets(event, pt_cut = 20000, eta_cut = 2.4, verbose = False):
         good_jet_pt, good_jet_indices = (list(t) for t in zip(*tups))
 
     return good_jet_indices
+
+# ------------------------------------------------------------------------------
+def getInvisibles( event ):
+    invisible_indices = {}
+
+    for mc_it in xrange(event.mc_n):
+        pass
 
 # ------------------------------------------------------------------------------
 class hFlavorChannels(object):
@@ -378,17 +416,15 @@ class hNumJet(object):
                                          # , True
                                          )
 
-        num_jets = len(getGoodJets(event))
+        num_jets = len(getGoodJets( event
+                                  , 20000
+                                  , 2.4
+                                  , self.pt_cut
+                                  , self.eta_cut
+                                  # , True
+                                  )
+                      )
         self.hist[flavor_channel['channel']].Fill(num_jets)
-
-        # for el_index in flavor_channel['el']:
-        #     pt.append(event.el_pt.at(el_index)/1000.)
-        # for mu_index in flavor_channel['mu']:
-        #     pt.append(event.mu_staco_pt.at(mu_index)/1000.)
-
-        # for num_lep, lep_pt in enumerate(pt):
-        #     if num_lep == max_num_leptons: break
-        #     self.hist_pt[flavor_channel['channel']][num_lep].Fill(lep_pt)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -400,61 +436,108 @@ class hNumJet(object):
         for fc in flavor_channels:
             self.hist[fc].Write()
 
-# # ------------------------------------------------------------------------------
-# class hJetPt(object):
-#     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#     def __init__( self
-#                 , name = 'h_jet_pt'
-#                 , title = 'jet pt'
-#                 , pt_cut = 10000
-#                 , eta_cut = 2.4
-#                 ):
-#         self.pt_cut  = pt_cut
-#         self.eta_cut = eta_cut
-# 
-#         num_bins = 100
-#         x_min = 0
-#         x_max = 500
-# 
-#         self.hist_pt   = {}
-#         for fc in flavor_channels:
-#             self.hist_pt[fc] = []
-#             for num_jet in xrange(max_num_jets):
-#                 self.hist_pt[fc].append( ROOT.TH1F( '%s_%s_%d' % (fc, name, num_jet)
-#                                                   , '%s - %s -- jet %d; p_{T}^{%d} [GeV]' % (title, fc, num_jet, num_jet)
-#                                                   , num_bins, x_min, x_max
-#                                                   )
-#                                        )
-# 
-#     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#     def fill(self, event):
-#         pt = []
-# 
-#         flavor_channel = getFlavorChannel( event
-#                                          , self.pt_cut
-#                                          , self.eta_cut
-#                                          # , True
-#                                          )
-# 
-#         # for el_index in flavor_channel['el']:
-#         #     pt.append(event.el_pt.at(el_index)/1000.)
-#         # for mu_index in flavor_channel['mu']:
-#         #     pt.append(event.mu_staco_pt.at(mu_index)/1000.)
-# 
-#         # for num_lep, lep_pt in enumerate(pt):
-#         #     if num_lep == max_num_leptons: break
-#         #     self.hist_pt[flavor_channel['channel']][num_lep].Fill(lep_pt)
-# 
-#     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#     def writeToFile(self, out_file):
-#         out_file.cd()
-#         dir_name = 'pt_%s__eta_%s' % (self.pt_cut, self.eta_cut)
-#         if out_file.GetDirectory(dir_name) == None:
-#             out_file.mkdir(dir_name)
-#         out_file.cd(dir_name)
-#         for fc in flavor_channels:
-#             for num_lep in xrange(max_num_jets):
-#                 self.hist_pt[fc][num_jets].Write()
+# ------------------------------------------------------------------------------
+class hJetPt(object):
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def __init__( self
+                , name = 'h_jet_pt'
+                , title = 'jet pt'
+                , pt_cut = 10000
+                , eta_cut = 2.4
+                ):
+        self.pt_cut  = pt_cut
+        self.eta_cut = eta_cut
+
+        num_bins = 50
+        x_min = 0
+        x_max = 500
+
+        self.hist = {}
+        for fc in flavor_channels:
+            self.hist[fc] = []
+            for num_jet in xrange(max_num_jets):
+                self.hist[fc].append( ROOT.TH1F( '%s_%s_%d' % (fc, name, num_jet)
+                                               , '%s - %s -- jet %d; p_{T}^{%d} [GeV]' % (title, fc, num_jet, num_jet)
+                                               , num_bins, x_min, x_max
+                                               )
+                                    )
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def fill(self, event):
+        pt = []
+
+        flavor_channel = getFlavorChannel( event
+                                         , self.pt_cut
+                                         , self.eta_cut
+                                         # , True
+                                         )
+        jet_indicies = getGoodJets( event
+                                  , 20000
+                                  , 2.4
+                                  , self.pt_cut
+                                  , self.eta_cut
+                                  )
+
+        for jet_num, jet_index in enumerate(jet_indicies):
+            if jet_num == max_num_jets: break
+            self.hist[flavor_channel['channel']][jet_num].Fill(event.jet_AntiKt4TruthJets_pt.at(jet_index)/1000.)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def writeToFile(self, out_file):
+        out_file.cd()
+        dir_name = 'pt_%s__eta_%s' % (self.pt_cut, self.eta_cut)
+        if out_file.GetDirectory(dir_name) == None:
+            out_file.mkdir(dir_name)
+        out_file.cd(dir_name)
+        for fc in flavor_channels:
+            for jet_itr in xrange(max_num_jets):
+                self.hist[fc][jet_itr].Write()
+
+# ------------------------------------------------------------------------------
+class hMet(object):
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def __init__( self
+                , name = 'h_met'
+                , title = 'met'
+                , pt_cut = 10000
+                , eta_cut = 2.4
+                ):
+        self.pt_cut  = pt_cut
+        self.eta_cut = eta_cut
+
+        num_bins = 50
+        x_min = 0
+        x_max = 500
+
+        self.hist   = {}
+        for fc in flavor_channels:
+            self.hist[fc] = ROOT.TH1F( '%s_%s' % (fc, name)
+                                     , '%s - %s; E_{T}^{miss} [GeV]' % (title, fc)
+                                     , num_bins, x_min, x_max
+                                     )
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def fill(self, event):
+        flavor_channel = getFlavorChannel( event
+                                         , self.pt_cut
+                                         , self.eta_cut
+                                         # , True
+                                         )
+
+        met_etx = event.MET_Truth_NonInt_etx
+        met_ety = event.MET_Truth_NonInt_ety
+        met = math.sqrt(met_etx*met_etx + met_ety*met_ety)/1000.
+        self.hist[flavor_channel['channel']].Fill(met)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def writeToFile(self, out_file):
+        out_file.cd()
+        dir_name = 'pt_%s__eta_%s' % (self.pt_cut, self.eta_cut)
+        if out_file.GetDirectory(dir_name) == None:
+            out_file.mkdir(dir_name)
+        out_file.cd(dir_name)
+        for fc in flavor_channels:
+            self.hist[fc].Write()
 
 # ------------------------------------------------------------------------------
 def getInFile(in_file):
@@ -505,6 +588,14 @@ def plotTruth(tree):
     hists['num_jet']    = hNumJet(name = 'num_jet'   , pt_cut = 0    , eta_cut = 3)
     hists['num_jet_8']  = hNumJet(name = 'num_jet_8' , pt_cut = 8000 )
     hists['num_jet_10'] = hNumJet(name = 'num_jet_10', pt_cut = 10000)
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    hists['jet_pt']    = hJetPt(name = 'jet_pt'   , pt_cut = 0    , eta_cut = 3)
+    hists['jet_pt_8']  = hJetPt(name = 'jet_pt_8' , pt_cut = 8000 )
+    hists['jet_pt_10'] = hJetPt(name = 'jet_pt_10', pt_cut = 10000)
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    hists['met']    = hMet(name = 'met'   , pt_cut = 0    , eta_cut = 3)
+    hists['met_8']  = hMet(name = 'met_8' , pt_cut = 8000 )
+    hists['met_10'] = hMet(name = 'met_10', pt_cut = 10000)
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     total_num_events = tree.GetEntries()
