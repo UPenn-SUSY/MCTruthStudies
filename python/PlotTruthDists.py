@@ -22,11 +22,16 @@ class FileHandle(object):
         self.directory_name = directory
 
         self.in_file = ROOT.TFile(in_file)
-        self.directory = self.in_file.GetDirectory(directory)
+        # self.directory = None
+        if directory == '':
+            self.directory = self.in_file
+        else:
+            self.directory = self.in_file.GetDirectory(directory)
 
         keys = [lok.GetName() for lok in self.directory.GetListOfKeys()]
         print keys
         channel_name = [lok.GetName() for lok in self.directory.GetListOfKeys() if lok.GetName().startswith('channels')]
+        print channel_name
         assert len(channel_name) == 1
         channel_name = channel_name[0]
 
@@ -99,7 +104,7 @@ def main():
     files = []
     files.append( FileHandle( '(300,50) x=0.95'
                             , 'out_hists.144885_x95.root'
-                            , 'pt_10000__eta_2.4'
+                            , ''
                             , ROOT.kBlue+2
                             , ROOT.kFullCircle
                             , 1
@@ -107,7 +112,7 @@ def main():
                 )
     files.append( FileHandle( '(300,50) x=0.50'
                             , 'out_hists.144885_x50.root'
-                            , 'pt_10000__eta_2.4'
+                            , ''
                             , ROOT.kBlue+2
                             , ROOT.kOpenCircle
                             , 8
@@ -115,7 +120,7 @@ def main():
                 )
     files.append( FileHandle( '(200,50) x=0.95'
                             , 'out_hists.144880_x95.root'
-                            , 'pt_10000__eta_2.4'
+                            , ''
                             , ROOT.kGreen+2
                             , ROOT.kFullTriangleUp
                             , 1
@@ -123,7 +128,7 @@ def main():
                 )
     files.append( FileHandle( '(200,50) x=0.50'
                             , 'out_hists.144880_x50.root'
-                            , 'pt_10000__eta_2.4'
+                            , ''
                             , ROOT.kGreen+2
                             , ROOT.kOpenTriangleUp
                             , 8
@@ -131,7 +136,7 @@ def main():
                 )
     files.append( FileHandle( '(300,200) x=0.95'
                             , 'out_hists.144888_x95.root'
-                            , 'pt_10000__eta_2.4'
+                            , ''
                             , ROOT.kRed+2
                             , ROOT.kFullSquare
                             , 1
@@ -139,7 +144,7 @@ def main():
                 )
     files.append( FileHandle( '(300,200) x=0.50'
                             , 'out_hists.144888_x50.root'
-                            , 'pt_10000__eta_2.4'
+                            , ''
                             , ROOT.kRed+2
                             , ROOT.kOpenSquare
                             , 8
@@ -147,7 +152,7 @@ def main():
                 )
     files.append( FileHandle( '(207.5,142.5) x=0.95'
                             , 'out_hists.176539_x95.root'
-                            , 'pt_10000__eta_2.4'
+                            , ''
                             , ROOT.kMagenta+2
                             , ROOT.kFullTriangleDown
                             , 1
@@ -155,23 +160,27 @@ def main():
                 )
     files.append( FileHandle( '(207.5,142.5) x=0.50'
                             , 'out_hists.176539_x50.root'
-                            , 'pt_10000__eta_2.4'
+                            , ''
                             , ROOT.kMagenta+2
                             , ROOT.kOpenTriangleDown
                             , 8
                             )
                 )
 
+    out_file = ROOT.TFile.Open('truth_compare.canv.root', 'RECREATE')
+    out_file.cd()
     list_of_hists = files[0].getListOfHists()
     for loh in list_of_hists:
         print 'hist: %s' % loh
         hm = HistMerger( files, loh )
-        hm.canvas.Print('%s.eps' % loh)
+        hm.canvas.Write()
 
         if 'channel' in loh:
             print 'leg: %s' % loh
-            hm.leg_canvas.Print('%s_leg.eps' % loh)
+            hm.leg_canvas.Write('c_leg')
+    out_file.Close()
 
 # ==============================================================================
 if __name__ == '__main__':
+    ROOT.gROOT.SetBatch()
     main()
