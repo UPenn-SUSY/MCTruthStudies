@@ -30,7 +30,7 @@ class FileHandle(object):
 
         keys = [lok.GetName() for lok in self.directory.GetListOfKeys()]
         print keys
-        channel_name = [lok.GetName() for lok in self.directory.GetListOfKeys() if lok.GetName().startswith('channels')]
+        channel_name = [lok.GetName() for lok in self.directory.GetListOfKeys() if lok.GetName().startswith('h__flavor_channel')]
         print channel_name
         assert len(channel_name) == 1
         channel_name = channel_name[0]
@@ -92,11 +92,13 @@ class HistMerger(object):
             self.legend.AddEntry(h, self.file_names[i], 'L')
             self.big_legend.AddEntry(h, self.file_names[i], 'L')
 
-        self.canvas = ROOT.TCanvas('c_%s' % hist_name)
+        canvas_name = hist_name.replace('h__', 'c__')
+        # self.canvas = ROOT.TCanvas('c_%s' % hist_name)
+        self.canvas = ROOT.TCanvas(canvas_name)
         self.stack.Draw('nostack')
         self.legend.Draw()
 
-        self.leg_canvas = ROOT.TCanvas('c_%s_leg' % hist_name)
+        self.leg_canvas = ROOT.TCanvas('%s__leg' % canvas_name)
         self.big_legend.Draw()
 
 # ------------------------------------------------------------------------------
@@ -177,10 +179,11 @@ def main():
 
         if 'channel' in loh:
             print 'leg: %s' % loh
-            hm.leg_canvas.Write('c_leg')
+            hm.leg_canvas.Write('c__leg')
     out_file.Close()
 
 # ==============================================================================
 if __name__ == '__main__':
     ROOT.gROOT.SetBatch()
     main()
+
