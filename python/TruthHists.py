@@ -284,47 +284,16 @@ class hMet(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def fill(self, flavor_channel, signal_objects, event):
         # interacting type met
-        met_etx_int = event.MET_Truth_Int_etx
-        met_ety_int = event.MET_Truth_Int_ety
-        met_int = math.sqrt( met_etx_int*met_etx_int
-                           + met_ety_int*met_ety_int
-                           )/1000.
-        metrel_int = getMetRel( met_etx_int
-                              , met_ety_int
-                              , signal_objects
-                              , event
-                              )/1000.
+        met_int = signal_objects['met']['int']
+        metrel_int = signal_objects['met']['rel_int']
+
         self.hist_met_int[flavor_channel].Fill(met_int)
         self.hist_metrel_int[flavor_channel].Fill(metrel_int)
 
-        # interacting type met + muons pT
-        met_etx_int_w_mu = met_etx_int
-        met_ety_int_w_mu = met_ety_int
-        for mu_index in signal_objects['mu']['index']:
-            met_etx_int_w_mu -= event.mu_staco_px.at(mu_index)
-            met_ety_int_w_mu -= event.mu_staco_py.at(mu_index)
-        met_int_w_mu = math.sqrt( met_etx_int_w_mu*met_etx_int_w_mu
-                                + met_ety_int_w_mu*met_ety_int_w_mu
-                                )/1000.
-        metrel_int_w_mu = getMetRel( met_etx_int_w_mu
-                                   , met_ety_int_w_mu
-                                   , signal_objects
-                                   , event
-                                   )/1000.
-        self.hist_met_int_w_mu[flavor_channel].Fill(met_int_w_mu)
-        self.hist_metrel_int_w_mu[flavor_channel].Fill(metrel_int_w_mu)
 
         # non interacting type met
-        met_etx_noint = event.MET_Truth_NonInt_etx
-        met_ety_noint = event.MET_Truth_NonInt_ety
-        met_noint = math.sqrt( met_etx_noint*met_etx_noint
-                             + met_ety_noint*met_ety_noint
-                             )/1000.
-        metrel_noint = getMetRel( met_etx_noint
-                                , met_ety_noint
-                                , signal_objects
-                                , event
-                                )/1000.
+        met_noint = signal_objects['met']['noint']
+        metrel_noint = signal_objects['met']['rel_noint']
         self.hist_met_noint[flavor_channel].Fill(met_noint)
         self.hist_metrel_noint[flavor_channel].Fill(metrel_noint)
 
@@ -332,16 +301,10 @@ class hMet(object):
         self.hist_met_diff[flavor_channel].Fill( met_noint
                                                - met_int
                                                )
-        self.hist_met_diff_w_mu[flavor_channel].Fill( met_noint
-                                                    - met_int_w_mu
-                                                    )
 
         self.hist_metrel_diff[flavor_channel].Fill( metrel_noint
                                                   - metrel_int
                                                   )
-        self.hist_metrel_diff_w_mu[flavor_channel].Fill( metrel_noint
-                                                       - metrel_int_w_mu
-                                                       )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -363,32 +326,30 @@ class hMet(object):
             self.hist_metrel_diff_w_mu[fc].Write()
 
 # ------------------------------------------------------------------------------
-def getMetRel(met_etx, met_ety, signal_objects, event):
-    met_phi = math.atan2(met_ety, met_etx)
+class hMll(object):
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def __init__( self
+                , title = 'mll'
+                ):
+        num_bins = 40
+        x_min = 0
+        x_max = 400
 
-    min_dphi = 9999999999
+        self.hist = {}
+        for fc in cutflow.flavor_channels:
+            self.hist[fc] = ROOT.TH1F( 'h__%s__mll' % fc
+                                     , '%s - %s -- mll; m_{ll} [GeV]' % (title, fc)
+                                     , num_bins, x_min, x_max
+                                     )
 
-    for el_index in signal_objects['el']['index']:
-        el_phi = event.el_phi.at(el_index)
-        dphi = abs(met_phi - el_phi)
-        while dphi > 3.14159: dphi -= 3.14159
-        if dphi < min_dphi: min_dphi = dphi
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def fill(self, flavor_channel, signal_objects, event):
+        mll = signal_objects['mll']/1000
+        self.hist[flavor_channel].Fill(mll)
 
-    for mu_index in signal_objects['mu']['index']:
-        mu_phi = event.mu_staco_phi.at(mu_index)
-        dphi = abs(met_phi - mu_phi)
-        while dphi > 3.14159: dphi -= 3.14159
-        if dphi < min_dphi: min_dphi = dphi
-
-    for jet_index in signal_objects['jet']['index']:
-        mu_phi = event.jet_AntiKt4TruthJets_phi.at(jet_index)
-        dphi = abs(met_phi - mu_phi)
-        while dphi > 3.14159: dphi -= 3.14159
-        if dphi < min_dphi: min_dphi = dphi
-
-    met_rel = math.sqrt(met_etx*met_etx + met_ety*met_ety)
-    if min_dphi < 3.14159:
-        met_rel *= math.cos(min_dphi)
-
-    return met_rel
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def writeToFile(self, out_file):
+        out_file.cd()
+        for fc in cutflow.flavor_channels:
+            self.hist[fc].Write()
 

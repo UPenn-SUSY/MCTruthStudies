@@ -96,7 +96,12 @@ def getBaselineObjects( event
                   , 'pt':[]
                   , 'eta':[]
                   , 'phi':[]
+                  # , 'theta':[]
                   , 'charge':[]
+                  , 'px':[]
+                  , 'py':[]
+                  , 'pz':[]
+                  , 'E':[]
                   }
 
     baseline_mu = { 'num':0
@@ -104,7 +109,12 @@ def getBaselineObjects( event
                   , 'pt':[]
                   , 'eta':[]
                   , 'phi':[]
+                  # , 'theta':[]
                   , 'charge':[]
+                  , 'px':[]
+                  , 'py':[]
+                  , 'pz':[]
+                  , 'E':[]
                   }
 
     baseline_jet = { 'num':0
@@ -112,6 +122,11 @@ def getBaselineObjects( event
                    , 'pt':[]
                    , 'eta':[]
                    , 'phi':[]
+                   , 'theta':[]
+                   , 'px':[]
+                   , 'py':[]
+                   , 'pz':[]
+                   , 'E':[]
                    }
 
     # Get baseline electrons
@@ -128,7 +143,12 @@ def getBaselineObjects( event
         baseline_el['pt'].append(     el_pt)
         baseline_el['eta'].append(    event.el_eta.at(el_index))
         baseline_el['phi'].append(    event.el_phi.at(el_index))
+        # baseline_el['theta'].append(    event.el_theta.at(el_index))
         baseline_el['charge'].append( event.el_charge.at(el_index))
+        baseline_el['px'].append(    event.el_px.at(el_index))
+        baseline_el['py'].append(    event.el_py.at(el_index))
+        baseline_el['pz'].append(    event.el_pz.at(el_index))
+        baseline_el['E'].append(     event.el_E.at(el_index))
 
     # Get baseline muons
     mu_index_order = getPtSortedIndices(event.mu_staco_n, event.mu_staco_pt)
@@ -144,7 +164,12 @@ def getBaselineObjects( event
         baseline_mu['pt'].append(     mu_pt)
         baseline_mu['eta'].append(    event.mu_staco_eta.at(mu_index))
         baseline_mu['phi'].append(    event.mu_staco_phi.at(mu_index))
+        # baseline_mu['theta'].append(    event.mu_staco_theta.at(mu_index))
         baseline_mu['charge'].append( event.mu_staco_charge.at(mu_index))
+        baseline_mu['px'].append(     event.mu_staco_px.at(mu_index))
+        baseline_mu['py'].append(     event.mu_staco_py.at(mu_index))
+        baseline_mu['pz'].append(     event.mu_staco_pz.at(mu_index))
+        baseline_mu['E'].append(      event.mu_staco_E.at(mu_index))
 
     # get baseline jets
     jet_index_order = getPtSortedIndices(event.jet_AntiKt4TruthJets_n, event.jet_AntiKt4TruthJets_pt)
@@ -155,11 +180,21 @@ def getBaselineObjects( event
             if verbose:
                 print '  jet %d failed pt cut (%f < %f)' % (jet_index, jet_pt, jet_pt_cut)
             continue
+
+        jet_phi = event.jet_AntiKt4TruthJets_phi.at(jet_index)
+        jet_eta = event.jet_AntiKt4TruthJets_eta.at(jet_index)
+        jet_theta = math.copysign(2*math.atan(math.exp(-abs(jet_eta))), jet_eta)
+
         baseline_jet['num'] += 1
         baseline_jet['index'].append(jet_index)
         baseline_jet['pt'].append(   jet_pt)
-        baseline_jet['eta'].append(  event.jet_AntiKt4TruthJets_eta.at(jet_index))
-        baseline_jet['phi'].append(  event.jet_AntiKt4TruthJets_phi.at(jet_index))
+        baseline_jet['eta'].append(  jet_eta)
+        baseline_jet['phi'].append(  jet_phi)
+        baseline_jet['theta'].append(jet_theta)
+        baseline_jet['px'].append(   jet_pt*math.cos(jet_phi))
+        baseline_jet['py'].append(   jet_pt*math.sin(jet_phi))
+        baseline_jet['pz'].append(   jet_pt*math.sin(jet_theta))
+        baseline_jet['E'].append(    event.jet_AntiKt4TruthJets_E.at(jet_index))
 
     return {'el':baseline_el, 'mu':baseline_mu, 'jet':baseline_jet}
 
@@ -415,6 +450,7 @@ def getSignalObjects( event
     signal_mu  = baseline_objects['mu']
     signal_jet = baseline_objects['jet']
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Get signal electrons
     to_remove_el = []
     for el_it in xrange(signal_el['num']):
@@ -432,6 +468,7 @@ def getSignalObjects( event
         to_remove_el.append(el_it)
     removeElements(signal_el, to_remove_el)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Get signal muons
     to_remove_mu = []
     for mu_it in xrange(signal_mu['num']):
@@ -449,7 +486,8 @@ def getSignalObjects( event
         to_remove_mu.append(mu_it)
     removeElements(signal_mu, to_remove_mu)
 
-    # Get signal muons
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Get signal jets
     to_remove_jet = []
     for jet_it in xrange(signal_jet['num']):
         jet_pt  = signal_jet['pt'][jet_it]
@@ -466,7 +504,80 @@ def getSignalObjects( event
         to_remove_jet.append(jet_it)
     removeElements(signal_jet, to_remove_jet)
 
-    return {'el':signal_el, 'mu':signal_mu, 'jet':signal_jet}
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # get mll
+    mll = getMll(signal_el, signal_mu)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # get met and met-related variables
+    signal_met = {}
+
+    met_etx_int = event.MET_Truth_Int_etx
+    met_ety_int = event.MET_Truth_Int_ety
+    met_int = math.sqrt( met_etx_int*met_etx_int
+                        + met_ety_int*met_ety_int
+                        )/1000.
+    metrel_int = getMetRel( met_etx_int
+                          , met_ety_int
+                          , signal_el
+                          , signal_mu
+                          , signal_jet
+                          , event
+                          )/1000.
+
+    met_etx_noint = event.MET_Truth_NonInt_etx
+    met_ety_noint = event.MET_Truth_NonInt_ety
+    met_noint = math.sqrt( met_etx_noint*met_etx_noint
+                        + met_ety_noint*met_ety_noint
+                        )/1000.
+    metrel_noint = getMetRel( met_etx_noint
+                            , met_ety_noint
+                            , signal_el
+                            , signal_mu
+                            , signal_jet
+                            , event
+                            )/1000.
+
+    signal_met = { 'int':met_int    , 'rel_int':metrel_int
+                 , 'noint':met_noint, 'rel_noint':metrel_noint
+                 }
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    return { 'el':signal_el
+           , 'mu':signal_mu
+           , 'jet':signal_jet
+           , 'mll':mll, 'met':signal_met
+           }
+
+# ------------------------------------------------------------------------------
+def getMetRel( met_etx, met_ety , signal_el, signal_mu, signal_jet, event):
+    met_phi = math.atan2(met_ety, met_etx)
+
+    min_dphi = 9999999999
+
+    for el_index in signal_el['index']:
+        el_phi = event.el_phi.at(el_index)
+        dphi = abs(met_phi - el_phi)
+        while dphi > 3.14159: dphi -= 3.14159
+        if dphi < min_dphi: min_dphi = dphi
+
+    for mu_index in signal_mu['index']:
+        mu_phi = event.mu_staco_phi.at(mu_index)
+        dphi = abs(met_phi - mu_phi)
+        while dphi > 3.14159: dphi -= 3.14159
+        if dphi < min_dphi: min_dphi = dphi
+
+    for jet_index in signal_jet['index']:
+        mu_phi = event.jet_AntiKt4TruthJets_phi.at(jet_index)
+        dphi = abs(met_phi - mu_phi)
+        while dphi > 3.14159: dphi -= 3.14159
+        if dphi < min_dphi: min_dphi = dphi
+
+    met_rel = math.sqrt(met_etx*met_etx + met_ety*met_ety)
+    if min_dphi < 3.14159:
+        met_rel *= math.cos(min_dphi)
+
+    return met_rel
 
 # ------------------------------------------------------------------------------
 def getFlavorChannel(signal_objects, verbose = False):
@@ -518,3 +629,23 @@ def getFlavorChannel(signal_objects, verbose = False):
 
     return 'none'
 
+# ------------------------------------------------------------------------------
+def getMll(el_list, mu_list):
+    px = 0.
+    py = 0.
+    pz = 0.
+    e = 0.
+
+    for el_it in xrange(len(el_list['index'])):
+        px += el_list['px'][el_it]
+        py += el_list['py'][el_it]
+        pz += el_list['pz'][el_it]
+        e  += el_list['E' ][el_it]
+    for mu_it in xrange(len(mu_list['index'])):
+        px += mu_list['px'][mu_it]
+        py += mu_list['py'][mu_it]
+        pz += mu_list['pz'][mu_it]
+        e  += mu_list['E' ][mu_it]
+
+    m2 = (e*e - px*px - py*py - pz*pz)
+    return math.copysign(math.sqrt(abs(m2)), m2)

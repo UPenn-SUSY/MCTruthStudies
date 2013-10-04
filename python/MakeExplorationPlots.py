@@ -48,11 +48,12 @@ def plotTruth(tree):
     hists = {}
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     hists['channels'] = TruthHists.hFlavorChannels()
-    hists['pt']       = TruthHists.hPt()
-    hists['eta']      = TruthHists.hEta()
-    hists['num_jet']  = TruthHists.hNumJet()
-    hists['jet_pt']   = TruthHists.hJetPt()
+    # hists['pt']       = TruthHists.hPt()
+    # hists['eta']      = TruthHists.hEta()
+    # hists['num_jet']  = TruthHists.hNumJet()
+    # hists['jet_pt']   = TruthHists.hJetPt()
     hists['met']      = TruthHists.hMet()
+    hists['mll']      = TruthHists.hMll()
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # hists['channels'] = TruthHists.hFlavorChannels(name = 'channels')
     # hists['pt']       = TruthHists.hPt(name             = 'pt'      )
