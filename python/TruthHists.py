@@ -353,3 +353,59 @@ class hMll(object):
         for fc in cutflow.flavor_channels:
             self.hist[fc].Write()
 
+# ------------------------------------------------------------------------------
+class hMt2(object):
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def __init__( self
+                , title = 'mt2'
+                ):
+        num_bins = 40
+        x_min = 0
+        x_max = 400
+
+        self.hist = {}
+        for fc in cutflow.flavor_channels:
+            self.hist[fc] = ROOT.TH1F( 'h__%s__mt2' % fc
+                                     , '%s - %s -- mt2; m_{T2} [GeV]' % (title, fc)
+                                     , num_bins, x_min, x_max
+                                     )
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def fill(self, flavor_channel, signal_objects, event):
+        mt2 = signal_objects['mt2']/1000
+        self.hist[flavor_channel].Fill(mt2)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def writeToFile(self, out_file):
+        out_file.cd()
+        for fc in cutflow.flavor_channels:
+            self.hist[fc].Write()
+
+# ------------------------------------------------------------------------------
+class hPtll(object):
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def __init__( self
+                , title = 'ptll'
+                ):
+        num_bins = 40
+        x_min = 0
+        x_max = 400
+
+        self.hist = {}
+        for fc in cutflow.flavor_channels:
+            self.hist[fc] = ROOT.TH1F( 'h__%s__ptll' % fc
+                                     , '%s - %s -- ptll; p_{T}^{ll} [GeV]' % (title, fc)
+                                     , num_bins, x_min, x_max
+                                     )
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def fill(self, flavor_channel, signal_objects, event):
+        ptll = signal_objects['ptll']/1000
+        self.hist[flavor_channel].Fill(ptll)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def writeToFile(self, out_file):
+        out_file.cd()
+        for fc in cutflow.flavor_channels:
+            self.hist[fc].Write()
+

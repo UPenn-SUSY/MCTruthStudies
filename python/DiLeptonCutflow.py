@@ -10,6 +10,8 @@ import ROOT
 import rootlogon
 import metaroot
 
+import mt2 as mt2_calc
+
 # ==============================================================================
 # helper definitions
 flavor_channels = [ 'ee_os'
@@ -508,6 +510,10 @@ def getSignalObjects( event
     # get mll
     mll = getMll(signal_el, signal_mu)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # get ptll
+    ptll = getPtll(signal_el, signal_mu)
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # get met and met-related variables
     signal_met = {}
@@ -542,11 +548,17 @@ def getSignalObjects( event
                  , 'noint':met_noint, 'rel_noint':metrel_noint
                  }
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    mt2 = mt2_calc.getMT2(signal_el, signal_mu, met_etx_noint, met_ety_noint)
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     return { 'el':signal_el
            , 'mu':signal_mu
            , 'jet':signal_jet
-           , 'mll':mll, 'met':signal_met
+           , 'met':signal_met
+           , 'mll':mll
+           , 'ptll':ptll
+           , 'mt2':mt2
            }
 
 # ------------------------------------------------------------------------------
@@ -649,3 +661,19 @@ def getMll(el_list, mu_list):
 
     m2 = (e*e - px*px - py*py - pz*pz)
     return math.copysign(math.sqrt(abs(m2)), m2)
+
+# ------------------------------------------------------------------------------
+def getPtll(el_list, mu_list):
+    px = 0.
+    py = 0.
+
+    for el_it in xrange(len(el_list['index'])):
+        px += el_list['px'][el_it]
+        py += el_list['py'][el_it]
+    for mu_it in xrange(len(mu_list['index'])):
+        px += mu_list['px'][mu_it]
+        py += mu_list['py'][mu_it]
+
+    ptll2 = (px*px + py*py)
+    return math.copysign(math.sqrt(abs(ptll2)), ptll2)
+
