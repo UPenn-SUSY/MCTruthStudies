@@ -1,1 +1,5 @@
 *.pyc
+*_Dict.cxx
+*_Dict.h
+lib/
+*/obj/
