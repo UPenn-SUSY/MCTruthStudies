@@ -88,6 +88,24 @@ def doObjectSelection( event
     return signal
 
 # ------------------------------------------------------------------------------
+def isSRSS(signal_objects):
+    num_el = signal_objects['el']['num']
+    num_mu = signal_objects['mu']['num']
+    num_lep = num_el+num_mu
+
+    # if num_lep is not 2:
+    #     print 'failed num leptons: %s' % num_lep
+    #     return False
+    if "ss" not in getFlavorChannel(signal_objects):
+        return False
+    if signal_objects['met']['rel_noint'] < 50.:
+        return False
+    if signal_objects['emma_mt']/1000. > 40:
+        return False
+
+    return True
+
+# ------------------------------------------------------------------------------
 def getBaselineObjects( event
                       , lep_pt_cut
                       , jet_pt_cut
@@ -514,6 +532,10 @@ def getSignalObjects( event
     # get ptll
     ptll = getPtll(signal_el, signal_mu)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # get emma_mt
+    emma_mt = getEmmaMt(signal_el, signal_mu)
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # get met and met-related variables
     signal_met = {}
@@ -558,6 +580,7 @@ def getSignalObjects( event
            , 'met':signal_met
            , 'mll':mll
            , 'ptll':ptll
+           , 'emma_mt':emma_mt
            , 'mt2':mt2
            }
 
@@ -677,3 +700,8 @@ def getPtll(el_list, mu_list):
     ptll2 = (px*px + py*py)
     return math.copysign(math.sqrt(abs(ptll2)), ptll2)
 
+# ------------------------------------------------------------------------------
+def getEmmaMt(el_list, mu_list):
+    mll = getMll(el_list, mu_list)
+    ptll = getPtll(el_list, mu_list)
+    return math.sqrt(mll*mll + ptll*ptll)

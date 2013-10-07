@@ -409,3 +409,65 @@ class hPtll(object):
         for fc in cutflow.flavor_channels:
             self.hist[fc].Write()
 
+# ------------------------------------------------------------------------------
+class hEmmaMt(object):
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def __init__( self
+                , title = 'ptll'
+                ):
+        num_bins = 40
+        x_min = 0
+        x_max = 400
+
+        self.hist = {}
+        for fc in cutflow.flavor_channels:
+            self.hist[fc] = ROOT.TH1F( 'h__%s__emma_mt' % fc
+                                     , '%s - %s -- emma_mt; #sqrt{ (m_{ll})^{2} + (p_{T}^{ll})^{2} } [GeV]' % (title, fc)
+                                     , num_bins, x_min, x_max
+                                     )
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def fill(self, flavor_channel, signal_objects, event):
+        emma_mt = signal_objects['emma_mt']/1000
+        self.hist[flavor_channel].Fill(emma_mt)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def writeToFile(self, out_file):
+        out_file.cd()
+        for fc in cutflow.flavor_channels:
+            self.hist[fc].Write()
+
+# ------------------------------------------------------------------------------
+class hSRSS(object):
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def __init__( self
+                , title = 'srss'
+                ):
+        num_bins = 5
+        x_min = -0.5
+        x_max = 4.5
+
+        self.hist = {}
+        for fc in cutflow.flavor_channels:
+            self.hist[fc] = ROOT.TH1F( 'h__%s__srss' % fc
+                                     , '%s - %s -- srss; SR channel' % (title, fc)
+                                     , num_bins, x_min, x_max
+                                     )
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def fill(self, flavor_channel, signal_objects, event):
+        is_sr_ss = cutflow.isSRSS(signal_objects)
+        fill_bin = 0
+        if is_sr_ss:
+            if   flavor_channel == 'ee_ss': fill_bin = 1
+            elif flavor_channel == 'mm_ss': fill_bin = 2
+            elif flavor_channel == 'em_ss': fill_bin = 3
+            elif flavor_channel == 'me_ss': fill_bin = 4
+        self.hist[flavor_channel].Fill(fill_bin)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def writeToFile(self, out_file):
+        out_file.cd()
+        for fc in cutflow.flavor_channels:
+            self.hist[fc].Write()
+
