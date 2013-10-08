@@ -89,9 +89,11 @@ def getMT2(signal_el, signal_mu, met_x, met_y):
 
     # get mT2
     mt2_lib.getMt2.restype = c_double
+    # print 'getting mt2 value'
     mt2_value = mt2_lib.getMt2( c_double(signal_leptons[0]['m'])  , c_double(signal_leptons[0]['px']) , c_double(signal_leptons[0]['py'])
                               , c_double(signal_leptons[1]['m'])  , c_double(signal_leptons[1]['px']) , c_double(signal_leptons[1]['py'])
-                              , c_double(met_x), c_double(met_y)
+                              , c_double(met_x), c_double(met_y), False
                               )
+    # print 'got mt2 value: %s' % mt2_value
 
     return mt2_value

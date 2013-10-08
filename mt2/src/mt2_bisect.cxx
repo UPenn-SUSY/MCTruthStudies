@@ -666,16 +666,22 @@ namespace mt2_bisect
 extern "C" {
   double getMt2( double ma, double pax, double pay
       , double mb, double pbx, double pby
-      , double pmissx , double pmissy
+      , double pmissx , double pmissy, bool verbose = false
       )
   {
-    mt2_bisect::mt2 this_mt2;
+    if (verbose) std::cout << "setting pa0\n";
     double pa0[3]    = {ma, pax, pay};
+    if (verbose) std::cout << "setting pb0\n";
     double pb0[3]    = {mb, pbx, pby};
+    if (verbose) std::cout << "setting pmiss0\n";
     double pmiss0[3] = {0 , pmissx, pmissy};
+    if (verbose) std::cout << "getting this_mt2\n";
+    mt2_bisect::mt2 this_mt2;
+    if (verbose) std::cout << "setting momenta in this_mt2\n";
     this_mt2.set_momenta(pa0, pb0, pmiss0);
+    if (verbose) std::cout << "getting mt2 value (C++)\n";
     double value = this_mt2.get_mt2();
-    // std::cout << "mt2_value: " << value << "\n";
+    if (verbose) std::cout << "mt2_value: " << value << "\n";
     return value;
   }
 }
