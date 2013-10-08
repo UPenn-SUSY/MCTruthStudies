@@ -11,9 +11,13 @@ from ctypes import cdll
 from ctypes import c_double
 from ctypes import c_void_p
 
-# mt2_lib = cdll.LoadLibrary('../mt2/obj/mt2_bisect.o')
-# mt2_lib = cdll.LoadLibrary('MCTruthStudies/lib/libmt2.so')
-mt2_lib = cdll.LoadLibrary('lib/libmt2.so')
+this_script_loc = os.path.realpath(__file__)
+lib_loc = '%s/../lib/libmt2.so' % os.path.dirname(this_script_loc)
+# lib_loc = '/Users/bjackson/work/MCGenTesting/MCTruthStudies/lib/libmt2.so'
+print 'this_script_loc: %s' % this_script_loc
+print 'lib_loc: %s' % lib_loc
+# mt2_lib = cdll.LoadLibrary('lib/libmt2.so')
+mt2_lib = cdll.LoadLibrary(lib_loc)
 
 class mt2_bisect(object):
     def __init__(self):
