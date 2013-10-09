@@ -158,6 +158,21 @@ def isSRSS4(signal_objects):
     return True
 
 # ------------------------------------------------------------------------------
+def isSRSS5(signal_objects):
+    num_el = signal_objects['el']['num']
+    num_mu = signal_objects['mu']['num']
+    num_lep = num_el+num_mu
+
+    if "ss" not in getFlavorChannel(signal_objects):
+        return False
+    # if signal_objects['jet']['num'] != 0:
+    #     return False
+    if signal_objects['met']['rel_noint'] < 200.:
+        return False
+
+    return True
+
+# ------------------------------------------------------------------------------
 def getBaselineObjects( event
                       , lep_pt_cut
                       , jet_pt_cut

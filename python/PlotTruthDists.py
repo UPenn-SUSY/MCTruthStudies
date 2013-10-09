@@ -173,6 +173,22 @@ def main():
                             , 8
                             )
                 )
+    files.append( FileHandle( '(207.5,142.5) x=0.95'
+                            , 'out_hists.179579_x95.root'
+                            , ''
+                            , ROOT.kCyan
+                            , ROOT.kFullTriangleDown
+                            , 1
+                            )
+                )
+    files.append( FileHandle( '(207.5,142.5) x=0.50'
+                            , 'out_hists.179579_x50.root'
+                            , ''
+                            , ROOT.kCyan
+                            , ROOT.kOpenTriangleDown
+                            , 8
+                            )
+                )
 
     out_file = ROOT.TFile.Open('truth_compare.canv.root', 'RECREATE')
     out_file.cd()

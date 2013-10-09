@@ -443,9 +443,9 @@ class hSRSS(object):
     def __init__( self
                 , title = 'srss'
                 ):
-        num_bins = 5
+        num_bins = 7
         x_min = -0.5
-        x_max = 4.5
+        x_max = 6.5
 
         self.hist = {}
         for fc in cutflow.flavor_channels:
@@ -462,6 +462,7 @@ class hSRSS(object):
         if cutflow.isSRSS2(signal_objects): fill_bin.append(2)
         if cutflow.isSRSS3(signal_objects): fill_bin.append(3)
         if cutflow.isSRSS4(signal_objects): fill_bin.append(4)
+        if cutflow.isSRSS5(signal_objects): fill_bin.append(5)
 
         if len(fill_bin) == 0:
             self.hist[flavor_channel].Fill(0)
