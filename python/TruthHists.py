@@ -223,17 +223,17 @@ class hMet(object):
         self.hist_met_int         = {}
         self.hist_metrel_int      = {}
 
-        self.hist_met_int_w_mu    = {}
-        self.hist_metrel_int_w_mu = {}
+        # self.hist_met_int_w_mu    = {}
+        # self.hist_metrel_int_w_mu = {}
 
         self.hist_met_noint       = {}
         self.hist_metrel_noint    = {}
 
         self.hist_met_diff        = {}
-        self.hist_met_diff_w_mu   = {}
+        # self.hist_met_diff_w_mu   = {}
 
         self.hist_metrel_diff        = {}
-        self.hist_metrel_diff_w_mu   = {}
+        # self.hist_metrel_diff_w_mu   = {}
 
         for fc in cutflow.flavor_channels:
             self.hist_met_int[fc] = ROOT.TH1F( 'h__%s__met_int' % fc
@@ -245,14 +245,14 @@ class hMet(object):
                                              , num_bins, x_min, x_max
                                              )
 
-            self.hist_met_int_w_mu[fc] = ROOT.TH1F( 'h__%s__met_int_w_mu' % fc
-                                                  , '%s int - %s; E_{T}^{miss,int+#mu} [GeV]' % (title, fc)
-                                                  , num_bins, x_min, x_max
-                                                  )
-            self.hist_metrel_int_w_mu[fc] = ROOT.TH1F( 'h__%s__metrel_int_w_mu' % fc
-                                                  , '%s int - %s; E_{T}^{miss,rel,int+#mu} [GeV]' % (title, fc)
-                                                  , num_bins, x_min, x_max
-                                                  )
+            # self.hist_met_int_w_mu[fc] = ROOT.TH1F( 'h__%s__met_int_w_mu' % fc
+            #                                       , '%s int - %s; E_{T}^{miss,int+#mu} [GeV]' % (title, fc)
+            #                                       , num_bins, x_min, x_max
+            #                                       )
+            # self.hist_metrel_int_w_mu[fc] = ROOT.TH1F( 'h__%s__metrel_int_w_mu' % fc
+            #                                       , '%s int - %s; E_{T}^{miss,rel,int+#mu} [GeV]' % (title, fc)
+            #                                       , num_bins, x_min, x_max
+            #                                       )
 
             self.hist_met_noint[fc] = ROOT.TH1F( 'h__%s__met_noint' % fc
                                                , '%s no int - %s; E_{T}^{miss,no int} [GeV]' % (title, fc)
@@ -267,19 +267,19 @@ class hMet(object):
                                               , '%s diff - %s; E_{T}^{miss,no int} - E_{T}^{miss,int} [GeV]' % (title, fc)
                                               , num_bins, -x_max, x_max
                                               )
-            self.hist_met_diff_w_mu[fc] = ROOT.TH1F( 'h__%s__met_int_noint_diff_w_mu' % fc
-                                                   , '%s diff - %s; E_{T}^{miss,no int} - E_{T}^{miss,int+#mu} [GeV]' % (title, fc)
-                                                   , num_bins, -x_max, x_max
-                                                   )
+            # self.hist_met_diff_w_mu[fc] = ROOT.TH1F( 'h__%s__met_int_noint_diff_w_mu' % fc
+            #                                        , '%s diff - %s; E_{T}^{miss,no int} - E_{T}^{miss,int+#mu} [GeV]' % (title, fc)
+            #                                        , num_bins, -x_max, x_max
+            #                                        )
 
             self.hist_metrel_diff[fc] = ROOT.TH1F( 'h__%s__metrel_int_noint_diff' % fc
                                                  , '%s diff - %s; E_{T}^{miss,rel,no int} - E_{T}^{miss,rel,int} [GeV]' % (title, fc)
                                                  , num_bins, -x_max, x_max
                                                  )
-            self.hist_metrel_diff_w_mu[fc] = ROOT.TH1F( 'h__%s__metrel_int_noint_diff_w_mu' % fc
-                                                      , '%s diff - %s; E_{T}^{miss,rel,no int} - E_{T}^{miss,rel,int+#mu} [GeV]' % (title, fc)
-                                                      , num_bins, -x_max, x_max
-                                                      )
+            # self.hist_metrel_diff_w_mu[fc] = ROOT.TH1F( 'h__%s__metrel_int_noint_diff_w_mu' % fc
+            #                                           , '%s diff - %s; E_{T}^{miss,rel,no int} - E_{T}^{miss,rel,int+#mu} [GeV]' % (title, fc)
+            #                                           , num_bins, -x_max, x_max
+            #                                           )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def fill(self, flavor_channel, signal_objects, event):
@@ -313,17 +313,17 @@ class hMet(object):
             self.hist_met_int[fc].Write()
             self.hist_metrel_int[fc].Write()
 
-            self.hist_met_int_w_mu[fc].Write()
-            self.hist_metrel_int_w_mu[fc].Write()
+            # self.hist_met_int_w_mu[fc].Write()
+            # self.hist_metrel_int_w_mu[fc].Write()
 
             self.hist_met_noint[fc].Write()
             self.hist_metrel_noint[fc].Write()
 
             self.hist_met_diff[fc].Write()
-            self.hist_met_diff_w_mu[fc].Write()
+            # self.hist_met_diff_w_mu[fc].Write()
 
             self.hist_metrel_diff[fc].Write()
-            self.hist_metrel_diff_w_mu[fc].Write()
+            # self.hist_metrel_diff_w_mu[fc].Write()
 
 # ------------------------------------------------------------------------------
 class hMll(object):
@@ -456,14 +456,18 @@ class hSRSS(object):
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def fill(self, flavor_channel, signal_objects, event):
-        is_sr_ss = cutflow.isSRSS(signal_objects)
-        fill_bin = 0
-        if is_sr_ss:
-            if   flavor_channel == 'ee_ss': fill_bin = 1
-            elif flavor_channel == 'mm_ss': fill_bin = 2
-            elif flavor_channel == 'em_ss': fill_bin = 3
-            elif flavor_channel == 'me_ss': fill_bin = 4
-        self.hist[flavor_channel].Fill(fill_bin)
+        fill_bin = []
+
+        if cutflow.isSRSS1(signal_objects): fill_bin.append(1)
+        if cutflow.isSRSS2(signal_objects): fill_bin.append(2)
+        if cutflow.isSRSS3(signal_objects): fill_bin.append(3)
+        if cutflow.isSRSS4(signal_objects): fill_bin.append(4)
+
+        if len(fill_bin) == 0:
+            self.hist[flavor_channel].Fill(0)
+        else:
+            for fb in fill_bin:
+                self.hist[flavor_channel].Fill(fb)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):

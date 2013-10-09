@@ -88,19 +88,71 @@ def doObjectSelection( event
     return signal
 
 # ------------------------------------------------------------------------------
-def isSRSS(signal_objects):
+def isSRSS1(signal_objects):
     num_el = signal_objects['el']['num']
     num_mu = signal_objects['mu']['num']
     num_lep = num_el+num_mu
 
-    # if num_lep is not 2:
-    #     print 'failed num leptons: %s' % num_lep
-    #     return False
     if "ss" not in getFlavorChannel(signal_objects):
+        return False
+    if signal_objects['jet']['num'] == 0:
         return False
     if signal_objects['met']['rel_noint'] < 50.:
         return False
     if signal_objects['emma_mt']/1000. > 40:
+        return False
+
+    return True
+
+# ------------------------------------------------------------------------------
+def isSRSS2(signal_objects):
+    num_el = signal_objects['el']['num']
+    num_mu = signal_objects['mu']['num']
+    num_lep = num_el+num_mu
+
+    if "ss" not in getFlavorChannel(signal_objects):
+        return False
+    if signal_objects['jet']['num'] == 0:
+        return False
+    if signal_objects['met']['rel_noint'] < 50.:
+        return False
+    if signal_objects['mll']/1000. > 100:
+        return False
+    if signal_objects['ptll']/1000. > 100:
+        return False
+
+    return True
+
+# ------------------------------------------------------------------------------
+def isSRSS3(signal_objects):
+    num_el = signal_objects['el']['num']
+    num_mu = signal_objects['mu']['num']
+    num_lep = num_el+num_mu
+
+    if "ss" not in getFlavorChannel(signal_objects):
+        return False
+    if signal_objects['jet']['num'] == 0:
+        return False
+    if signal_objects['met']['rel_noint'] < 50.:
+        return False
+    if signal_objects['mll']/1000. > 75:
+        return False
+    if signal_objects['ptll']/1000. > 75:
+        return False
+
+    return True
+
+# ------------------------------------------------------------------------------
+def isSRSS4(signal_objects):
+    num_el = signal_objects['el']['num']
+    num_mu = signal_objects['mu']['num']
+    num_lep = num_el+num_mu
+
+    if "ss" not in getFlavorChannel(signal_objects):
+        return False
+    # if signal_objects['jet']['num'] != 0:
+    #     return False
+    if signal_objects['met']['noint'] < 200.:
         return False
 
     return True
@@ -542,9 +594,12 @@ def getSignalObjects( event
 
     met_etx_int = event.MET_Truth_Int_etx
     met_ety_int = event.MET_Truth_Int_ety
+    for mu_px, mu_py in zip(signal_mu['px'], signal_mu['py']):
+        met_etx_int -= mu_px
+        met_ety_int -= mu_py
     met_int = math.sqrt( met_etx_int*met_etx_int
-                        + met_ety_int*met_ety_int
-                        )/1000.
+                       + met_ety_int*met_ety_int
+                       )/1000.
     metrel_int = getMetRel( met_etx_int
                           , met_ety_int
                           , signal_el

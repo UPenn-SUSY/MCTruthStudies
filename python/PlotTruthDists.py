@@ -44,29 +44,24 @@ class FileHandle(object):
         hist_list = [obj.GetName() for obj in self.directory.GetListOfKeys()]
         return hist_list
 
-    def getHist(self, hist_name):
+    def getHist(self, hist_name, normalize = True):
+        this_hist_name = 'clone_%s' % hist_name
+        if normalize:
+            this_hist_name += '_norm'
         print 'title: %s - dir_name: %s - hist_name: %s' % (self.title, self.directory_name, hist_name)
-        hist = self.directory.Get(hist_name)
-        if hist.Integral() != 0.:
+        hist = self.directory.Get(hist_name).Clone(this_hist_name)
+        if normalize and hist.Integral() != 0.:
             hist.Scale(1./hist.Integral())
-        # hist.Scale(self.scale)
-        return self.directory.Get(hist_name)
+        return hist
 
 # ==============================================================================
 class HistMerger(object):
-    def __init__(self, file_handles, hist_name):
+    def __init__(self, file_handles, hist_name, normalize = True):
         self.name = hist_name
         self.file_names = [fh.title              for fh in file_handles]
-        self.hists      = [fh.getHist(hist_name) for fh in file_handles]
+        self.hists = [fh.getHist(hist_name, normalize) for fh in file_handles]
+        self.setStyle(file_handles, self.hists)
 
-        for fh,h in zip(file_handles, self.hists):
-            h.SetMarkerStyle(fh.shape)
-            h.SetMarkerColor(fh.color)
-            h.SetLineStyle(fh.line)
-            h.SetLineColor(fh.color)
-            h.SetLineWidth(3)
-
-        # self.canvas = ROOT.TCanvas('c_%s' % hist_name)
         title = '%s;%s;%s' % ( self.hists[0].GetTitle()
                              , self.hists[0].GetXaxis().GetTitle()
                              , self.hists[0].GetYaxis().GetTitle()
@@ -86,20 +81,30 @@ class HistMerger(object):
         self.legend = ROOT.TLegend(leg_x1, leg_y1, leg_x2, leg_y2)
         self.big_legend = ROOT.TLegend(big_leg_x1, big_leg_y1, big_leg_x2, big_leg_y2)
         for i, h in enumerate(self.hists):
-            # self.stack.Add(h, 'P')
-            # self.legend.AddEntry(h, self.file_names[i], 'P')
             self.stack.Add(h, 'HIST')
             self.legend.AddEntry(h, self.file_names[i], 'L')
             self.big_legend.AddEntry(h, self.file_names[i], 'L')
 
         canvas_name = hist_name.replace('h__', 'c__')
-        # self.canvas = ROOT.TCanvas('c_%s' % hist_name)
+        if normalize:
+            print 'old canvas name: %s' % canvas_name
+            canvas_name = canvas_name + "_norm"
+            print 'new canvas name: %s' % canvas_name
         self.canvas = ROOT.TCanvas(canvas_name)
         self.stack.Draw('nostack')
         self.legend.Draw()
 
         self.leg_canvas = ROOT.TCanvas('%s__leg' % canvas_name)
         self.big_legend.Draw()
+
+    def setStyle(self, file_handles, hists):
+        for fh,h in zip(file_handles, hists):
+            h.SetMarkerStyle(fh.shape)
+            h.SetMarkerColor(fh.color)
+            h.SetLineStyle(fh.line)
+            h.SetLineColor(fh.color)
+            h.SetLineWidth(3)
+
 
 # ------------------------------------------------------------------------------
 def main():
@@ -174,8 +179,11 @@ def main():
     list_of_hists = files[0].getListOfHists()
     for loh in list_of_hists:
         print 'hist: %s' % loh
-        hm = HistMerger( files, loh )
+        hm = HistMerger( files, loh, False )
         hm.canvas.Write()
+
+        hm_norm = HistMerger( files, loh, True )
+        hm_norm.canvas.Write()
 
         if 'channel' in loh:
             print 'leg: %s' % loh

@@ -59,13 +59,6 @@ def plotTruth(tree):
     hists['emma_mt']  = TruthHists.hEmmaMt()
     hists['sr_ss']    = TruthHists.hSRSS()
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # hists['channels'] = TruthHists.hFlavorChannels(name = 'channels')
-    # hists['pt']       = TruthHists.hPt(name             = 'pt'      )
-    # hists['eta']      = TruthHists.hEta(name            = 'eta'     )
-    # hists['num_jet']  = TruthHists.hNumJet(name         = 'num_jet' )
-    # hists['jet_pt']   = TruthHists.hJetPt(name          = 'jet_pt'  )
-    # hists['met']      = TruthHists.hMet(name            = 'met'     )
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     total_num_events = tree.GetEntries()
     for i, event in enumerate(tree):
