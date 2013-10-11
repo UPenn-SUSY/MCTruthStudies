@@ -184,7 +184,7 @@ def isSROSMT2a(signal_objects):
             return False
     if signal_objects['met']['rel_noint'] < 40.:
         return False
-    if signal_objects['mt2'] < 90.:
+    if signal_objects['mt2']/1000. < 90.:
         return False
 
     return True
@@ -205,7 +205,7 @@ def isSROSMT2b(signal_objects):
             return False
     if signal_objects['met']['rel_noint'] < 40.:
         return False
-    if signal_objects['mt2'] < 120.:
+    if signal_objects['mt2']/1000. < 120.:
         return False
 
     return True
@@ -226,7 +226,7 @@ def isSROSMT2c(signal_objects):
             return False
     if signal_objects['met']['rel_noint'] < 40.:
         return False
-    if signal_objects['mt2'] < 150.:
+    if signal_objects['mt2']/1000. < 150.:
         return False
 
     return True

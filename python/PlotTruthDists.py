@@ -110,7 +110,7 @@ class HistMerger(object):
 def main():
     files = []
     files.append( FileHandle( '(300,50) x=0.95'
-                            , 'out_hists.144885_x95.root'
+                            , 'C1N2_plots/out_hists.144885_x95.root'
                             , ''
                             , ROOT.kBlue+2
                             , ROOT.kFullCircle
@@ -118,7 +118,7 @@ def main():
                             )
                 )
     files.append( FileHandle( '(300,50) x=0.50'
-                            , 'out_hists.144885_x50.root'
+                            , 'C1N2_plots/out_hists.144885_x50.root'
                             , ''
                             , ROOT.kBlue+2
                             , ROOT.kOpenCircle
@@ -126,7 +126,7 @@ def main():
                             )
                 )
     files.append( FileHandle( '(200,50) x=0.95'
-                            , 'out_hists.144880_x95.root'
+                            , 'C1N2_plots/out_hists.144880_x95.root'
                             , ''
                             , ROOT.kGreen+2
                             , ROOT.kFullTriangleUp
@@ -134,7 +134,7 @@ def main():
                             )
                 )
     files.append( FileHandle( '(200,50) x=0.50'
-                            , 'out_hists.144880_x50.root'
+                            , 'C1N2_plots/out_hists.144880_x50.root'
                             , ''
                             , ROOT.kGreen+2
                             , ROOT.kOpenTriangleUp
@@ -142,7 +142,7 @@ def main():
                             )
                 )
     files.append( FileHandle( '(300,200) x=0.95'
-                            , 'out_hists.144888_x95.root'
+                            , 'C1N2_plots/out_hists.144888_x95.root'
                             , ''
                             , ROOT.kRed+2
                             , ROOT.kFullSquare
@@ -150,7 +150,7 @@ def main():
                             )
                 )
     files.append( FileHandle( '(300,200) x=0.50'
-                            , 'out_hists.144888_x50.root'
+                            , 'C1N2_plots/out_hists.144888_x50.root'
                             , ''
                             , ROOT.kRed+2
                             , ROOT.kOpenSquare
@@ -158,7 +158,7 @@ def main():
                             )
                 )
     files.append( FileHandle( '(207.5,142.5) x=0.95'
-                            , 'out_hists.176539_x95.root'
+                            , 'C1N2_plots/out_hists.176539_x95.root'
                             , ''
                             , ROOT.kMagenta+2
                             , ROOT.kFullTriangleDown
@@ -166,7 +166,7 @@ def main():
                             )
                 )
     files.append( FileHandle( '(207.5,142.5) x=0.50'
-                            , 'out_hists.176539_x50.root'
+                            , 'C1N2_plots/out_hists.176539_x50.root'
                             , ''
                             , ROOT.kMagenta+2
                             , ROOT.kOpenTriangleDown
@@ -174,7 +174,7 @@ def main():
                             )
                 )
     files.append( FileHandle( '(207.5,142.5) x=0.95'
-                            , 'out_hists.179579_x95.root'
+                            , 'C1N2_plots/out_hists.179579_x95.root'
                             , ''
                             , ROOT.kCyan
                             , ROOT.kFullTriangleDown
@@ -182,7 +182,7 @@ def main():
                             )
                 )
     files.append( FileHandle( '(207.5,142.5) x=0.50'
-                            , 'out_hists.179579_x50.root'
+                            , 'C1N2_plots/out_hists.179579_x50.root'
                             , ''
                             , ROOT.kCyan
                             , ROOT.kOpenTriangleDown
