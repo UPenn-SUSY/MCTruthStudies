@@ -476,3 +476,40 @@ class hSRSS(object):
         for fc in cutflow.flavor_channels:
             self.hist[fc].Write()
 
+# ------------------------------------------------------------------------------
+class hSROS(object):
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def __init__( self
+                , title = 'sros'
+                ):
+        num_bins = 7
+        x_min = -0.5
+        x_max = 6.5
+
+        self.hist = {}
+        for fc in cutflow.flavor_channels:
+            self.hist[fc] = ROOT.TH1F( 'h__%s__sros' % fc
+                                     , '%s - %s -- sros; SR channel' % (title, fc)
+                                     , num_bins, x_min, x_max
+                                     )
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def fill(self, flavor_channel, signal_objects, event):
+        fill_bin = []
+
+        if cutflow.isSRMT2a(signal_objects): fill_bin.append(1)
+        if cutflow.isSRMT2b(signal_objects): fill_bin.append(2)
+        if cutflow.isSRMT2c(signal_objects): fill_bin.append(3)
+
+        if len(fill_bin) == 0:
+            self.hist[flavor_channel].Fill(0)
+        else:
+            for fb in fill_bin:
+                self.hist[flavor_channel].Fill(fb)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def writeToFile(self, out_file):
+        out_file.cd()
+        for fc in cutflow.flavor_channels:
+            self.hist[fc].Write()
+

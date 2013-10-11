@@ -58,6 +58,7 @@ def plotTruth(tree):
     hists['ptll']     = TruthHists.hPtll()
     hists['emma_mt']  = TruthHists.hEmmaMt()
     hists['sr_ss']    = TruthHists.hSRSS()
+    hists['sr_os']    = TruthHists.hSROS()
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     total_num_events = tree.GetEntries()

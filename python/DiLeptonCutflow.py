@@ -150,8 +150,6 @@ def isSRSS4(signal_objects):
 
     if "ss" not in getFlavorChannel(signal_objects):
         return False
-    # if signal_objects['jet']['num'] != 0:
-    #     return False
     if signal_objects['met']['noint'] < 200.:
         return False
 
@@ -165,9 +163,70 @@ def isSRSS5(signal_objects):
 
     if "ss" not in getFlavorChannel(signal_objects):
         return False
-    # if signal_objects['jet']['num'] != 0:
-    #     return False
     if signal_objects['met']['rel_noint'] < 200.:
+        return False
+
+    return True
+
+# ------------------------------------------------------------------------------
+def isSROSMT2a(signal_objects):
+    num_el = signal_objects['el']['num']
+    num_mu = signal_objects['mu']['num']
+    num_lep = num_el+num_mu
+
+    flavor_channel = getFlavorChannel(signal_objects)
+    if 'os' not in flavor_channel:
+        return False
+    #Z veto for ee/mm
+    mll = signal_objects['mll']
+    if 'ee' in flavor_channel or 'mm' in flavor_channel:
+        if abs(mll/1000. - 91.2) < 10:
+            return False
+    if signal_objects['met']['rel_noint'] < 40.:
+        return False
+    if signal_objects['mt2'] < 90.:
+        return False
+
+    return True
+
+# ------------------------------------------------------------------------------
+def isSROSMT2b(signal_objects):
+    num_el = signal_objects['el']['num']
+    num_mu = signal_objects['mu']['num']
+    num_lep = num_el+num_mu
+
+    flavor_channel = getFlavorChannel(signal_objects)
+    if 'os' not in flavor_channel:
+        return False
+    #Z veto for ee/mm
+    mll = signal_objects['mll']
+    if 'ee' in flavor_channel or 'mm' in flavor_channel:
+        if abs(mll/1000. - 91.2) < 10:
+            return False
+    if signal_objects['met']['rel_noint'] < 40.:
+        return False
+    if signal_objects['mt2'] < 120.:
+        return False
+
+    return True
+
+# ------------------------------------------------------------------------------
+def isSROSMT2c(signal_objects):
+    num_el = signal_objects['el']['num']
+    num_mu = signal_objects['mu']['num']
+    num_lep = num_el+num_mu
+
+    flavor_channel = getFlavorChannel(signal_objects)
+    if 'os' not in flavor_channel:
+        return False
+    #Z veto for ee/mm
+    mll = signal_objects['mll']
+    if 'ee' in flavor_channel or 'mm' in flavor_channel:
+        if abs(mll/1000. - 91.2) < 10:
+            return False
+    if signal_objects['met']['rel_noint'] < 40.:
+        return False
+    if signal_objects['mt2'] < 150.:
         return False
 
     return True
