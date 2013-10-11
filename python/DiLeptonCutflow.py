@@ -276,6 +276,8 @@ def getBaselineObjects( event
                    }
 
     # Get baseline electrons
+    if verbose:
+        print '    getting baseline electrons'
     el_index_order = getPtSortedIndices(event.el_n, event.el_pt)
     for el_index in el_index_order:
         el_pt = event.el_pt.at(el_index)
@@ -297,6 +299,8 @@ def getBaselineObjects( event
         baseline_el['E'].append(     event.el_E.at(el_index))
 
     # Get baseline muons
+    if verbose:
+        print '    getting baseline muons'
     mu_index_order = getPtSortedIndices(event.mu_staco_n, event.mu_staco_pt)
     for mu_index in mu_index_order:
         mu_pt = event.mu_staco_pt.at(mu_index)
@@ -318,6 +322,8 @@ def getBaselineObjects( event
         baseline_mu['E'].append(      event.mu_staco_E.at(mu_index))
 
     # get baseline jets
+    if verbose:
+        print '    getting baseline jets'
     jet_index_order = getPtSortedIndices(event.jet_AntiKt4TruthJets_n, event.jet_AntiKt4TruthJets_pt)
     for jet_index in jet_index_order:
         jet_pt     = event.jet_AntiKt4TruthJets_pt.at(jet_index)
@@ -598,6 +604,8 @@ def getSignalObjects( event
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Get signal electrons
+    if verbose:
+        print '    get signal electrons'
     to_remove_el = []
     for el_it in xrange(signal_el['num']):
         el_pt  = signal_el['pt'][el_it]
@@ -616,6 +624,8 @@ def getSignalObjects( event
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Get signal muons
+    if verbose:
+        print '    get signal muons'
     to_remove_mu = []
     for mu_it in xrange(signal_mu['num']):
         mu_pt  = signal_mu['pt'][mu_it]
@@ -634,6 +644,8 @@ def getSignalObjects( event
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Get signal jets
+    if verbose:
+        print '    get signal jets'
     to_remove_jet = []
     for jet_it in xrange(signal_jet['num']):
         jet_pt  = signal_jet['pt'][jet_it]
@@ -652,18 +664,26 @@ def getSignalObjects( event
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # get mll
+    if verbose:
+        print '    get mll'
     mll = getMll(signal_el, signal_mu)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # get ptll
+    if verbose:
+        print '    get ptll'
     ptll = getPtll(signal_el, signal_mu)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # get emma_mt
+    if verbose:
+        print '    get emma_mt'
     emma_mt = getEmmaMt(signal_el, signal_mu)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # get met and met-related variables
+    if verbose:
+        print '    get met'
     signal_met = {}
 
     met_etx_int = event.MET_Truth_Int_etx
@@ -700,7 +720,15 @@ def getSignalObjects( event
                  }
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    mt2 = mt2_calc.getMT2(signal_el, signal_mu, met_etx_noint, met_ety_noint)
+    if verbose:
+        print '    get mt2'
+    mt2 = mt2_calc.getMT2( signal_el
+                         , signal_mu
+                         , met_etx_noint
+                         , met_ety_noint
+                         , minv = 0.
+                         , verbose = False
+                         )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     return { 'el':signal_el

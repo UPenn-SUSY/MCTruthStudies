@@ -351,7 +351,6 @@ namespace mt2_bisect
     Deltasq0 = ma*(ma + 2*mn); //The minimum mass square to have two ellipses
 
     // find the coefficients for the two quadratic equations when Deltasq=Deltasq0.
-
     a1 = 1-pax*pax/(Easq);
     b1 = -pax*pay/(Easq);
     c1 = 1-pay*pay/(Easq);
@@ -431,7 +430,7 @@ namespace mt2_bisect
     //number of solutions at Deltasq_low should not be larger than zero
     if( nsols(Deltasq_low) > 0 )
     {
-      //cout << "nsolutions(Deltasq_low) > 0"<<endl;
+      cout << "nsolutions(Deltasq_low) > 0"<<endl;
       mt2_b = (double) sqrt(mnsq+Deltasq0);
       return;
     }
@@ -665,23 +664,37 @@ namespace mt2_bisect
 
 extern "C" {
   double getMt2( double ma, double pax, double pay
-      , double mb, double pbx, double pby
-      , double pmissx , double pmissy, bool verbose = false
-      )
+               , double mb, double pbx, double pby
+               , double pmissx , double pmissy
+               , double minv = 0
+               , bool verbose = false
+               )
   {
-    if (verbose) std::cout << "setting pa0\n";
+    if (verbose) {
+      std::cout << "getMt2():"
+                << "\n\tma: " << ma
+                << "\n\tpax: " << pax
+                << "\n\tpay: " << pay
+                << "\n\tmb: " << ma
+                << "\n\tpbx: " << pax
+                << "\n\tpby: " << pay
+                << "\n\tpmissx: " << pax
+                << "\n\tpmissy: " << pay
+                << "\n";
+    }
+
     double pa0[3]    = {ma, pax, pay};
-    if (verbose) std::cout << "setting pb0\n";
     double pb0[3]    = {mb, pbx, pby};
-    if (verbose) std::cout << "setting pmiss0\n";
     double pmiss0[3] = {0 , pmissx, pmissy};
-    if (verbose) std::cout << "getting this_mt2\n";
-    mt2_bisect::mt2 this_mt2;
-    if (verbose) std::cout << "setting momenta in this_mt2\n";
-    this_mt2.set_momenta(pa0, pb0, pmiss0);
-    if (verbose) std::cout << "getting mt2 value (C++)\n";
-    double value = this_mt2.get_mt2();
-    if (verbose) std::cout << "mt2_value: " << value << "\n";
+
+    mt2_bisect::mt2* this_mt2 = new mt2_bisect::mt2();
+    this_mt2->set_mn(minv);
+    this_mt2->set_momenta(pa0, pb0, pmiss0);
+    double value = this_mt2->get_mt2();
+    delete this_mt2;
+    if (verbose)
+      std::cout << "\tmt2_value: " << value << "\n";
+
     return value;
   }
 }

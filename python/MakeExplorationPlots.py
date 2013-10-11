@@ -98,13 +98,18 @@ def readInputs():
 
 # ------------------------------------------------------------------------------
 def main():
+    print 'getting configs'
     configs = readInputs()
     if configs is None: return
 
+    print 'getting input file'
     input = getInFile(configs['in'])
+    print 'about to make plots!!!'
     hists = plotTruth(input['tree'])
 
+    print 'creating output file'
     out_file = ROOT.TFile(configs['out'], 'RECREATE')
+    print 'writing hists to file'
     for h in hists:
         hists[h].writeToFile(out_file)
     out_file.Close()
