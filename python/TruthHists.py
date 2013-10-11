@@ -497,9 +497,9 @@ class hSROS(object):
     def fill(self, flavor_channel, signal_objects, event):
         fill_bin = []
 
-        if cutflow.isSRMT2a(signal_objects): fill_bin.append(1)
-        if cutflow.isSRMT2b(signal_objects): fill_bin.append(2)
-        if cutflow.isSRMT2c(signal_objects): fill_bin.append(3)
+        if cutflow.isSROSMT2a(signal_objects): fill_bin.append(1)
+        if cutflow.isSROSMT2b(signal_objects): fill_bin.append(2)
+        if cutflow.isSROSMT2c(signal_objects): fill_bin.append(3)
 
         if len(fill_bin) == 0:
             self.hist[flavor_channel].Fill(0)
