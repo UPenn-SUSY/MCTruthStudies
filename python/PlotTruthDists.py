@@ -9,6 +9,26 @@ import ROOT
 import rootlogon
 import metaroot
 
+import yaml
+
+# ==============================================================================
+def readInputConfig(in_file_name):
+    print 'finput config file: %s' % in_file_name
+    config_file = open(in_file_name)
+    config_dict = yaml.load(config_file)
+
+    file_handles = []
+    for cd in config_dict:
+        file_handles.append( FileHandle( cd['label']
+                                       , cd['file']
+                                       , cd['dir']
+                                       , cd['color']
+                                       , cd['shape']
+                                       , cd['line']
+                                       )
+                           )
+    return file_handles
+
 # ==============================================================================
 # input files:
 class FileHandle(object):
@@ -108,87 +128,8 @@ class HistMerger(object):
 
 # ------------------------------------------------------------------------------
 def main():
-    files = []
-    files.append( FileHandle( '(300,50) x=0.95'
-                            , 'C1N2_plots/out_hists.144885_x95.root'
-                            , ''
-                            , ROOT.kBlue+2
-                            , ROOT.kFullCircle
-                            , 1
-                            )
-                )
-    files.append( FileHandle( '(300,50) x=0.50'
-                            , 'C1N2_plots/out_hists.144885_x50.root'
-                            , ''
-                            , ROOT.kBlue+2
-                            , ROOT.kOpenCircle
-                            , 8
-                            )
-                )
-    files.append( FileHandle( '(200,50) x=0.95'
-                            , 'C1N2_plots/out_hists.144880_x95.root'
-                            , ''
-                            , ROOT.kGreen+2
-                            , ROOT.kFullTriangleUp
-                            , 1
-                            )
-                )
-    files.append( FileHandle( '(200,50) x=0.50'
-                            , 'C1N2_plots/out_hists.144880_x50.root'
-                            , ''
-                            , ROOT.kGreen+2
-                            , ROOT.kOpenTriangleUp
-                            , 8
-                            )
-                )
-    files.append( FileHandle( '(300,200) x=0.95'
-                            , 'C1N2_plots/out_hists.144888_x95.root'
-                            , ''
-                            , ROOT.kRed+2
-                            , ROOT.kFullSquare
-                            , 1
-                            )
-                )
-    files.append( FileHandle( '(300,200) x=0.50'
-                            , 'C1N2_plots/out_hists.144888_x50.root'
-                            , ''
-                            , ROOT.kRed+2
-                            , ROOT.kOpenSquare
-                            , 8
-                            )
-                )
-    files.append( FileHandle( '(207.5,142.5) x=0.95'
-                            , 'C1N2_plots/out_hists.176539_x95.root'
-                            , ''
-                            , ROOT.kMagenta+2
-                            , ROOT.kFullTriangleDown
-                            , 1
-                            )
-                )
-    files.append( FileHandle( '(207.5,142.5) x=0.50'
-                            , 'C1N2_plots/out_hists.176539_x50.root'
-                            , ''
-                            , ROOT.kMagenta+2
-                            , ROOT.kOpenTriangleDown
-                            , 8
-                            )
-                )
-    files.append( FileHandle( '(207.5,142.5) x=0.95'
-                            , 'C1N2_plots/out_hists.179579_x95.root'
-                            , ''
-                            , ROOT.kCyan
-                            , ROOT.kFullTriangleDown
-                            , 1
-                            )
-                )
-    files.append( FileHandle( '(207.5,142.5) x=0.50'
-                            , 'C1N2_plots/out_hists.179579_x50.root'
-                            , ''
-                            , ROOT.kCyan
-                            , ROOT.kOpenTriangleDown
-                            , 8
-                            )
-                )
+    config_file_name = sys.argv[1]
+    files = readInputConfig(config_file_name)
 
     out_file = ROOT.TFile.Open('truth_compare.canv.root', 'RECREATE')
     out_file.cd()
