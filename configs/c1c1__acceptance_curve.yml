@@ -2,7 +2,7 @@
   color: 600 # kBlue
   shape: 20
   line: 1
-  x_label: 'm(C1) [GeV]'
+  x_label: 'm(#chi_{1}^{0}) [GeV]'
   x_max:   600
   files:
     - x_value: 75
@@ -19,13 +19,13 @@
       file: '/tmp/bjackson/truth_ntuples/c1n2_400.n1_50.0.xslep_0.5.truth.root'
     - x_value: 500
       file: '/tmp/bjackson/truth_ntuples/c1n2_500.n1_50.0.xslep_0.5.truth.root'
-#
 
 - label: 'x=0.05'
   color: 593 # kBlue - 7
   shape: 23
   line: 1
-  x_label: 'm(C1) [GeV]'
+# x_label: 'm(C1) [GeV]'
+  x_label: 'm(#chi_{1}^{0}) [GeV]'
   x_max:   600
   files:
     - x_value: 75
@@ -47,7 +47,8 @@
   color: 602 # kBlue - 7
   shape: 22
   line: 1
-  x_label: 'm(C1) [GeV]'
+# x_label: 'm(C1) [GeV]'
+  x_label: 'm(#chi_{1}^{0}) [GeV]'
   x_max:   600
   files:
     - x_value: 75
@@ -64,9 +65,3 @@
       file: '/tmp/bjackson/truth_ntuples/c1n2_400.n1_50.0.xslep_0.95.truth.root'
     - x_value: 500
       file: '/tmp/bjackson/truth_ntuples/c1n2_500.n1_50.0.xslep_0.95.truth.root'
-
-
-
-
-
-

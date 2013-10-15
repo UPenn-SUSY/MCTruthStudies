@@ -16,13 +16,12 @@ import DiLeptonCutflow as cutflow
 
 # ==============================================================================
 def readInputConfig(in_file_name):
-    print 'finput config file: %s' % in_file_name
+    print 'input config file: %s' % in_file_name
     config_file = open(in_file_name)
     config_dict = yaml.load(config_file)
 
     file_handles = []
     for cd in config_dict:
-        print 'cd: %s' % cd
         file_handles.append( FileHandle( cd['label']
                                        , cd['files']
                                        , cd['color']
@@ -32,7 +31,6 @@ def readInputConfig(in_file_name):
                                        , cd['x_max']
                                        )
                            )
-        print ''
     return file_handles
 
 # ==============================================================================
@@ -49,6 +47,8 @@ class FileHandle(object):
 
 # ------------------------------------------------------------------------------
 def getSignalAcceptance(in_file_name, signal_region_function):
+    print '----------------------------------------'
+    print 'Getting signal acceptance for input file: %s' % in_file_name
     f = ROOT.TFile.Open(in_file_name)
     tree = f.Get('truth')
     total_num_events = tree.GetEntries()
@@ -56,6 +56,7 @@ def getSignalAcceptance(in_file_name, signal_region_function):
     for i, event in enumerate(tree):
         if i % 100 == 0:
             print 'Event %d of %d' % (i, total_num_events)
+        # if i > 500: break
         num_el = event.el_n
         num_mu = event.mu_staco_n
 
@@ -70,20 +71,16 @@ def getSignalAcceptance(in_file_name, signal_region_function):
 
         if signal_region_function(signal_objects):
             num_sr += 1
+    f.Close()
     return float(num_sr)/total_num_events
 
 # ------------------------------------------------------------------------------
 def getSignalAcceptanceCurve(file_handle, signal_region_function):
-    print '-------------------------'
     x_value = []
     acc = []
     for fl in file_handle.file_list:
-        print fl
-        print fl['file']
         x_value.append(fl['x_value'])
         acc.append(getSignalAcceptance(fl['file'], signal_region_function))
-    print x_value
-    print acc
 
     acc_curve = ROOT.TGraph( len(x_value)
                            , array.array('d', x_value)
@@ -95,8 +92,8 @@ def getSignalAcceptanceCurve(file_handle, signal_region_function):
 # ------------------------------------------------------------------------------
 def getSignalAcceptanceCanvas(file_handle_list, signal_region_function):
     # create legend
-    leg_x1 = 0.80
-    leg_x2 = 0.98
+    leg_x1 = 0.20
+    leg_x2 = 0.38
     leg_y1 = 0.98
     leg_y2 = leg_y1-(0.06*len(file_handle_list))
 
@@ -106,6 +103,7 @@ def getSignalAcceptanceCanvas(file_handle_list, signal_region_function):
     # big_leg_y2 = leg_y1-(0.08*len(file_handle_list))
 
     leg     = ROOT.TLegend(leg_x1    , leg_y1    , leg_x2    , leg_y2    )
+    leg.SetFillColor(0)
     # big_leg = ROOT.TLegend(big_leg_x1, big_leg_y1, big_leg_x2, big_leg_y2)
 
     # get acceptance values for each model, and add to TGraph
@@ -138,12 +136,9 @@ def getSignalAcceptanceCanvas(file_handle_list, signal_region_function):
             acl.GetHistogram().GetXaxis().SetTitle(fh.x_label)
             acl.GetHistogram().GetYaxis().SetTitle('fractional acceptance')
 
-            # acc_curve.GetHistogram().GetYaxis().SetRangeUser(0.,1.1)
-            # acl.GetHistogram().GetYaxis().SetRangeUser(0.,0.005)
             acc_curve.GetHistogram().GetYaxis().SetRangeUser(0.,1.2*y_max)
 
             acl.Draw('ALP')
-            print acc_curve
             drawn = True
         else:
             acl.Draw('LPSAME')
