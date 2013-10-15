@@ -118,6 +118,7 @@ def getSignalAcceptanceCanvas(file_handle_list, signal_region_function):
         acc_curve.SetLineWidth(4)
         acc_curve.SetMarkerStyle(fh.shape)
         acc_curve.SetMarkerColor(fh.color)
+        acc_curve.SetMarkerSize(1.5)
         acc_curve_list.append(acc_curve)
 
         leg.AddEntry(acc_curve, fh.title, 'alp')
