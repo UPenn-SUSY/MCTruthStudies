@@ -1,0 +1,49 @@
+- label: '(75,50) x=0.05'
+  file:  'C1C1_plots/out_hists.c1n2_75.n1_50.0.xslep_0.05.root'
+  dir:   ''
+  color: 600 # kBlue
+  shape:  22
+  line:   3
+
+- label: '(100,50) x=0.05'
+  file:  'C1C1_plots/out_hists.c1n2_100.n1_50.0.xslep_0.05.root'
+  dir:   ''
+  color: 432 # kCyan
+  shape:  22
+  line:   3
+
+- label: '(150,50) x=0.05'
+  file:  'C1C1_plots/out_hists.c1n2_150.n1_50.0.xslep_0.05.root'
+  dir:   ''
+  color: 416 # kGreen
+  shape:  22
+  line:   3
+
+- label: '(200,50) x=0.05'
+  file:  'C1C1_plots/out_hists.c1n2_200.n1_50.0.xslep_0.05.root'
+  dir:   ''
+  color: 616 # kMagenta
+  shape:  22
+  line:   3
+
+- label: '(300,50) x=0.05'
+  file:  'C1C1_plots/out_hists.c1n2_300.n1_50.0.xslep_0.05.root'
+  dir:   ''
+  color: 632 # kRed
+  shape:  22
+  line:   3
+
+- label: '(400,50) x=0.05'
+  file:  'C1C1_plots/out_hists.c1n2_400.n1_50.0.xslep_0.05.root'
+  dir:   ''
+  color: 797 # kOrange-3
+  shape:  22
+  line:   3
+
+- label: '(500,50) x=0.05'
+  file:  'C1C1_plots/out_hists.c1n2_500.n1_50.0.xslep_0.05.root'
+  dir:   ''
+  color: 880 # kViolet
+  shape:  22
+  line:   3
+
