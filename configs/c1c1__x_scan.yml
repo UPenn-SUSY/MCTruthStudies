@@ -1,4 +1,5 @@
-- label: '(75,50) x=0.05'
+# ------------------------------------------------------------------------------
+label: '(75,50) x=0.05'
   file:  'C1C1_plots/out_hists.c1n2_75.n1_50.0.xslep_0.05.root'
   dir:   ''
   color: 600 # kBlue
@@ -19,6 +20,7 @@
   shape:  22
   line:   8
 
+# ------------------------------------------------------------------------------
 - label: '(100,50) x=0.05'
   file:  'C1C1_plots/out_hists.c1n2_100.n1_50.0.xslep_0.05.root'
   dir:   ''
@@ -40,6 +42,7 @@
   shape:  22
   line:   8
 
+# ------------------------------------------------------------------------------
 - label: '(150,50) x=0.05'
   file:  'C1C1_plots/out_hists.c1n2_150.n1_50.0.xslep_0.05.root'
   dir:   ''
@@ -61,6 +64,7 @@
   shape:  22
   line:   8
 
+# ------------------------------------------------------------------------------
 - label: '(200,50) x=0.05'
   file:  'C1C1_plots/out_hists.c1n2_200.n1_50.0.xslep_0.05.root'
   dir:   ''
@@ -82,6 +86,7 @@
   shape:  22
   line:   8
 
+# ------------------------------------------------------------------------------
 - label: '(300,50) x=0.05'
   file:  'C1C1_plots/out_hists.c1n2_300.n1_50.0.xslep_0.05.root'
   dir:   ''
@@ -103,6 +108,7 @@
   shape:  22
   line:   8
 
+# ------------------------------------------------------------------------------
 - label: '(400,50) x=0.05'
   file:  'C1C1_plots/out_hists.c1n2_400.n1_50.0.xslep_0.05.root'
   dir:   ''
@@ -124,6 +130,7 @@
   shape:  22
   line:   8
 
+# ------------------------------------------------------------------------------
 - label: '(500,50) x=0.05'
   file:  'C1C1_plots/out_hists.c1n2_500.n1_50.0.xslep_0.05.root'
   dir:   ''
@@ -145,3 +152,68 @@
   shape:  22
   line:   8
 
+# ------------------------------------------------------------------------------
+- label: '(125,50) x=0.05'
+  file:   'C1C1_plots/out_hists.c1n2_125.n1_50.0.xslep_0.05.root'
+  dir:   ''
+  color: 880 # kViolet
+  shape:  22
+  line:   8
+
+- label: '(125,50) x=0.50'
+  file:   'C1C1_plots/out_hists.c1n2_125.n1_50.0.xslep_0.5.root'
+  dir:   ''
+  color: 880 # kViolet
+  shape:  22
+  line:   8
+
+- label: '(125,50) x=0.95'
+  file:   'C1C1_plots/out_hists.c1n2_125.n1_50.0.xslep_0.95.root'
+  dir:   ''
+  color: 880 # kViolet
+  shape:  22
+  line:   8
+
+# ------------------------------------------------------------------------------
+- label: '(175,50) x=0.05'
+  file:   'C1C1_plots/out_hists.c1n2_175.n1_50.0.xslep_0.05.root'
+  dir:   ''
+  color: 880 # kViolet
+  shape:  22
+  line:   8
+
+- label: '(175,50) x=0.50'
+  file:   'C1C1_plots/out_hists.c1n2_175.n1_50.0.xslep_0.5.root'
+  dir:   ''
+  color: 880 # kViolet
+  shape:  22
+  line:   8
+
+- label: '(175,50) x=0.95'
+  file:   'C1C1_plots/out_hists.c1n2_175.n1_50.0.xslep_0.95.root'
+  dir:   ''
+  color: 880 # kViolet
+  shape:  22
+  line:   8
+
+# ------------------------------------------------------------------------------
+- label: '(250,50) x=0.05'
+  file:   'C1C1_plots/out_hists.c1n2_250.n1_50.0.xslep_0.05.root'
+  dir:   ''
+  color: 880 # kViolet
+  shape:  22
+  line:   8
+
+- label: '(250,50) x=0.50'
+  file:   'C1C1_plots/out_hists.c1n2_250.n1_50.0.xslep_0.5.root'
+  dir:   ''
+  color: 880 # kViolet
+  shape:  22
+  line:   8
+
+- label: '(250,50) x=0.95'
+  file:   'C1C1_plots/out_hists.c1n2_250.n1_50.0.xslep_0.95.root'
+  dir:   ''
+  color: 880 # kViolet
+  shape:  22
+  line:   8
