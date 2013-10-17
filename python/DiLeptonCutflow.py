@@ -248,6 +248,7 @@ def getBaselineObjects( event
                   , 'py':[]
                   , 'pz':[]
                   , 'E':[]
+                  , 'parent_pdgid':[]
                   }
 
     baseline_mu = { 'num':0
@@ -261,6 +262,7 @@ def getBaselineObjects( event
                   , 'py':[]
                   , 'pz':[]
                   , 'E':[]
+                  , 'parent_pdgid':[]
                   }
 
     baseline_jet = { 'num':0
@@ -297,6 +299,10 @@ def getBaselineObjects( event
         baseline_el['py'].append(    event.el_py.at(el_index))
         baseline_el['pz'].append(    event.el_pz.at(el_index))
         baseline_el['E'].append(     event.el_E.at(el_index))
+        baseline_el['parent_pdgid'].append( getParentPdgIDFromBarcode( event
+                                                                     , event.el_barcode.at(el_index)
+                                                                     )
+                                          )
 
     # Get baseline muons
     if verbose:
@@ -320,6 +326,10 @@ def getBaselineObjects( event
         baseline_mu['py'].append(     event.mu_staco_py.at(mu_index))
         baseline_mu['pz'].append(     event.mu_staco_pz.at(mu_index))
         baseline_mu['E'].append(      event.mu_staco_E.at(mu_index))
+        baseline_mu['parent_pdgid'].append(getParentPdgIDFromBarcode( event
+                                                                    , event.mu_staco_barcode.at(mu_index)
+                                                                    )
+                                          )
 
     # get baseline jets
     if verbose:
@@ -730,6 +740,16 @@ def getSignalObjects( event
                          , verbose = False
                          )
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    if verbose:
+        print 'found signal objects!!!'
+        print '  signal electrons'
+        print '    %s' % signal_el
+        print '  signal muons'
+        print '    %s' % signal_mu
+        print '  signal jets'
+        print '    %s' % signal_jet
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     return { 'el':signal_el
            , 'mu':signal_mu
@@ -862,3 +882,45 @@ def getEmmaMt(el_list, mu_list):
     mll = getMll(el_list, mu_list)
     ptll = getPtll(el_list, mu_list)
     return math.sqrt(mll*mll + ptll*ptll)
+
+# ------------------------------------------------------------------------------
+def getParentPdgID(event, particle_index):
+    original_pdgid = event.mc_pdgId.at(particle_index)
+    current_index  = particle_index
+    mother = None
+    # prevent infinite loops!!!
+    iteration = 0
+    MAX_ITERATION = 100
+
+    # Loop over truth particles looking for mother which is not the same particle
+    # print 'searching for parent'
+    while mother is None and iteration < MAX_ITERATION:
+        iteration += 1
+
+        # Loop over this particle's parents
+        # print '  looping over parents (%s)' % event.mc_parent_index.at(current_index).size()
+        for ll in xrange(event.mc_parent_index.at(current_index).size()):
+            parent_index  = event.mc_parent_index.at(current_index).at(ll);
+            parent_pdgid  = event.mc_pdgId.at(parent_index); 
+            parent_status = event.mc_status.at(parent_index);
+
+            # if parent pdgid = original pdgid, the particle is the result of a scatter. take one step back...
+            if parent_pdgid == original_pdgid:
+                current_index = parent_index
+                break
+            # else we found the mother!!!
+            else:
+                mother = parent_pdgid
+
+    # print 'parent pdgid: %s' % mother
+    return mother
+
+# ------------------------------------------------------------------------------
+def getParentPdgIDFromBarcode(event, barcode):
+    mc_index = None
+    for index in xrange(event.mc_n):
+        if event.mc_barcode.at(index) == barcode:
+            mc_index = index
+            # print 'found index matching this barcode -- index: %s  pdgid: %s' % (mc_index, event.mc_pdgId.at(mc_index))
+            return getParentPdgID(event, mc_index)
+    return None
