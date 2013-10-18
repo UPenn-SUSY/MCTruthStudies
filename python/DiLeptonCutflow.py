@@ -13,6 +13,9 @@ import metaroot
 import mt2 as mt2_calc
 
 # ==============================================================================
+ROOT.gInterpreter.GenerateDictionary("vector<vector<int> >","vector");
+
+# ==============================================================================
 # helper definitions
 flavor_channels = [ 'ee_os'
                   , 'ee_ss'
@@ -901,7 +904,7 @@ def getParentPdgID(event, particle_index):
         # print '  looping over parents (%s)' % event.mc_parent_index.at(current_index).size()
         for ll in xrange(event.mc_parent_index.at(current_index).size()):
             parent_index  = event.mc_parent_index.at(current_index).at(ll);
-            parent_pdgid  = event.mc_pdgId.at(parent_index); 
+            parent_pdgid  = event.mc_pdgId.at(parent_index);
             parent_status = event.mc_status.at(parent_index);
 
             # if parent pdgid = original pdgid, the particle is the result of a scatter. take one step back...
