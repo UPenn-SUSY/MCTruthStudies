@@ -87,7 +87,7 @@ def getSignalAcceptanceCurve(file_handle, signal_region_function):
                            , array.array('d', acc)
                            )
     acc_curve.SetName('g__acc__%s' % file_handle.title)
-    return acc_curve
+    return {'curve':acc_curve, 'max':max(acc)}
 
 # ------------------------------------------------------------------------------
 def getSignalAcceptanceCanvas(file_handle_list, signal_region_function):
@@ -113,20 +113,21 @@ def getSignalAcceptanceCanvas(file_handle_list, signal_region_function):
     for fh in file_handle_list:
         label = fh.title
         acc_curve = getSignalAcceptanceCurve(fh, signal_region_function)
-        acc_curve.SetLineStyle(fh.line)
-        acc_curve.SetLineColor(fh.color)
-        acc_curve.SetLineWidth(4)
-        acc_curve.SetMarkerStyle(fh.shape)
-        acc_curve.SetMarkerColor(fh.color)
-        acc_curve.SetMarkerSize(1.5)
-        acc_curve_list.append(acc_curve)
+        acc_curve['curve'].SetLineStyle(fh.line)
+        acc_curve['curve'].SetLineColor(fh.color)
+        acc_curve['curve'].SetLineWidth(4)
+        acc_curve['curve'].SetMarkerStyle(fh.shape)
+        acc_curve['curve'].SetMarkerColor(fh.color)
+        acc_curve['curve'].SetMarkerSize(1.5)
+        acc_curve_list.append(acc_curve['curve'])
 
-        leg.AddEntry(acc_curve, fh.title, 'alp')
+        leg.AddEntry(acc_curve['curve'], fh.title, 'alp')
         # big_leg.AddEntry(acc_curve, fh.title, 'alp')
 
         # check maximum y value
-        local_max = acc_curve.GetMaximum()
+        local_max = acc_curve['max']
         y_max = max(y_max, local_max)
+        print 'local_max: %s  -  y_max: %s' % (local_max, y_max)
 
     # Draw TGraphs onto canvas
     drawn = False
@@ -137,7 +138,8 @@ def getSignalAcceptanceCanvas(file_handle_list, signal_region_function):
             acl.GetHistogram().GetXaxis().SetTitle(fh.x_label)
             acl.GetHistogram().GetYaxis().SetTitle('fractional acceptance')
 
-            acc_curve.GetHistogram().GetYaxis().SetRangeUser(0.,1.2*y_max)
+            print 'setting plotting range!!! (0, %f)' % (1.2*y_max)
+            acl.GetHistogram().GetYaxis().SetRangeUser(0.,1.2*y_max)
 
             acl.Draw('ALP')
             drawn = True
