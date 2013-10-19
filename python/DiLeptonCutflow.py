@@ -17,6 +17,12 @@ ROOT.gInterpreter.GenerateDictionary("vector<vector<int> >","vector");
 
 # ==============================================================================
 # helper definitions
+decay_categories = [ 'c1_c1'
+                   , 'sl_sl'
+                   , 'c1_sl'
+                   , 'sl_c1'
+                   ]
+
 flavor_channels = [ 'ee_os'
                   , 'ee_ss'
                   , 'mm_os'
