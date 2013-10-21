@@ -21,6 +21,7 @@ decay_categories = [ 'c1_c1'
                    , 'sl_sl'
                    , 'c1_sl'
                    , 'sl_c1'
+                   , 'none'
                    ]
 
 flavor_channels = [ 'ee_os'
@@ -849,6 +850,16 @@ def getFlavorChannel(signal_objects, verbose = False):
         return 'multi'
 
     return 'none'
+
+# ------------------------------------------------------------------------------
+def getDecayCategory(signal_objects, verbose = False):
+    mother_pdgid_list = []
+    for mother_pdgid in signal_objects['el']['parent_pdgid']:
+        mother_pdgid_list.append(mother_pdgid)
+    for mother_pdgid in signal_objects['mu']['parent_pdgid']:
+        mother_pdgid_list.append(mother_pdgid)
+    print mother_pdgid_list
+    return None
 
 # ------------------------------------------------------------------------------
 def getMll(el_list, mu_list):
