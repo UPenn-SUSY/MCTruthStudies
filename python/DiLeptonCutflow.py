@@ -23,7 +23,6 @@ decay_categories = [ 'c1_c1'
                    , 'sl_c1'
                    , 'none'
                    ]
-
 flavor_channels = [ 'ee_os'
                   , 'ee_ss'
                   , 'mm_os'
@@ -39,6 +38,7 @@ flavor_channels = [ 'ee_os'
                   , 'multi'
                   , 'none'
                   ]
+
 max_num_leptons = 4
 max_num_jets = 2
 
@@ -51,9 +51,9 @@ baseline_el_pt_cut  = 10.e3
 baseline_mu_pt_cut  = 10.e3
 baseline_jet_pt_cut = 20.e3
 
-baseline_el_eta_cut  = 2.4
+baseline_el_eta_cut  = 2.47
 baseline_mu_eta_cut  = 2.4
-baseline_jet_eta_cut = 2.4
+baseline_jet_eta_cut = 5
 
 
 signal_el_pt_cut  = 10.e3
@@ -64,38 +64,98 @@ signal_el_eta_cut  = 2.4
 signal_mu_eta_cut  = 2.4
 signal_jet_eta_cut = 2.4
 
+# ==============================================================================
+class Electron(object):
+    # ------------------------------------------------------------------------------
+    def __init__(self, event, electron_index):
+        self.index        = electron_index
+        self.pt           = event.el_pt.at(electron_index)
+        self.eta          = event.el_eta.at(electron_index)
+        self.phi          = event.el_phi.at(electron_index)
+        self.E            = event.el_E.at(electron_index)
+        self.charge       = event.el_charge.at(electron_index)
+        self.px           = event.el_px.at(electron_index)
+        self.py           = event.el_py.at(electron_index)
+        self.pz           = event.el_pz.at(electron_index)
+        self.parent_pdgid = getParentPdgIDFromBarcode( event
+                                                     , event.el_barcode.at(electron_index)
+                                                     )
 
-# ------------------------------------------------------------------------------
-def doObjectSelection( event
-                     , lep_pt_cut
-                     , lep_eta_cut
-                     , jet_pt_cut
-                     , jet_eta_cut
-                     , verbose = False
-                     ):
-    if verbose:
-        print '----------------------------------------'
-        print 'doing object selection for event: %s' % event.EventNumber
+# ==============================================================================
+class Muon(object):
+    # ------------------------------------------------------------------------------
+    def __init__(self, event, muon_index):
+        self.index        = muon_index
+        self.pt           = event.mu_staco_pt.at(muon_index)
+        self.eta          = event.mu_staco_eta.at(muon_index)
+        self.phi          = event.mu_staco_phi.at(muon_index)
+        self.E            = event.mu_staco_E.at(muon_index)
+        self.charge       = event.mu_staco_charge.at(muon_index)
+        self.px           = event.mu_staco_px.at(muon_index)
+        self.py           = event.mu_staco_py.at(muon_index)
+        self.pz           = event.mu_staco_pz.at(muon_index)
+        self.parent_pdgid = getParentPdgIDFromBarcode( event
+                                                     , event.mu_staco_barcode.at(muon_index)
+                                                     )
 
-    # get baseline objects
-    baseline = getBaselineObjects( event
-                                 , lep_pt_cut
-                                 , jet_pt_cut
-                                 , verbose
-                                 )
+# ==============================================================================
+class Jet(object):
+    # ------------------------------------------------------------------------------
+    def __init__(self, event, jet_index):
+        self.index        = jet_index
+        self.pt           = event.jet_AntiKt4TruthJets_pt.at(jet_index)
+        self.eta          = event.jet_AntiKt4TruthJets_eta.at(jet_index)
+        self.phi          = event.jet_AntiKt4TruthJets_phi.at(jet_index)
+        self.E            = event.jet_AntiKt4TruthJets_E.at(jet_index)
+        self.theta        = math.copysign( 2*math.atan(math.exp(-abs(self.eta)))
+                                         , self.eta
+                                         )
+        # self.charge       = event.jet_AntiKt4TruthJets_charge.at(jet_index)
+        self.px           = self.pt*math.cos(self.phi)
+        self.py           = self.pt*math.sin(self.phi)
+        self.pz           = self.pt*math.sin(self.theta)
+        # self.parent_pdgid = getParentPdgIDFromBarcode( event
+        #                                              , event.jet_AntiKt4TruthJets_barcode.at(jet_index)
+        #                                              )
 
-    overlap_removed = doOverlapRemoval(baseline, verbose)
+# ==============================================================================
+class EwkCutFlow(object):
+    # ------------------------------------------------------------------------------
+    def __init__(self, event):
+        self.event = event
+        self.doObjectSelection( lep_pt_cut  = 10.e3
+                              , lep_eta_cut = 2.4
+                              , jet_pt_cut  = 20.e3
+                              , jet_eta_cut = 2.7
+                              # , verbose = True
+                              )
 
-    signal = getSignalObjects( event
-                             , overlap_removed
-                             , lep_pt_cut
-                             , lep_eta_cut
-                             , jet_pt_cut
-                             , jet_eta_cut
-                             , verbose
-                             )
+    # ------------------------------------------------------------------------------
+    def doObjectSelection( self
+                        , lep_pt_cut
+                        , lep_eta_cut
+                        , jet_pt_cut
+                        , jet_eta_cut
+                        , verbose = False
+                        ):
+        if verbose:
+            print '----------------------------------------'
+            print 'doing object selection for event: %s' % event.EventNumber
 
-    return signal
+        # get baseline objects
+        self.baseline = getBaselineObjects( self.event, verbose)
+
+        # do overlap removal
+        doOverlapRemoval(self.baseline, verbose)
+
+        # self.signal = getSignalObjects( verbose  # self.event
+        #                               # , self.overlap_removed
+        #                               # , lep_pt_cut
+        #                               # , lep_eta_cut
+        #                               # , jet_pt_cut
+        #                               # , jet_eta_cut
+        #                               # , verbose
+        #                               )
 
 # ------------------------------------------------------------------------------
 def isSRSS1(signal_objects):
@@ -243,130 +303,71 @@ def isSROSMT2c(signal_objects):
 
 # ------------------------------------------------------------------------------
 def getBaselineObjects( event
-                      , lep_pt_cut
-                      , jet_pt_cut
                       , verbose = False
                       ):
-    baseline_el = { 'num':0
-                  , 'index':[]
-                  , 'pt':[]
-                  , 'eta':[]
-                  , 'phi':[]
-                  # , 'theta':[]
-                  , 'charge':[]
-                  , 'px':[]
-                  , 'py':[]
-                  , 'pz':[]
-                  , 'E':[]
-                  , 'parent_pdgid':[]
-                  }
+    baseline_el  = []
+    baseline_mu  = []
+    baseline_jet = []
 
-    baseline_mu = { 'num':0
-                  , 'index':[]
-                  , 'pt':[]
-                  , 'eta':[]
-                  , 'phi':[]
-                  # , 'theta':[]
-                  , 'charge':[]
-                  , 'px':[]
-                  , 'py':[]
-                  , 'pz':[]
-                  , 'E':[]
-                  , 'parent_pdgid':[]
-                  }
-
-    baseline_jet = { 'num':0
-                   , 'index':[]
-                   , 'pt':[]
-                   , 'eta':[]
-                   , 'phi':[]
-                   , 'theta':[]
-                   , 'px':[]
-                   , 'py':[]
-                   , 'pz':[]
-                   , 'E':[]
-                   }
-
-    # Get baseline electrons
-    if verbose:
-        print '    getting baseline electrons'
+    # get baseline electrons
     el_index_order = getPtSortedIndices(event.el_n, event.el_pt)
     for el_index in el_index_order:
-        el_pt = event.el_pt.at(el_index)
-
-        if el_pt < lep_pt_cut:
+        this_el = Electron(event, el_index)
+        if this_el.pt < baseline_el_pt_cut:
             if verbose:
-                print '  electron %d failed pt cut (%f < %f)' % (el_index, el_pt, lep_pt_cut)
+                print '  electron %d failed pt cut (%f < %f)' % ( el_index
+                                                                , this_el.pt
+                                                                , baseline_el_pt_cut
+                                                                )
             continue
-        baseline_el['num'] += 1
-        baseline_el['index'].append(el_index)
-        baseline_el['pt'].append(     el_pt)
-        baseline_el['eta'].append(    event.el_eta.at(el_index))
-        baseline_el['phi'].append(    event.el_phi.at(el_index))
-        # baseline_el['theta'].append(    event.el_theta.at(el_index))
-        baseline_el['charge'].append( event.el_charge.at(el_index))
-        baseline_el['px'].append(    event.el_px.at(el_index))
-        baseline_el['py'].append(    event.el_py.at(el_index))
-        baseline_el['pz'].append(    event.el_pz.at(el_index))
-        baseline_el['E'].append(     event.el_E.at(el_index))
-        baseline_el['parent_pdgid'].append( getParentPdgIDFromBarcode( event
-                                                                     , event.el_barcode.at(el_index)
-                                                                     )
-                                          )
+        if this_el.eta < baseline_el_eta_cut:
+            if verbose:
+                print '  electron %d failed eta cut (%f < %f)' % ( el_index
+                                                                 , this_el.eta
+                                                                 , baseline_el_eta_cut
+                                                                 )
+            continue
+        baseline_el.append(this_el)
 
-    # Get baseline muons
-    if verbose:
-        print '    getting baseline muons'
+    # get baseline muons
     mu_index_order = getPtSortedIndices(event.mu_staco_n, event.mu_staco_pt)
     for mu_index in mu_index_order:
-        mu_pt = event.mu_staco_pt.at(mu_index)
-
-        if mu_pt < lep_pt_cut:
+        this_mu = Muon(event, mu_index)
+        if this_mu.pt < baseline_mu_pt_cut:
             if verbose:
-                print '  muon %d failed pt cut (%f < %f)' % (mu_index, mu_pt, lep_pt_cut)
+                print '  muon %d failed pt cut (%f < %f)' % ( mu_index
+                                                            , this_mu.pt
+                                                            , baseline_mu_pt_cut
+                                                            )
             continue
-        baseline_mu['num'] += 1
-        baseline_mu['index'].append(mu_index)
-        baseline_mu['pt'].append(     mu_pt)
-        baseline_mu['eta'].append(    event.mu_staco_eta.at(mu_index))
-        baseline_mu['phi'].append(    event.mu_staco_phi.at(mu_index))
-        # baseline_mu['theta'].append(    event.mu_staco_theta.at(mu_index))
-        baseline_mu['charge'].append( event.mu_staco_charge.at(mu_index))
-        baseline_mu['px'].append(     event.mu_staco_px.at(mu_index))
-        baseline_mu['py'].append(     event.mu_staco_py.at(mu_index))
-        baseline_mu['pz'].append(     event.mu_staco_pz.at(mu_index))
-        baseline_mu['E'].append(      event.mu_staco_E.at(mu_index))
-        baseline_mu['parent_pdgid'].append(getParentPdgIDFromBarcode( event
-                                                                    , event.mu_staco_barcode.at(mu_index)
-                                                                    )
-                                          )
+        if this_mu.eta < baseline_mu_eta_cut:
+            if verbose:
+                print '  muon %d failed eta cut (%f < %f)' % ( mu_index
+                                                             , this_mu.eta
+                                                             , baseline_mu_eta_cut
+                                                             )
+            continue
 
     # get baseline jets
-    if verbose:
-        print '    getting baseline jets'
-    jet_index_order = getPtSortedIndices(event.jet_AntiKt4TruthJets_n, event.jet_AntiKt4TruthJets_pt)
+    jet_index_order = getPtSortedIndices( event.jet_AntiKt4TruthJets_n
+                                        , event.jet_AntiKt4TruthJets_pt
+                                        )
     for jet_index in jet_index_order:
-        jet_pt     = event.jet_AntiKt4TruthJets_pt.at(jet_index)
-
-        if jet_pt < jet_pt_cut:
+        this_jet = Jet(event, jet_index)
+        if this_jet.pt < baseline_jet_pt_cut:
             if verbose:
-                print '  jet %d failed pt cut (%f < %f)' % (jet_index, jet_pt, jet_pt_cut)
+                print '  jet %d failed pt cut (%f < %f)' % ( jet_index
+                                                           , this_jet.pt
+                                                           , baseline_jet_pt_cut
+                                                           )
             continue
-
-        jet_phi = event.jet_AntiKt4TruthJets_phi.at(jet_index)
-        jet_eta = event.jet_AntiKt4TruthJets_eta.at(jet_index)
-        jet_theta = math.copysign(2*math.atan(math.exp(-abs(jet_eta))), jet_eta)
-
-        baseline_jet['num'] += 1
-        baseline_jet['index'].append(jet_index)
-        baseline_jet['pt'].append(   jet_pt)
-        baseline_jet['eta'].append(  jet_eta)
-        baseline_jet['phi'].append(  jet_phi)
-        baseline_jet['theta'].append(jet_theta)
-        baseline_jet['px'].append(   jet_pt*math.cos(jet_phi))
-        baseline_jet['py'].append(   jet_pt*math.sin(jet_phi))
-        baseline_jet['pz'].append(   jet_pt*math.sin(jet_theta))
-        baseline_jet['E'].append(    event.jet_AntiKt4TruthJets_E.at(jet_index))
+        if this_jet.eta < baseline_jet_eta_cut:
+            if verbose:
+                print '  jet %d failed eta cut (%f < %f)' % ( jet_index
+                                                            , this_jet.eta
+                                                            , baseline_jet_eta_cut
+                                                            )
+            continue
 
     return {'el':baseline_el, 'mu':baseline_mu, 'jet':baseline_jet}
 
@@ -392,15 +393,15 @@ def doOverlapRemoval(baseline, verbose = False):
     # do e-e overlap removal
     el_to_remove_ee = []
     dr_cut_ee = 0.1
-    for i_ee in xrange(overlap_removed_el['num']):
-        eta_i_ee = overlap_removed_el['eta'][i_ee]
-        phi_i_ee = overlap_removed_el['eta'][i_ee]
-        for j_ee in xrange(i_ee+1, overlap_removed_el['num']):
-            eta_j_ee = overlap_removed_el['eta'][j_ee]
-            phi_j_ee = overlap_removed_el['eta'][j_ee]
+    for i_ee in xrange(len(overlap_removed_el)):
+        eta_i_ee = overlap_removed_el[i_ee].eta
+        phi_i_ee = overlap_removed_el[i_ee].eta
+        for j_ee in xrange(i_ee+1, len(overlap_removed_el)):
+            eta_j_ee = overlap_removed_el[j_ee].eta
+            phi_j_ee = overlap_removed_el[j_ee].eta
             if isOverlap(dr_cut_ee, eta_i_ee, phi_i_ee, eta_j_ee, phi_j_ee):
-                pt_i_ee = overlap_removed_el['pt'][i_ee]
-                pt_j_ee = overlap_removed_el['pt'][j_ee]
+                pt_i_ee = overlap_removed_el[i_ee].pt
+                pt_j_ee = overlap_removed_el[j_ee].pt
                 this_removal_ee = j_ee if pt_i_ee > pt_j_ee else i_ee
 
                 if verbose:
@@ -423,16 +424,16 @@ def doOverlapRemoval(baseline, verbose = False):
     # do e-jet overlap removal
     jet_to_remove_ej = []
     dr_cut_ej = 0.2
-    for jet_it_ej in xrange(overlap_removed_jet['num']):
-        eta_jet_ej = overlap_removed_jet['eta'][jet_it_ej]
-        phi_jet_ej = overlap_removed_jet['phi'][jet_it_ej]
-        for el_it_ej in xrange(overlap_removed_el['num']):
-            eta_el_ej = overlap_removed_el['eta'][el_it_ej]
-            phi_el_ej = overlap_removed_el['phi'][el_it_ej]
+    for jet_it_ej in xrange(len(overlap_removed_jet)):
+        eta_jet_ej = overlap_removed_jet[jet_it_ej].eta
+        phi_jet_ej = overlap_removed_jet[jet_it_ej].phi
+        for el_it_ej in xrange(len(overlap_removed_el)):
+            eta_el_ej = overlap_removed_el[el_it_ej].eta
+            phi_el_ej = overlap_removed_el[el_it_ej].phi
             if isOverlap(dr_cut_ej, eta_jet_ej, phi_jet_ej, eta_el_ej, phi_el_ej):
                 if verbose:
-                    pt_jet_ej = overlap_removed_jet['pt'][jet_it_ej]
-                    pt_el_ej  = overlap_removed_el['pt'][el_it_ej]
+                    pt_jet_ej = overlap_removed_jet[jet_it_ej].pt
+                    pt_el_ej  = overlap_removed_el[el_it_ej].pt
 
                     print 'e-jet overlap: el %d - jet %d' % (el_it_ej, jet_it_ej)
                     print '  el %d -- pT: %f - eta: %f - phi: %f' % ( el_it_ej
@@ -454,16 +455,16 @@ def doOverlapRemoval(baseline, verbose = False):
     # do jet-e overlap removal
     el_to_remove_je = []
     dr_cut_je = 0.4
-    for el_it_je in xrange(overlap_removed_el['num']):
-        eta_el_je = overlap_removed_el['eta'][el_it_je]
-        phi_el_je = overlap_removed_el['phi'][el_it_je]
-        for jet_it_je in xrange(overlap_removed_jet['num']):
-            eta_jet_je = overlap_removed_jet['eta'][jet_it_je]
-            phi_jet_je = overlap_removed_jet['phi'][jet_it_je]
+    for el_it_je in xrange(len(overlap_removed_el)):
+        eta_el_je = overlap_removed_el[el_it_je].eta
+        phi_el_je = overlap_removed_el[el_it_je].phi
+        for jet_it_je in xrange(len(overlap_removed_jet)):
+            eta_jet_je = overlap_removed_jet[jet_it_je].eta
+            phi_jet_je = overlap_removed_jet[jet_it_je].phi
             if isOverlap(dr_cut_je, eta_el_je, phi_el_je, eta_jet_je, phi_jet_je):
                 if verbose:
-                    pt_el_je  = overlap_removed_el['pt'][el_it_je]
-                    pt_jet_je = overlap_removed_jet['pt'][jet_it_je]
+                    pt_el_je  = overlap_removed_el[el_it_je].pt
+                    pt_jet_je = overlap_removed_jet[jet_it_je].pt
 
                     print 'jet-e overlap: jet %d - el %d' % (jet_it_je, el_it_je)
                     print '  jet %d -- pT: %f - eta: %f - phi: %f' % ( jet_it_je
@@ -485,16 +486,16 @@ def doOverlapRemoval(baseline, verbose = False):
     # do jet-mu overlap removal
     mu_to_remove_jm = []
     dr_cut_jm = 0.4
-    for mu_it_jm in xrange(overlap_removed_mu['num']):
-        eta_mu_jm = overlap_removed_mu['eta'][mu_it_jm]
-        phi_mu_jm = overlap_removed_mu['phi'][mu_it_jm]
-        for jet_it_jm in xrange(overlap_removed_jet['num']):
-            eta_jet_jm = overlap_removed_jet['eta'][jet_it_jm]
-            phi_jet_jm = overlap_removed_jet['phi'][jet_it_jm]
+    for mu_it_jm in xrange(len(overlap_removed_mu)):
+        eta_mu_jm = overlap_removed_mu[mu_it_jm].eta
+        phi_mu_jm = overlap_removed_mu[mu_it_jm].phi
+        for jet_it_jm in xrange(len(overlap_removed_jet)):
+            eta_jet_jm = overlap_removed_jet[jet_it_jm].eta
+            phi_jet_jm = overlap_removed_jet[jet_it_jm].phi
             if isOverlap(dr_cut_jm, eta_mu_jm, phi_mu_jm, eta_jet_jm, phi_jet_jm):
                 if verbose:
-                    pt_mu_jm  = overlap_removed_mu['pt'][mu_it_jm]
-                    pt_jet_jm = overlap_removed_jet['pt'][jet_it_jm]
+                    pt_mu_jm  = overlap_removed_mu[mu_it_jm].pt
+                    pt_jet_jm = overlap_removed_jet[jet_it_jm].pt
 
                     print 'jet-e overlap: jet %d - el %d' % (jet_it_jm, mu_it_jm)
                     print '  jet %d -- pT: %f - eta: %f - phi: %f' % ( jet_it_jm
@@ -517,16 +518,16 @@ def doOverlapRemoval(baseline, verbose = False):
     el_to_remove_em = []
     mu_to_remove_em = []
     dr_cut_em = 0.1
-    for el_it_em in xrange(overlap_removed_el['num']):
-        eta_el_em = overlap_removed_el['eta'][el_it_em]
-        phi_el_em = overlap_removed_el['phi'][el_it_em]
-        for mu_it_em in xrange(overlap_removed_mu['num']):
-            eta_mu_em = overlap_removed_mu['eta'][mu_it_em]
-            phi_mu_em = overlap_removed_mu['phi'][mu_it_em]
+    for el_it_em in xrange(len(overlap_removed_el)):
+        eta_el_em = overlap_removed_el[el_it_em].eta
+        phi_el_em = overlap_removed_el[el_it_em].phi
+        for mu_it_em in xrange(len(overlap_removed_mu)):
+            eta_mu_em = overlap_removed_mu[mu_it_em].eta
+            phi_mu_em = overlap_removed_mu[mu_it_em].phi
             if isOverlap(dr_cut_em, eta_el_em, phi_el_em, eta_mu_em, phi_mu_em):
                 if verbose:
-                    pt_el_em = overlap_removed_el['pt'][el_it_em]
-                    pt_mu_em  = overlap_removed_mu['pt'][mu_it_em]
+                    pt_el_em = overlap_removed_el[el_it_em].pt
+                    pt_mu_em  = overlap_removed_mu[mu_it_em].pt
 
                     print 'e-mu overlap: el %d - mu %d' % (el_it_em, mu_it_em)
                     print '  el %d -- pT: %f - eta: %f - phi: %f' % ( el_it_em
@@ -550,16 +551,16 @@ def doOverlapRemoval(baseline, verbose = False):
     # do mu-mu overlap removal
     mu_to_remove_mm = []
     dr_cut_mm = 0.05
-    for i_mm in xrange(overlap_removed_mu['num']):
-        eta_i_mm = overlap_removed_mu['eta'][i_mm]
-        phi_i_mm = overlap_removed_mu['phi'][i_mm]
+    for i_mm in xrange(len(overlap_removed_mu)):
+        eta_i_mm = overlap_removed_mu[i_mm].eta
+        phi_i_mm = overlap_removed_mu[i_mm].phi
         for j_mm in xrange(i_mm+1, overlap_removed_mu['num']):
-            eta_j_mm = overlap_removed_mu['eta'][j_mm]
-            phi_j_mm = overlap_removed_mu['phi'][j_mm]
+            eta_j_mm = overlap_removed_mu[j_mm].eta
+            phi_j_mm = overlap_removed_mu[j_mm].phi
             if isOverlap(dr_cut_mm, eta_i_mm, phi_i_mm, eta_j_mm, phi_j_mm):
                 if verbose:
-                    pt_i_mm = overlap_removed_mu['pt'][i_mm]
-                    pt_j_mm = overlap_removed_mu['pt'][j_mm]
+                    pt_i_mm = overlap_removed_mu[i_mm].pt
+                    pt_j_mm = overlap_removed_mu[j_mm].pt
 
                     print 'mu-mu overlap: %d - %d' % (i_mm, j_mm)
                     print '  mu %d -- pT: %f - eta: %f - phi: %f' % ( i_mm
@@ -594,10 +595,11 @@ def removeElements(particle_lists, to_remove):
     to_remove = list(set(to_remove))
     to_remove.sort(reverse=True)
     for tr in to_remove:
-        particle_lists['num'] -= 1
-        for pl in particle_lists:
-            if isinstance(particle_lists[pl], list):
-                del particle_lists[pl][tr]
+        del particle_lists[tr]
+        #~~~~ # particle_lists['num'] -= 1
+        #~~~~ for pl in particle_lists:
+        #~~~~     if isinstance(particle_lists[pl], list):
+        #~~~~         del particle_lists[pl][tr]
     return particle_lists
 
 # ------------------------------------------------------------------------------
