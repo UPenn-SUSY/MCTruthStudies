@@ -13,11 +13,23 @@ import metaroot
 import DiLeptonCutflow as cutflow
 
 # ------------------------------------------------------------------------------
+def writeToDir(hist, out_file, dir_name):
+    out_file.cd()
+    if dir_name is not '':
+        if out_file.Get(dir_name) == None:
+            out_file.mkdir(dir_name)
+        out_file.cd(dir_name)
+    hist.Write()
+
+# ------------------------------------------------------------------------------
 class hFlavorChannels(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
                 , title = 'flavor channels'
+                , dir_name = ''
                 ):
+        self.dir_name = dir_name
+
         self.hist = ROOT.TH1F( 'h__flavor_channel'
                              , title
                              , len(cutflow.flavor_channels)
@@ -34,24 +46,20 @@ class hFlavorChannels(object):
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
-        out_file.cd()
-        self.hist.Write()
-        self.hist.Fill(bin_num)
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def writeToFile(self, out_file):
-        out_file.cd()
-        self.hist.Write()
+        writeToDir(self.hist, out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
 class hPt(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
                 , title = 'pt'
+                , dir_name = ''
                 ):
         num_bins = 50
         x_min = 0
         x_max = 500
+
+        self.dir_name = dir_name
 
         self.hist_pt   = {}
         self.hist_diff = {}
@@ -101,19 +109,22 @@ class hPt(object):
         out_file.cd()
         for fc in cutflow.flavor_channels:
             for num_lep in xrange(cutflow.max_num_leptons):
-                self.hist_pt[fc][num_lep].Write()
-            self.hist_diff[fc].Write()
-            self.hist_2d[fc].Write()
+                writeToDir(self.hist_pt[fc][num_lep], out_file, self.dir_name)
+            writeToDir(self.hist_diff[fc], out_file, self.dir_name)
+            writeToDir(self.hist_2d[fc]  , out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
 class hEta(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
                 , title = 'eta'
+                , dir_name = ''
                 ):
         num_bins = 10
         x_min = -3.
         x_max = +3.
+
+        self.dir_name = dir_name
 
         self.hist_eta = {}
         for fc in cutflow.flavor_channels:
@@ -143,17 +154,20 @@ class hEta(object):
         out_file.cd()
         for fc in cutflow.flavor_channels:
             for num_lep in xrange(cutflow.max_num_leptons):
-                self.hist_eta[fc][num_lep].Write()
+                writeToDir(self.hist_eta[fc][num_lep], out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
 class hNumJet(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
                 , title = 'num jet'
+                , dir_name = ''
                 ):
         num_bins = 10
         x_min = -0.5
         x_max = num_bins - 0.5
+
+        self.dir_name = dir_name
 
         self.hist   = {}
         for fc in cutflow.flavor_channels:
@@ -170,17 +184,20 @@ class hNumJet(object):
     def writeToFile(self, out_file):
         out_file.cd()
         for fc in cutflow.flavor_channels:
-            self.hist[fc].Write()
+            writeToDir(self.hist[fc], out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
 class hJetPt(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
                 , title = 'jet pt'
+                , dir_name = ''
                 ):
         num_bins = 50
         x_min = 0
         x_max = 500
+
+        self.dir_name = dir_name
 
         self.hist = {}
         for fc in cutflow.flavor_channels:
@@ -208,32 +225,29 @@ class hJetPt(object):
         out_file.cd()
         for fc in cutflow.flavor_channels:
             for jet_itr in xrange(cutflow.max_num_jets):
-                self.hist[fc][jet_itr].Write()
+                writeToDir(self.hist[fc][jet_itr], out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
 class hMet(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
                 , title = 'met'
+                , dir_name = ''
                 ):
         num_bins = 50
         x_min = 0
         x_max = 500
 
+        self.dir_name = dir_name
+
         self.hist_met_int         = {}
         self.hist_metrel_int      = {}
-
-        # self.hist_met_int_w_mu    = {}
-        # self.hist_metrel_int_w_mu = {}
 
         self.hist_met_noint       = {}
         self.hist_metrel_noint    = {}
 
         self.hist_met_diff        = {}
-        # self.hist_met_diff_w_mu   = {}
-
         self.hist_metrel_diff        = {}
-        # self.hist_metrel_diff_w_mu   = {}
 
         for fc in cutflow.flavor_channels:
             self.hist_met_int[fc] = ROOT.TH1F( 'h__%s__met_int' % fc
@@ -244,15 +258,6 @@ class hMet(object):
                                              , '%s int - %s; E_{T}^{miss,rel,int} [GeV]' % (title, fc)
                                              , num_bins, x_min, x_max
                                              )
-
-            # self.hist_met_int_w_mu[fc] = ROOT.TH1F( 'h__%s__met_int_w_mu' % fc
-            #                                       , '%s int - %s; E_{T}^{miss,int+#mu} [GeV]' % (title, fc)
-            #                                       , num_bins, x_min, x_max
-            #                                       )
-            # self.hist_metrel_int_w_mu[fc] = ROOT.TH1F( 'h__%s__metrel_int_w_mu' % fc
-            #                                       , '%s int - %s; E_{T}^{miss,rel,int+#mu} [GeV]' % (title, fc)
-            #                                       , num_bins, x_min, x_max
-            #                                       )
 
             self.hist_met_noint[fc] = ROOT.TH1F( 'h__%s__met_noint' % fc
                                                , '%s no int - %s; E_{T}^{miss,no int} [GeV]' % (title, fc)
@@ -267,19 +272,10 @@ class hMet(object):
                                               , '%s diff - %s; E_{T}^{miss,no int} - E_{T}^{miss,int} [GeV]' % (title, fc)
                                               , num_bins, -x_max, x_max
                                               )
-            # self.hist_met_diff_w_mu[fc] = ROOT.TH1F( 'h__%s__met_int_noint_diff_w_mu' % fc
-            #                                        , '%s diff - %s; E_{T}^{miss,no int} - E_{T}^{miss,int+#mu} [GeV]' % (title, fc)
-            #                                        , num_bins, -x_max, x_max
-            #                                        )
-
             self.hist_metrel_diff[fc] = ROOT.TH1F( 'h__%s__metrel_int_noint_diff' % fc
                                                  , '%s diff - %s; E_{T}^{miss,rel,no int} - E_{T}^{miss,rel,int} [GeV]' % (title, fc)
                                                  , num_bins, -x_max, x_max
                                                  )
-            # self.hist_metrel_diff_w_mu[fc] = ROOT.TH1F( 'h__%s__metrel_int_noint_diff_w_mu' % fc
-            #                                           , '%s diff - %s; E_{T}^{miss,rel,no int} - E_{T}^{miss,rel,int+#mu} [GeV]' % (title, fc)
-            #                                           , num_bins, -x_max, x_max
-            #                                           )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def fill(self, flavor_channel, signal_objects, event):
@@ -301,7 +297,6 @@ class hMet(object):
         self.hist_met_diff[flavor_channel].Fill( met_noint
                                                - met_int
                                                )
-
         self.hist_metrel_diff[flavor_channel].Fill( metrel_noint
                                                   - metrel_int
                                                   )
@@ -310,30 +305,27 @@ class hMet(object):
     def writeToFile(self, out_file):
         out_file.cd()
         for fc in cutflow.flavor_channels:
-            self.hist_met_int[fc].Write()
-            self.hist_metrel_int[fc].Write()
+            writeToDir(self.hist_met_int[fc], out_file, self.dir_name)
+            writeToDir(self.hist_metrel_int[fc], out_file, self.dir_name)
 
-            # self.hist_met_int_w_mu[fc].Write()
-            # self.hist_metrel_int_w_mu[fc].Write()
+            writeToDir(self.hist_met_noint[fc], out_file, self.dir_name)
+            writeToDir(self.hist_metrel_noint[fc], out_file, self.dir_name)
 
-            self.hist_met_noint[fc].Write()
-            self.hist_metrel_noint[fc].Write()
-
-            self.hist_met_diff[fc].Write()
-            # self.hist_met_diff_w_mu[fc].Write()
-
-            self.hist_metrel_diff[fc].Write()
-            # self.hist_metrel_diff_w_mu[fc].Write()
+            writeToDir(self.hist_met_diff[fc], out_file, self.dir_name)
+            writeToDir(self.hist_metrel_diff[fc], out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
 class hMll(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
                 , title = 'mll'
+                , dir_name = ''
                 ):
         num_bins = 40
         x_min = 0
         x_max = 400
+
+        self.dir_name = dir_name
 
         self.hist = {}
         for fc in cutflow.flavor_channels:
@@ -351,17 +343,20 @@ class hMll(object):
     def writeToFile(self, out_file):
         out_file.cd()
         for fc in cutflow.flavor_channels:
-            self.hist[fc].Write()
+            writeToDir(self.hist[fc], out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
 class hMt2(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
                 , title = 'mt2'
+                , dir_name = ''
                 ):
         num_bins = 40
         x_min = 0
         x_max = 400
+
+        self.dir_name = dir_name
 
         self.hist = {}
         for fc in cutflow.flavor_channels:
@@ -379,17 +374,20 @@ class hMt2(object):
     def writeToFile(self, out_file):
         out_file.cd()
         for fc in cutflow.flavor_channels:
-            self.hist[fc].Write()
+            writeToDir(self.hist[fc], out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
 class hPtll(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
                 , title = 'ptll'
+                , dir_name = ''
                 ):
         num_bins = 40
         x_min = 0
         x_max = 400
+
+        self.dir_name = dir_name
 
         self.hist = {}
         for fc in cutflow.flavor_channels:
@@ -407,17 +405,20 @@ class hPtll(object):
     def writeToFile(self, out_file):
         out_file.cd()
         for fc in cutflow.flavor_channels:
-            self.hist[fc].Write()
+            writeToDir(self.hist[fc], out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
 class hEmmaMt(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
-                , title = 'ptll'
+                , title = 'emma_mt'
+                , dir_name = ''
                 ):
         num_bins = 40
         x_min = 0
         x_max = 400
+
+        self.dir_name = dir_name
 
         self.hist = {}
         for fc in cutflow.flavor_channels:
@@ -435,17 +436,20 @@ class hEmmaMt(object):
     def writeToFile(self, out_file):
         out_file.cd()
         for fc in cutflow.flavor_channels:
-            self.hist[fc].Write()
+            writeToDir(self.hist[fc], out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
 class hSRSS(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
                 , title = 'srss'
+                , dir_name = ''
                 ):
         num_bins = 7
         x_min = -0.5
         x_max = 6.5
+
+        self.dir_name = dir_name
 
         self.hist = {}
         for fc in cutflow.flavor_channels:
@@ -474,17 +478,20 @@ class hSRSS(object):
     def writeToFile(self, out_file):
         out_file.cd()
         for fc in cutflow.flavor_channels:
-            self.hist[fc].Write()
+            writeToDir(self.hist[fc], out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
 class hSROS(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
                 , title = 'sros'
+                , dir_name = ''
                 ):
         num_bins = 7
         x_min = -0.5
         x_max = 6.5
+
+        self.dir_name = dir_name
 
         self.hist = {}
         for fc in cutflow.flavor_channels:
@@ -511,5 +518,5 @@ class hSROS(object):
     def writeToFile(self, out_file):
         out_file.cd()
         for fc in cutflow.flavor_channels:
-            self.hist[fc].Write()
+            writeToDir(self.hist[fc], out_file, self.dir_name)
 
