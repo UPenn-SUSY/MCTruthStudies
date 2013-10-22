@@ -17,28 +17,41 @@ ROOT.gInterpreter.GenerateDictionary("vector<vector<int> >","vector");
 
 # ==============================================================================
 # helper definitions
-decay_categories = [ 'c1_c1'
-                   , 'sl_sl'
-                   , 'c1_sl'
-                   , 'sl_c1'
+mother_type_list = [ 'c1'
+                   , 'n2'
+                   , 'sl'
                    , 'none'
                    ]
-
-flavor_channels = [ 'ee_os'
-                  , 'ee_ss'
-                  , 'mm_os'
-                  , 'mm_ss'
-                  , 'em_os'
-                  , 'em_ss'
-                  , 'me_os'
-                  , 'me_ss'
-                  , 'eee'
-                  , 'eem'
-                  , 'emm'
-                  , 'mmm'
-                  , 'multi'
-                  , 'none'
+decay_categories = [ 'dc_all'
+                   , 'dc_c1_c1'
+                   , 'dc_sl_sl'
+                   , 'dc_c1_sl'
+                   , 'dc_sl_c1'
+                   , 'dc_n2_n2'
+                   , 'dc_n2_c1'
+                   , 'dc_c1_n2'
+                   , 'dc_n2_sl'
+                   , 'dc_sl_n2'
+                   , 'dc_none'
+                   ]
+flavor_channels = [ 'fc_all'
+                  , 'fc_ee_os'
+                  , 'fc_ee_ss'
+                  , 'fc_mm_os'
+                  , 'fc_mm_ss'
+                  , 'fc_em_os'
+                  , 'fc_em_ss'
+                  , 'fc_me_os'
+                  , 'fc_me_ss'
+                  , 'fc_eee'
+                  , 'fc_eem'
+                  , 'fc_emm'
+                  , 'fc_mmm'
+                  , 'fc_multi'
+                  , 'fc_none'
                   ]
+
+min_num_leptons = 2
 max_num_leptons = 4
 max_num_jets = 2
 
@@ -51,9 +64,9 @@ baseline_el_pt_cut  = 10.e3
 baseline_mu_pt_cut  = 10.e3
 baseline_jet_pt_cut = 20.e3
 
-baseline_el_eta_cut  = 2.4
+baseline_el_eta_cut  = 2.47
 baseline_mu_eta_cut  = 2.4
-baseline_jet_eta_cut = 2.4
+baseline_jet_eta_cut = 5
 
 
 signal_el_pt_cut  = 10.e3
@@ -64,309 +77,363 @@ signal_el_eta_cut  = 2.4
 signal_mu_eta_cut  = 2.4
 signal_jet_eta_cut = 2.4
 
+# ==============================================================================
+class Electron(object):
+    # ------------------------------------------------------------------------------
+    def __init__(self, event, electron_index):
+        self.index        = electron_index
+        self.pt           = event.el_pt.at(electron_index)
+        self.eta          = event.el_eta.at(electron_index)
+        self.phi          = event.el_phi.at(electron_index)
+        self.E            = event.el_E.at(electron_index)
+        self.charge       = event.el_charge.at(electron_index)
+        self.px           = event.el_px.at(electron_index)
+        self.py           = event.el_py.at(electron_index)
+        self.pz           = event.el_pz.at(electron_index)
+        self.parent_pdgid = getParentPdgIDFromBarcode( event
+                                                     , event.el_barcode.at(electron_index)
+                                                     )
 
-# ------------------------------------------------------------------------------
-def doObjectSelection( event
-                     , lep_pt_cut
-                     , lep_eta_cut
-                     , jet_pt_cut
-                     , jet_eta_cut
-                     , verbose = False
-                     ):
-    if verbose:
-        print '----------------------------------------'
-        print 'doing object selection for event: %s' % event.EventNumber
+# ==============================================================================
+class Muon(object):
+    # ------------------------------------------------------------------------------
+    def __init__(self, event, muon_index):
+        self.index        = muon_index
+        self.pt           = event.mu_staco_pt.at(muon_index)
+        self.eta          = event.mu_staco_eta.at(muon_index)
+        self.phi          = event.mu_staco_phi.at(muon_index)
+        self.E            = event.mu_staco_E.at(muon_index)
+        self.charge       = event.mu_staco_charge.at(muon_index)
+        self.px           = event.mu_staco_px.at(muon_index)
+        self.py           = event.mu_staco_py.at(muon_index)
+        self.pz           = event.mu_staco_pz.at(muon_index)
+        self.parent_pdgid = getParentPdgIDFromBarcode( event
+                                                     , event.mu_staco_barcode.at(muon_index)
+                                                     )
 
-    # get baseline objects
-    baseline = getBaselineObjects( event
-                                 , lep_pt_cut
-                                 , jet_pt_cut
-                                 , verbose
-                                 )
+# ==============================================================================
+class Jet(object):
+    # ------------------------------------------------------------------------------
+    def __init__(self, event, jet_index):
+        self.index        = jet_index
+        self.pt           = event.jet_AntiKt4TruthJets_pt.at(jet_index)
+        self.eta          = event.jet_AntiKt4TruthJets_eta.at(jet_index)
+        self.phi          = event.jet_AntiKt4TruthJets_phi.at(jet_index)
+        self.E            = event.jet_AntiKt4TruthJets_E.at(jet_index)
+        self.theta        = math.copysign( 2*math.atan(math.exp(-abs(self.eta)))
+                                         , self.eta
+                                         )
+        self.px           = self.pt*math.cos(self.phi)
+        self.py           = self.pt*math.sin(self.phi)
+        self.pz           = self.pt*math.sin(self.theta)
 
-    overlap_removed = doOverlapRemoval(baseline, verbose)
+# ==============================================================================
+class EwkCutFlow(object):
+    # ------------------------------------------------------------------------------
+    def __init__(self, event):
+        self.event = event
+        self.valid_cutflow = self.doObjectSelection(
+                                                   # verbose = True
+                                                   )
 
-    signal = getSignalObjects( event
-                             , overlap_removed
-                             , lep_pt_cut
-                             , lep_eta_cut
-                             , jet_pt_cut
-                             , jet_eta_cut
-                             , verbose
-                             )
+    # ------------------------------------------------------------------------------
+    def doObjectSelection(self, verbose = False):
+        if verbose:
+            print '----------------------------------------'
+            print 'doing object selection for event: %s' % self.event.EventNumber
 
-    return signal
+        # get baseline objects
+        self.baseline = getBaselineObjects( self.event, verbose)
+        self.num_baseline_el  = len(self.baseline['el'])
+        self.num_baseline_mu  = len(self.baseline['mu'])
+        self.num_baseline_jet = len(self.baseline['jet'])
 
-# ------------------------------------------------------------------------------
-def isSRSS1(signal_objects):
-    num_el = signal_objects['el']['num']
-    num_mu = signal_objects['mu']['num']
-    num_lep = num_el+num_mu
+        if verbose:
+            print '  num baseline electrons: %s' % len(self.baseline['el'])
+            print '  num baseline muons:     %s' % len(self.baseline['mu'])
+            print '  num baseline jets:      %s' % len(self.baseline['jet'])
 
-    if "ss" not in getFlavorChannel(signal_objects):
-        return False
-    if signal_objects['jet']['num'] == 0:
-        return False
-    if signal_objects['met']['rel_noint'] < 50.:
-        return False
-    if signal_objects['emma_mt']/1000. > 40:
-        return False
-
-    return True
-
-# ------------------------------------------------------------------------------
-def isSRSS2(signal_objects):
-    num_el = signal_objects['el']['num']
-    num_mu = signal_objects['mu']['num']
-    num_lep = num_el+num_mu
-
-    if "ss" not in getFlavorChannel(signal_objects):
-        return False
-    if signal_objects['jet']['num'] == 0:
-        return False
-    if signal_objects['met']['rel_noint'] < 50.:
-        return False
-    if signal_objects['mll']/1000. > 100:
-        return False
-    if signal_objects['ptll']/1000. > 100:
-        return False
-
-    return True
-
-# ------------------------------------------------------------------------------
-def isSRSS3(signal_objects):
-    num_el = signal_objects['el']['num']
-    num_mu = signal_objects['mu']['num']
-    num_lep = num_el+num_mu
-
-    if "ss" not in getFlavorChannel(signal_objects):
-        return False
-    if signal_objects['jet']['num'] == 0:
-        return False
-    if signal_objects['met']['rel_noint'] < 50.:
-        return False
-    if signal_objects['mll']/1000. > 75:
-        return False
-    if signal_objects['ptll']/1000. > 75:
-        return False
-
-    return True
-
-# ------------------------------------------------------------------------------
-def isSRSS4(signal_objects):
-    num_el = signal_objects['el']['num']
-    num_mu = signal_objects['mu']['num']
-    num_lep = num_el+num_mu
-
-    if "ss" not in getFlavorChannel(signal_objects):
-        return False
-    if signal_objects['met']['noint'] < 200.:
-        return False
-
-    return True
-
-# ------------------------------------------------------------------------------
-def isSRSS5(signal_objects):
-    num_el = signal_objects['el']['num']
-    num_mu = signal_objects['mu']['num']
-    num_lep = num_el+num_mu
-
-    if "ss" not in getFlavorChannel(signal_objects):
-        return False
-    if signal_objects['met']['rel_noint'] < 200.:
-        return False
-
-    return True
-
-# ------------------------------------------------------------------------------
-def isSROSMT2a(signal_objects):
-    num_el = signal_objects['el']['num']
-    num_mu = signal_objects['mu']['num']
-    num_lep = num_el+num_mu
-
-    flavor_channel = getFlavorChannel(signal_objects)
-    if 'os' not in flavor_channel:
-        return False
-    #Z veto for ee/mm
-    mll = signal_objects['mll']
-    if 'ee' in flavor_channel or 'mm' in flavor_channel:
-        if abs(mll/1000. - 91.2) < 10:
+        if self.num_baseline_el + self.num_baseline_mu < min_num_leptons:
             return False
-    if signal_objects['met']['rel_noint'] < 40.:
-        return False
-    if signal_objects['mt2']/1000. < 90.:
-        return False
 
-    return True
+        # do overlap removal
+        self.overlap_removed = doOverlapRemoval(self.baseline, verbose)
+        self.num_overlap_removed_el  = len(self.overlap_removed['el'])
+        self.num_overlap_removed_mu  = len(self.overlap_removed['mu'])
+        self.num_overlap_removed_jet = len(self.overlap_removed['jet'])
 
-# ------------------------------------------------------------------------------
-def isSROSMT2b(signal_objects):
-    num_el = signal_objects['el']['num']
-    num_mu = signal_objects['mu']['num']
-    num_lep = num_el+num_mu
+        if verbose:
+            print '  num overlap removal electrons: %s' % len(self.overlap_removed['el'])
+            print '  num overlap removal muons:     %s' % len(self.overlap_removed['mu'])
+            print '  num overlap removal jets:      %s' % len(self.overlap_removed['jet'])
 
-    flavor_channel = getFlavorChannel(signal_objects)
-    if 'os' not in flavor_channel:
-        return False
-    #Z veto for ee/mm
-    mll = signal_objects['mll']
-    if 'ee' in flavor_channel or 'mm' in flavor_channel:
-        if abs(mll/1000. - 91.2) < 10:
+        if self.num_overlap_removed_el + self.num_overlap_removed_mu < min_num_leptons:
             return False
-    if signal_objects['met']['rel_noint'] < 40.:
-        return False
-    if signal_objects['mt2']/1000. < 120.:
-        return False
 
-    return True
+        # get signal objets
+        self.signal = getSignalObjects(self.overlap_removed, verbose)
+        self.num_signal_el  = len(self.signal['el'])
+        self.num_signal_mu  = len(self.signal['mu'])
+        self.num_signal_jet = len(self.signal['jet'])
 
-# ------------------------------------------------------------------------------
-def isSROSMT2c(signal_objects):
-    num_el = signal_objects['el']['num']
-    num_mu = signal_objects['mu']['num']
-    num_lep = num_el+num_mu
+        if verbose:
+            print '  num singal electrons: %s' % len(self.signal['el'])
+            print '  num singal muons:     %s' % len(self.signal['mu'])
+            print '  num singal jets:      %s' % len(self.signal['jet'])
 
-    flavor_channel = getFlavorChannel(signal_objects)
-    if 'os' not in flavor_channel:
-        return False
-    #Z veto for ee/mm
-    mll = signal_objects['mll']
-    if 'ee' in flavor_channel or 'mm' in flavor_channel:
-        if abs(mll/1000. - 91.2) < 10:
+        if self.num_signal_el + self.num_signal_mu < min_num_leptons:
             return False
-    if signal_objects['met']['rel_noint'] < 40.:
-        return False
-    if signal_objects['mt2']/1000. < 150.:
-        return False
 
-    return True
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # get flavor channel
+        self.flavor_channel = getFlavorChannel(self.signal)
+        if verbose:
+            print 'flavor channel: %s' % self.flavor_channel
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # get mll
+        if verbose:
+            print '    get mll'
+        self.mll = getMll(self.signal['el'], self.signal['mu'])
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # get ptll
+        if verbose:
+            print '    get ptll'
+        self.ptll = getPtll(self.signal['el'], self.signal['mu'])
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # get emma_mt
+        if verbose:
+            print '    get emma_mt'
+        self.emma_mt = getEmmaMt(self.signal['el'], self.signal['mu'])
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # get met and met-related variables
+        if verbose:
+            print '    get met'
+        self.getMet()
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        if verbose:
+            print '    get mt2'
+        self.mt2 = mt2_calc.getMT2( self.signal['el']
+                                  , self.signal['mu']
+                                  , self.event.MET_Truth_NonInt_etx
+                                  , self.event.MET_Truth_NonInt_ety
+                                  , minv = 0.
+                                  , verbose = False
+                                  )
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        if verbose:
+            print '    checking regions'
+        self.regions = []
+        if self.isSRSS1():    self.regions.append('srss1')
+        if self.isSRSS2():    self.regions.append('srss2')
+        if self.isSRSS3():    self.regions.append('srss3')
+        if self.isSRSS4():    self.regions.append('srss4')
+        if self.isSRSS5():    self.regions.append('srss5')
+        if self.isSROSMT2a(): self.regions.append('srmt2a')
+        if self.isSROSMT2b(): self.regions.append('srmt2b')
+        if self.isSROSMT2c(): self.regions.append('srmt2c')
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # checking decay categories
+        self.decay_category = getDecayCategory(self.signal)
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        return True
+
+    # ------------------------------------------------------------------------------
+    def getMet(self):
+        met_etx_int = self.event.MET_Truth_Int_etx
+        met_ety_int = self.event.MET_Truth_Int_ety
+        for muon in self.signal['mu']:
+            met_etx_int -= muon.px
+            met_ety_int -= muon.py
+        met_int = math.sqrt( met_etx_int*met_etx_int
+                           + met_ety_int*met_ety_int
+                           )/1000.
+        metrel_int = getMetRel( met_etx_int
+                              , met_ety_int
+                              , self.signal['el']
+                              , self.signal['mu']
+                              , self.signal['jet']
+                              )/1000.
+
+        met_etx_noint = self.event.MET_Truth_NonInt_etx
+        met_ety_noint = self.event.MET_Truth_NonInt_ety
+        met_noint = math.sqrt( met_etx_noint*met_etx_noint
+                             + met_ety_noint*met_ety_noint
+                             )/1000.
+        metrel_noint = getMetRel( met_etx_noint
+                                , met_ety_noint
+                                , self.signal['el']
+                                , self.signal['mu']
+                                , self.signal['jet']
+                                )/1000.
+
+        self.met = { 'int':met_int    , 'rel_int':metrel_int
+                   , 'noint':met_noint, 'rel_noint':metrel_noint
+                   }
+
+    # ------------------------------------------------------------------------------
+    def isSRSS1(self):
+        # num_el = len(self.signal['el'])
+        # num_mu = len(self.signal['mu'])
+        # num_lep = num_el+num_mu
+
+        if "ss" not in self.flavor_channel: return False
+        if len(self.signal['jet']) == 0:    return False
+        if self.met['rel_noint'] < 50.:     return False
+        if self.emma_mt/1000. > 40:         return False
+
+        return True
+
+    # ------------------------------------------------------------------------------
+    def isSRSS2(self):
+        # len(num_el = self.signal['el'])
+        # len(num_mu = self.signal['mu'])
+        # num_lep = num_el+num_mu
+
+        if "ss" not in self.flavor_channel: return False
+        if len(self.signal['jet']) == 0:    return False
+        if self.met['rel_noint'] < 50.:     return False
+        if self.mll/1000. > 100:            return False
+        if self.ptll/1000. > 100:           return False
+
+        return True
+
+    # ------------------------------------------------------------------------------
+    def isSRSS3(self):
+        if "ss" not in self.flavor_channel: return False
+        if len(self.signal['jet']) == 0:    return False
+        if self.met['rel_noint'] < 50.:     return False
+        if self.mll/1000. > 75:             return False
+        if self.ptll/1000. > 75:            return False
+
+        return True
+
+    # ------------------------------------------------------------------------------
+    def isSRSS4(self):
+        if "ss" not in self.flavor_channel: return False
+        if self.met['noint'] < 200.:        return False
+
+        return True
+
+    # ------------------------------------------------------------------------------
+    def isSRSS5(self):
+        if "ss" not in self.flavor_channel: return False
+        if self.met['rel_noint'] < 200.:    return False
+
+        return True
+
+    # ------------------------------------------------------------------------------
+    def isSROSMT2a(self):
+        if 'os' not in self.flavor_channel: return False
+        if self.met['rel_noint'] < 40.:     return False
+        if self.mt2/1000. < 90.:            return False
+
+        #Z veto for ee/mm
+        if 'ee' in self.flavor_channel or 'mm' in self.flavor_channel:
+            if abs(self.mll/1000. - 91.2) < 10: return False
+
+        return True
+
+    # ------------------------------------------------------------------------------
+    def isSROSMT2b(self):
+        if 'os' not in self.flavor_channel: return False
+        if self.met['rel_noint'] < 40.:     return False
+        if self.mt2/1000. < 120.:           return False
+
+        #Z veto for ee/mm
+        if 'ee' in self.flavor_channel or 'mm' in self.flavor_channel:
+            if abs(self.mll/1000. - 91.2) < 10: return False
+
+        return True
+
+    # ------------------------------------------------------------------------------
+    def isSROSMT2c(self):
+        if 'os' not in self.flavor_channel: return False
+        if self.met['rel_noint'] < 40.:     return False
+        if self.mt2/1000. < 150.:           return False
+
+        #Z veto for ee/mm
+        if 'ee' in self.flavor_channel or 'mm' in self.flavor_channel:
+            if abs(self.mll/1000. - 91.2) < 10: return False
+
+        return True
 
 # ------------------------------------------------------------------------------
 def getBaselineObjects( event
-                      , lep_pt_cut
-                      , jet_pt_cut
                       , verbose = False
                       ):
-    baseline_el = { 'num':0
-                  , 'index':[]
-                  , 'pt':[]
-                  , 'eta':[]
-                  , 'phi':[]
-                  # , 'theta':[]
-                  , 'charge':[]
-                  , 'px':[]
-                  , 'py':[]
-                  , 'pz':[]
-                  , 'E':[]
-                  , 'parent_pdgid':[]
-                  }
+    baseline_el  = []
+    baseline_mu  = []
+    baseline_jet = []
 
-    baseline_mu = { 'num':0
-                  , 'index':[]
-                  , 'pt':[]
-                  , 'eta':[]
-                  , 'phi':[]
-                  # , 'theta':[]
-                  , 'charge':[]
-                  , 'px':[]
-                  , 'py':[]
-                  , 'pz':[]
-                  , 'E':[]
-                  , 'parent_pdgid':[]
-                  }
-
-    baseline_jet = { 'num':0
-                   , 'index':[]
-                   , 'pt':[]
-                   , 'eta':[]
-                   , 'phi':[]
-                   , 'theta':[]
-                   , 'px':[]
-                   , 'py':[]
-                   , 'pz':[]
-                   , 'E':[]
-                   }
-
-    # Get baseline electrons
-    if verbose:
-        print '    getting baseline electrons'
+    # get baseline electrons
     el_index_order = getPtSortedIndices(event.el_n, event.el_pt)
     for el_index in el_index_order:
-        el_pt = event.el_pt.at(el_index)
-
-        if el_pt < lep_pt_cut:
+        this_el = Electron(event, el_index)
+        if this_el.pt < baseline_el_pt_cut:
             if verbose:
-                print '  electron %d failed pt cut (%f < %f)' % (el_index, el_pt, lep_pt_cut)
+                print '  electron %d failed pt cut (%f < %f)' % ( el_index
+                                                                , this_el.pt
+                                                                , baseline_el_pt_cut
+                                                                )
             continue
-        baseline_el['num'] += 1
-        baseline_el['index'].append(el_index)
-        baseline_el['pt'].append(     el_pt)
-        baseline_el['eta'].append(    event.el_eta.at(el_index))
-        baseline_el['phi'].append(    event.el_phi.at(el_index))
-        # baseline_el['theta'].append(    event.el_theta.at(el_index))
-        baseline_el['charge'].append( event.el_charge.at(el_index))
-        baseline_el['px'].append(    event.el_px.at(el_index))
-        baseline_el['py'].append(    event.el_py.at(el_index))
-        baseline_el['pz'].append(    event.el_pz.at(el_index))
-        baseline_el['E'].append(     event.el_E.at(el_index))
-        baseline_el['parent_pdgid'].append( getParentPdgIDFromBarcode( event
-                                                                     , event.el_barcode.at(el_index)
-                                                                     )
-                                          )
+        if abs(this_el.eta) > baseline_el_eta_cut:
+            if verbose:
+                print '  electron %d failed eta cut (%f < %f)' % ( el_index
+                                                                 , this_el.eta
+                                                                 , baseline_el_eta_cut
+                                                                 )
+            continue
+        baseline_el.append(this_el)
 
-    # Get baseline muons
-    if verbose:
-        print '    getting baseline muons'
+    # get baseline muons
     mu_index_order = getPtSortedIndices(event.mu_staco_n, event.mu_staco_pt)
     for mu_index in mu_index_order:
-        mu_pt = event.mu_staco_pt.at(mu_index)
-
-        if mu_pt < lep_pt_cut:
+        this_mu = Muon(event, mu_index)
+        if this_mu.pt < baseline_mu_pt_cut:
             if verbose:
-                print '  muon %d failed pt cut (%f < %f)' % (mu_index, mu_pt, lep_pt_cut)
+                print '  muon %d failed pt cut (%f < %f)' % ( mu_index
+                                                            , this_mu.pt
+                                                            , baseline_mu_pt_cut
+                                                            )
             continue
-        baseline_mu['num'] += 1
-        baseline_mu['index'].append(mu_index)
-        baseline_mu['pt'].append(     mu_pt)
-        baseline_mu['eta'].append(    event.mu_staco_eta.at(mu_index))
-        baseline_mu['phi'].append(    event.mu_staco_phi.at(mu_index))
-        # baseline_mu['theta'].append(    event.mu_staco_theta.at(mu_index))
-        baseline_mu['charge'].append( event.mu_staco_charge.at(mu_index))
-        baseline_mu['px'].append(     event.mu_staco_px.at(mu_index))
-        baseline_mu['py'].append(     event.mu_staco_py.at(mu_index))
-        baseline_mu['pz'].append(     event.mu_staco_pz.at(mu_index))
-        baseline_mu['E'].append(      event.mu_staco_E.at(mu_index))
-        baseline_mu['parent_pdgid'].append(getParentPdgIDFromBarcode( event
-                                                                    , event.mu_staco_barcode.at(mu_index)
-                                                                    )
-                                          )
+        if abs(this_mu.eta) > baseline_mu_eta_cut:
+            if verbose:
+                print '  muon %d failed eta cut (%f < %f)' % ( mu_index
+                                                             , this_mu.eta
+                                                             , baseline_mu_eta_cut
+                                                             )
+            continue
+        baseline_mu.append(this_mu)
 
     # get baseline jets
-    if verbose:
-        print '    getting baseline jets'
-    jet_index_order = getPtSortedIndices(event.jet_AntiKt4TruthJets_n, event.jet_AntiKt4TruthJets_pt)
+    jet_index_order = getPtSortedIndices( event.jet_AntiKt4TruthJets_n
+                                        , event.jet_AntiKt4TruthJets_pt
+                                        )
     for jet_index in jet_index_order:
-        jet_pt     = event.jet_AntiKt4TruthJets_pt.at(jet_index)
-
-        if jet_pt < jet_pt_cut:
+        this_jet = Jet(event, jet_index)
+        if this_jet.pt < baseline_jet_pt_cut:
             if verbose:
-                print '  jet %d failed pt cut (%f < %f)' % (jet_index, jet_pt, jet_pt_cut)
+                print '  jet %d failed pt cut (%f < %f)' % ( jet_index
+                                                           , this_jet.pt
+                                                           , baseline_jet_pt_cut
+                                                           )
             continue
-
-        jet_phi = event.jet_AntiKt4TruthJets_phi.at(jet_index)
-        jet_eta = event.jet_AntiKt4TruthJets_eta.at(jet_index)
-        jet_theta = math.copysign(2*math.atan(math.exp(-abs(jet_eta))), jet_eta)
-
-        baseline_jet['num'] += 1
-        baseline_jet['index'].append(jet_index)
-        baseline_jet['pt'].append(   jet_pt)
-        baseline_jet['eta'].append(  jet_eta)
-        baseline_jet['phi'].append(  jet_phi)
-        baseline_jet['theta'].append(jet_theta)
-        baseline_jet['px'].append(   jet_pt*math.cos(jet_phi))
-        baseline_jet['py'].append(   jet_pt*math.sin(jet_phi))
-        baseline_jet['pz'].append(   jet_pt*math.sin(jet_theta))
-        baseline_jet['E'].append(    event.jet_AntiKt4TruthJets_E.at(jet_index))
+        if abs(this_jet.eta) > baseline_jet_eta_cut:
+            if verbose:
+                print '  jet %d failed eta cut (%f < %f)' % ( jet_index
+                                                            , this_jet.eta
+                                                            , baseline_jet_eta_cut
+                                                            )
+            continue
+        baseline_jet.append(this_jet)
 
     return {'el':baseline_el, 'mu':baseline_mu, 'jet':baseline_jet}
 
@@ -384,23 +451,23 @@ def doOverlapRemoval(baseline, verbose = False):
 
     if verbose:
         print 'before overlap removal:'
-        print '    el:  %d - %s' % (overlap_removed_el['num'] , overlap_removed_el['index'])
-        print '    mu:  %d - %s' % (overlap_removed_mu['num'] , overlap_removed_mu['index'])
-        print '    jet: %d - %s' % (overlap_removed_jet['num'], overlap_removed_jet['index'])
+        print '    el:  %d - %s' % (len(overlap_removed_el) , len(overlap_removed_el))
+        print '    mu:  %d - %s' % (len(overlap_removed_mu) , len(overlap_removed_mu))
+        print '    jet: %d - %s' % (len(overlap_removed_jet), len(overlap_removed_jet))
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # do e-e overlap removal
     el_to_remove_ee = []
     dr_cut_ee = 0.1
-    for i_ee in xrange(overlap_removed_el['num']):
-        eta_i_ee = overlap_removed_el['eta'][i_ee]
-        phi_i_ee = overlap_removed_el['eta'][i_ee]
-        for j_ee in xrange(i_ee+1, overlap_removed_el['num']):
-            eta_j_ee = overlap_removed_el['eta'][j_ee]
-            phi_j_ee = overlap_removed_el['eta'][j_ee]
+    for i_ee in xrange(len(overlap_removed_el)):
+        eta_i_ee = overlap_removed_el[i_ee].eta
+        phi_i_ee = overlap_removed_el[i_ee].eta
+        for j_ee in xrange(i_ee+1, len(overlap_removed_el)):
+            eta_j_ee = overlap_removed_el[j_ee].eta
+            phi_j_ee = overlap_removed_el[j_ee].eta
             if isOverlap(dr_cut_ee, eta_i_ee, phi_i_ee, eta_j_ee, phi_j_ee):
-                pt_i_ee = overlap_removed_el['pt'][i_ee]
-                pt_j_ee = overlap_removed_el['pt'][j_ee]
+                pt_i_ee = overlap_removed_el[i_ee].pt
+                pt_j_ee = overlap_removed_el[j_ee].pt
                 this_removal_ee = j_ee if pt_i_ee > pt_j_ee else i_ee
 
                 if verbose:
@@ -423,16 +490,16 @@ def doOverlapRemoval(baseline, verbose = False):
     # do e-jet overlap removal
     jet_to_remove_ej = []
     dr_cut_ej = 0.2
-    for jet_it_ej in xrange(overlap_removed_jet['num']):
-        eta_jet_ej = overlap_removed_jet['eta'][jet_it_ej]
-        phi_jet_ej = overlap_removed_jet['phi'][jet_it_ej]
-        for el_it_ej in xrange(overlap_removed_el['num']):
-            eta_el_ej = overlap_removed_el['eta'][el_it_ej]
-            phi_el_ej = overlap_removed_el['phi'][el_it_ej]
+    for jet_it_ej in xrange(len(overlap_removed_jet)):
+        eta_jet_ej = overlap_removed_jet[jet_it_ej].eta
+        phi_jet_ej = overlap_removed_jet[jet_it_ej].phi
+        for el_it_ej in xrange(len(overlap_removed_el)):
+            eta_el_ej = overlap_removed_el[el_it_ej].eta
+            phi_el_ej = overlap_removed_el[el_it_ej].phi
             if isOverlap(dr_cut_ej, eta_jet_ej, phi_jet_ej, eta_el_ej, phi_el_ej):
                 if verbose:
-                    pt_jet_ej = overlap_removed_jet['pt'][jet_it_ej]
-                    pt_el_ej  = overlap_removed_el['pt'][el_it_ej]
+                    pt_jet_ej = overlap_removed_jet[jet_it_ej].pt
+                    pt_el_ej  = overlap_removed_el[el_it_ej].pt
 
                     print 'e-jet overlap: el %d - jet %d' % (el_it_ej, jet_it_ej)
                     print '  el %d -- pT: %f - eta: %f - phi: %f' % ( el_it_ej
@@ -454,16 +521,16 @@ def doOverlapRemoval(baseline, verbose = False):
     # do jet-e overlap removal
     el_to_remove_je = []
     dr_cut_je = 0.4
-    for el_it_je in xrange(overlap_removed_el['num']):
-        eta_el_je = overlap_removed_el['eta'][el_it_je]
-        phi_el_je = overlap_removed_el['phi'][el_it_je]
-        for jet_it_je in xrange(overlap_removed_jet['num']):
-            eta_jet_je = overlap_removed_jet['eta'][jet_it_je]
-            phi_jet_je = overlap_removed_jet['phi'][jet_it_je]
+    for el_it_je in xrange(len(overlap_removed_el)):
+        eta_el_je = overlap_removed_el[el_it_je].eta
+        phi_el_je = overlap_removed_el[el_it_je].phi
+        for jet_it_je in xrange(len(overlap_removed_jet)):
+            eta_jet_je = overlap_removed_jet[jet_it_je].eta
+            phi_jet_je = overlap_removed_jet[jet_it_je].phi
             if isOverlap(dr_cut_je, eta_el_je, phi_el_je, eta_jet_je, phi_jet_je):
                 if verbose:
-                    pt_el_je  = overlap_removed_el['pt'][el_it_je]
-                    pt_jet_je = overlap_removed_jet['pt'][jet_it_je]
+                    pt_el_je  = overlap_removed_el[el_it_je].pt
+                    pt_jet_je = overlap_removed_jet[jet_it_je].pt
 
                     print 'jet-e overlap: jet %d - el %d' % (jet_it_je, el_it_je)
                     print '  jet %d -- pT: %f - eta: %f - phi: %f' % ( jet_it_je
@@ -485,16 +552,16 @@ def doOverlapRemoval(baseline, verbose = False):
     # do jet-mu overlap removal
     mu_to_remove_jm = []
     dr_cut_jm = 0.4
-    for mu_it_jm in xrange(overlap_removed_mu['num']):
-        eta_mu_jm = overlap_removed_mu['eta'][mu_it_jm]
-        phi_mu_jm = overlap_removed_mu['phi'][mu_it_jm]
-        for jet_it_jm in xrange(overlap_removed_jet['num']):
-            eta_jet_jm = overlap_removed_jet['eta'][jet_it_jm]
-            phi_jet_jm = overlap_removed_jet['phi'][jet_it_jm]
+    for mu_it_jm in xrange(len(overlap_removed_mu)):
+        eta_mu_jm = overlap_removed_mu[mu_it_jm].eta
+        phi_mu_jm = overlap_removed_mu[mu_it_jm].phi
+        for jet_it_jm in xrange(len(overlap_removed_jet)):
+            eta_jet_jm = overlap_removed_jet[jet_it_jm].eta
+            phi_jet_jm = overlap_removed_jet[jet_it_jm].phi
             if isOverlap(dr_cut_jm, eta_mu_jm, phi_mu_jm, eta_jet_jm, phi_jet_jm):
                 if verbose:
-                    pt_mu_jm  = overlap_removed_mu['pt'][mu_it_jm]
-                    pt_jet_jm = overlap_removed_jet['pt'][jet_it_jm]
+                    pt_mu_jm  = overlap_removed_mu[mu_it_jm].pt
+                    pt_jet_jm = overlap_removed_jet[jet_it_jm].pt
 
                     print 'jet-e overlap: jet %d - el %d' % (jet_it_jm, mu_it_jm)
                     print '  jet %d -- pT: %f - eta: %f - phi: %f' % ( jet_it_jm
@@ -517,16 +584,16 @@ def doOverlapRemoval(baseline, verbose = False):
     el_to_remove_em = []
     mu_to_remove_em = []
     dr_cut_em = 0.1
-    for el_it_em in xrange(overlap_removed_el['num']):
-        eta_el_em = overlap_removed_el['eta'][el_it_em]
-        phi_el_em = overlap_removed_el['phi'][el_it_em]
-        for mu_it_em in xrange(overlap_removed_mu['num']):
-            eta_mu_em = overlap_removed_mu['eta'][mu_it_em]
-            phi_mu_em = overlap_removed_mu['phi'][mu_it_em]
+    for el_it_em in xrange(len(overlap_removed_el)):
+        eta_el_em = overlap_removed_el[el_it_em].eta
+        phi_el_em = overlap_removed_el[el_it_em].phi
+        for mu_it_em in xrange(len(overlap_removed_mu)):
+            eta_mu_em = overlap_removed_mu[mu_it_em].eta
+            phi_mu_em = overlap_removed_mu[mu_it_em].phi
             if isOverlap(dr_cut_em, eta_el_em, phi_el_em, eta_mu_em, phi_mu_em):
                 if verbose:
-                    pt_el_em = overlap_removed_el['pt'][el_it_em]
-                    pt_mu_em  = overlap_removed_mu['pt'][mu_it_em]
+                    pt_el_em = overlap_removed_el[el_it_em].pt
+                    pt_mu_em  = overlap_removed_mu[mu_it_em].pt
 
                     print 'e-mu overlap: el %d - mu %d' % (el_it_em, mu_it_em)
                     print '  el %d -- pT: %f - eta: %f - phi: %f' % ( el_it_em
@@ -550,16 +617,16 @@ def doOverlapRemoval(baseline, verbose = False):
     # do mu-mu overlap removal
     mu_to_remove_mm = []
     dr_cut_mm = 0.05
-    for i_mm in xrange(overlap_removed_mu['num']):
-        eta_i_mm = overlap_removed_mu['eta'][i_mm]
-        phi_i_mm = overlap_removed_mu['phi'][i_mm]
-        for j_mm in xrange(i_mm+1, overlap_removed_mu['num']):
-            eta_j_mm = overlap_removed_mu['eta'][j_mm]
-            phi_j_mm = overlap_removed_mu['phi'][j_mm]
+    for i_mm in xrange(len(overlap_removed_mu)):
+        eta_i_mm = overlap_removed_mu[i_mm].eta
+        phi_i_mm = overlap_removed_mu[i_mm].phi
+        for j_mm in xrange(i_mm+1, len(overlap_removed_mu)):
+            eta_j_mm = overlap_removed_mu[j_mm].eta
+            phi_j_mm = overlap_removed_mu[j_mm].phi
             if isOverlap(dr_cut_mm, eta_i_mm, phi_i_mm, eta_j_mm, phi_j_mm):
                 if verbose:
-                    pt_i_mm = overlap_removed_mu['pt'][i_mm]
-                    pt_j_mm = overlap_removed_mu['pt'][j_mm]
+                    pt_i_mm = overlap_removed_mu[i_mm].pt
+                    pt_j_mm = overlap_removed_mu[j_mm].pt
 
                     print 'mu-mu overlap: %d - %d' % (i_mm, j_mm)
                     print '  mu %d -- pT: %f - eta: %f - phi: %f' % ( i_mm
@@ -581,9 +648,9 @@ def doOverlapRemoval(baseline, verbose = False):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     if verbose:
         print 'after overlap removal:'
-        print '    el:  %d - %s' % (overlap_removed_el['num'] , overlap_removed_el['index'])
-        print '    mu:  %d - %s' % (overlap_removed_mu['num'] , overlap_removed_mu['index'])
-        print '    jet: %d - %s' % (overlap_removed_jet['num'], overlap_removed_jet['index'])
+        print '    el:  %d - %s' % (len(overlap_removed_el) , len(overlap_removed_el))
+        print '    mu:  %d - %s' % (len(overlap_removed_mu) , len(overlap_removed_mu))
+        print '    jet: %d - %s' % (len(overlap_removed_jet), len(overlap_removed_jet))
     return { 'el':overlap_removed_el
            , 'mu':overlap_removed_mu
            , 'jet':overlap_removed_jet
@@ -594,10 +661,11 @@ def removeElements(particle_lists, to_remove):
     to_remove = list(set(to_remove))
     to_remove.sort(reverse=True)
     for tr in to_remove:
-        particle_lists['num'] -= 1
-        for pl in particle_lists:
-            if isinstance(particle_lists[pl], list):
-                del particle_lists[pl][tr]
+        del particle_lists[tr]
+        #~~~~ # particle_lists['num'] -= 1
+        #~~~~ for pl in particle_lists:
+        #~~~~     if isinstance(particle_lists[pl], list):
+        #~~~~         del particle_lists[pl][tr]
     return particle_lists
 
 # ------------------------------------------------------------------------------
@@ -610,12 +678,7 @@ def isOverlap(cut, eta_1, phi_1, eta_2, phi_2):
     return (dr < cut)
 
 # ------------------------------------------------------------------------------
-def getSignalObjects( event
-                    , baseline_objects
-                    , lep_pt_cut
-                    , lep_eta_cut
-                    , jet_pt_cut
-                    , jet_eta_cut
+def getSignalObjects( baseline_objects
                     , verbose = False
                     ):
     signal_el  = baseline_objects['el']
@@ -627,19 +690,28 @@ def getSignalObjects( event
     if verbose:
         print '    get signal electrons'
     to_remove_el = []
-    for el_it in xrange(signal_el['num']):
-        el_pt  = signal_el['pt'][el_it]
-        el_eta = signal_el['eta'][el_it]
+    for el_it in xrange(len(signal_el)):
+        el_pt  = signal_el[el_it].pt
+        el_eta = signal_el[el_it].eta
 
-        if el_pt < lep_pt_cut:
+        if el_pt < signal_el_pt_cut:
             if verbose:
-                print '  electron %d failed pt cut (%f < %f)' % (el_it, el_pt, lep_pt_cut)
+                print '  electron %d failed pt cut (%f < %f)' % ( el_it
+                                                                , el_pt
+                                                                , signal_el_pt_cut
+                                                                )
+            to_remove_el.append(el_it)
             continue
-        if abs(el_eta) < lep_eta_cut:
+        if abs(el_eta) > signal_el_eta_cut:
             if verbose:
-                print '  electron %d failed pt cut (%f < %f)' % (el_it, el_pt, lep_pt_cut)
+                print '  electron %d failed eta cut (%f < %f)' % ( el_it
+                                                                 , el_eta
+                                                                 , signal_el_eta_cut
+                                                                 )
+            to_remove_el.append(el_it)
             continue
-        to_remove_el.append(el_it)
+    if verbose:
+        print '   removing electrons from signal selection: %s' % to_remove_el
     removeElements(signal_el, to_remove_el)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -647,19 +719,22 @@ def getSignalObjects( event
     if verbose:
         print '    get signal muons'
     to_remove_mu = []
-    for mu_it in xrange(signal_mu['num']):
-        mu_pt  = signal_mu['pt'][mu_it]
-        mu_eta = signal_mu['eta'][mu_it]
+    for mu_it in xrange(len(signal_mu)):
+        mu_pt  = signal_mu[mu_it].pt
+        mu_eta = signal_mu[mu_it].eta
 
-        if mu_pt < lep_pt_cut:
+        if mu_pt < signal_el_pt_cut:
             if verbose:
                 print '  muon %d failed pt cut (%f < %f)' % (mu_it, mu_pt, lep_pt_cut)
+            to_remove_mu.append(mu_it)
             continue
-        if abs(mu_eta) < lep_eta_cut:
+        if abs(mu_eta) > signal_mu_eta_cut:
             if verbose:
                 print '  muon %d failed eta cut (|%f| < %f)' % (mu_it, mu_eta, lep_eta_cut)
+            to_remove_mu.append(mu_it)
             continue
-        to_remove_mu.append(mu_it)
+    if verbose:
+        print '    removing muons from signal selection: %s' % to_remove_mu
     removeElements(signal_mu, to_remove_mu)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -667,131 +742,54 @@ def getSignalObjects( event
     if verbose:
         print '    get signal jets'
     to_remove_jet = []
-    for jet_it in xrange(signal_jet['num']):
-        jet_pt  = signal_jet['pt'][jet_it]
-        jet_eta = signal_jet['eta'][jet_it]
+    for jet_it in xrange(len(signal_jet)):
+        jet_pt  = signal_jet[jet_it].pt
+        jet_eta = signal_jet[jet_it].eta
 
-        if jet_pt < lep_pt_cut:
+        if jet_pt < signal_jet_pt_cut:
             if verbose:
-                print '  jet %d failed pt cut (%f < %f)' % (jet_it, jet_pt, lep_pt_cut)
+                print '  jet %d failed pt cut (%f < %f)' % ( jet_it
+                                                           , jet_pt
+                                                           , signal_jet_pt_cut
+                                                           )
+            to_remove_jet.append(jet_it)
             continue
-        if abs(jet_eta) < lep_eta_cut:
+        if abs(jet_eta) > signal_jet_eta_cut:
             if verbose:
-                print '  jet %d failed eta cut (|%f| < %f)' % (jet_eta, jet_eta, lep_eta_cut)
+                print '  jet %d failed eta cut (|%f| < %f)' % ( jet_eta
+                                                              , jet_eta
+                                                              , signal_jet_eta_cut
+                                                              )
+            to_remove_jet.append(jet_it)
             continue
-        to_remove_jet.append(jet_it)
+    if verbose:
+        print '    removing jets from signal selection: %s' % to_remove_jet
     removeElements(signal_jet, to_remove_jet)
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # get mll
-    if verbose:
-        print '    get mll'
-    mll = getMll(signal_el, signal_mu)
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # get ptll
-    if verbose:
-        print '    get ptll'
-    ptll = getPtll(signal_el, signal_mu)
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # get emma_mt
-    if verbose:
-        print '    get emma_mt'
-    emma_mt = getEmmaMt(signal_el, signal_mu)
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # get met and met-related variables
-    if verbose:
-        print '    get met'
-    signal_met = {}
-
-    met_etx_int = event.MET_Truth_Int_etx
-    met_ety_int = event.MET_Truth_Int_ety
-    for mu_px, mu_py in zip(signal_mu['px'], signal_mu['py']):
-        met_etx_int -= mu_px
-        met_ety_int -= mu_py
-    met_int = math.sqrt( met_etx_int*met_etx_int
-                       + met_ety_int*met_ety_int
-                       )/1000.
-    metrel_int = getMetRel( met_etx_int
-                          , met_ety_int
-                          , signal_el
-                          , signal_mu
-                          , signal_jet
-                          , event
-                          )/1000.
-
-    met_etx_noint = event.MET_Truth_NonInt_etx
-    met_ety_noint = event.MET_Truth_NonInt_ety
-    met_noint = math.sqrt( met_etx_noint*met_etx_noint
-                        + met_ety_noint*met_ety_noint
-                        )/1000.
-    metrel_noint = getMetRel( met_etx_noint
-                            , met_ety_noint
-                            , signal_el
-                            , signal_mu
-                            , signal_jet
-                            , event
-                            )/1000.
-
-    signal_met = { 'int':met_int    , 'rel_int':metrel_int
-                 , 'noint':met_noint, 'rel_noint':metrel_noint
-                 }
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    if verbose:
-        print '    get mt2'
-    mt2 = mt2_calc.getMT2( signal_el
-                         , signal_mu
-                         , met_etx_noint
-                         , met_ety_noint
-                         , minv = 0.
-                         , verbose = False
-                         )
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    if verbose:
-        print 'found signal objects!!!'
-        print '  signal electrons'
-        print '    %s' % signal_el
-        print '  signal muons'
-        print '    %s' % signal_mu
-        print '  signal jets'
-        print '    %s' % signal_jet
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     return { 'el':signal_el
            , 'mu':signal_mu
            , 'jet':signal_jet
-           , 'met':signal_met
-           , 'mll':mll
-           , 'ptll':ptll
-           , 'emma_mt':emma_mt
-           , 'mt2':mt2
            }
 
 # ------------------------------------------------------------------------------
-def getMetRel( met_etx, met_ety , signal_el, signal_mu, signal_jet, event):
+def getMetRel( met_etx, met_ety , signal_el, signal_mu, signal_jet):
     met_phi = math.atan2(met_ety, met_etx)
 
     min_dphi = 9999999999
 
-    for el_index in signal_el['index']:
-        el_phi = event.el_phi.at(el_index)
+    for el_phi in [el.phi for el in signal_el]:
         dphi = abs(met_phi - el_phi)
         while dphi > 3.14159: dphi -= 3.14159
         if dphi < min_dphi: min_dphi = dphi
 
-    for mu_index in signal_mu['index']:
-        mu_phi = event.mu_staco_phi.at(mu_index)
+    for mu_phi in [mu.phi for mu in signal_mu]:
         dphi = abs(met_phi - mu_phi)
         while dphi > 3.14159: dphi -= 3.14159
         if dphi < min_dphi: min_dphi = dphi
 
-    for jet_index in signal_jet['index']:
-        mu_phi = event.jet_AntiKt4TruthJets_phi.at(jet_index)
-        dphi = abs(met_phi - mu_phi)
+    for jet_phi in [jet.phi for jet in signal_jet]:
+        dphi = abs(met_phi - jet_phi)
         while dphi > 3.14159: dphi -= 3.14159
         if dphi < min_dphi: min_dphi = dphi
 
@@ -806,60 +804,98 @@ def getFlavorChannel(signal_objects, verbose = False):
     if verbose:
         print 'getting flavor channel'
 
-    num_el  = signal_objects['el']['num']
-    num_mu  = signal_objects['mu']['num']
+    num_el  = len(signal_objects['el'])
+    num_mu  = len(signal_objects['mu'])
     num_lep = num_el+num_mu
 
     # 2-lepton events
     if num_lep == 2:
         # get charge product
         charge_product = 1
-        for el_it in xrange(num_el):
-            charge_product *= signal_objects['el']['charge'][el_it]
-        for mu_it in xrange(num_mu):
-            charge_product *= signal_objects['mu']['charge'][mu_it]
+        for el in signal_objects['el']:
+            charge_product *= el.charge
+        for mu in signal_objects['mu']:
+            charge_product *= mu.charge
 
-        if num_el == 2 and charge_product < 0: return 'ee_os'
+        if num_el == 2 and charge_product < 0: return 'fc_ee_os'
         if num_el == 1 and charge_product < 0:
-            if signal_objects['el']['pt'][0] >= signal_objects['mu']['pt'][0]:
-                return 'em_os'
-            return 'me_os'
-        if num_el == 0 and charge_product < 0: return 'mm_os'
-        if num_el == 2 and charge_product > 0: return 'ee_ss'
+            if signal_objects['el'][0].pt >= signal_objects['mu'][0].pt:
+                return 'fc_em_os'
+            return 'fc_me_os'
+        if num_el == 0 and charge_product < 0: return 'fc_mm_os'
+        if num_el == 2 and charge_product > 0: return 'fc_ee_ss'
         if num_el == 1 and charge_product > 0:
-            if signal_objects['el']['pt'][0] >= signal_objects['mu']['pt'][0]:
-                return 'em_ss'
-            return 'me_ss'
-        if num_el == 0 and charge_product > 0: return 'mm_ss'
+            if signal_objects['el'][0].pt >= signal_objects['mu'][0].pt:
+                return 'fc_em_ss'
+            return 'fc_me_ss'
+        if num_el == 0 and charge_product > 0: return 'fc_mm_ss'
 
         print 'Oh no! Di-lepton event did not fall into any channel!!!'
+        print '    num el: %s' % num_el
+        print '    num mu: %s' % num_mu
+        print '    charge product: %s' % charge_product
         assert False
 
     # 3-lepton events
     if num_lep == 3:
-        if num_el == 3: return 'eee'
-        if num_el == 2: return 'eem'
-        if num_el == 1: return 'emm'
-        if num_el == 0: return 'mmm'
+        if num_el == 3: return 'fc_eee'
+        if num_el == 2: return 'fc_eem'
+        if num_el == 1: return 'fc_emm'
+        if num_el == 0: return 'fc_mmm'
 
         print 'Oh no! Tri-lepton event did not fall into any channel!!!'
         assert False
 
     # multi-lepton events
     if num_lep >= 4:
-        return 'multi'
+        return 'fc_multi'
 
-    return 'none'
+    return 'fc_none'
 
 # ------------------------------------------------------------------------------
 def getDecayCategory(signal_objects, verbose = False):
     mother_pdgid_list = []
-    for mother_pdgid in signal_objects['el']['parent_pdgid']:
-        mother_pdgid_list.append(mother_pdgid)
-    for mother_pdgid in signal_objects['mu']['parent_pdgid']:
-        mother_pdgid_list.append(mother_pdgid)
-    print mother_pdgid_list
-    return None
+    lepton_pt = []
+    for el in signal_objects['el']:
+        mother_pdgid_list.append(el.parent_pdgid)
+        lepton_pt.append(el.pt)
+    for mu in signal_objects['mu']:
+        mother_pdgid_list.append(mu.parent_pdgid)
+        lepton_pt.append(mu.pt)
+
+    # TODO do pt sorting
+
+    if verbose:
+        print mother_pdgid_list
+    num_sl_mothers = 0
+    num_n2_mothers = 0
+    num_c1_mothers = 0
+
+    for mpl in mother_pdgid_list:
+        if mpl is None: return 'dc_none'
+        if abs(mpl) >= 1000011 and abs(mpl) <= 1000016: num_sl_mothers += 1
+        if abs(mpl) == 1000023: num_n2_mothers += 1
+        if abs(mpl) == 1000024: num_c1_mothers += 1
+
+    if verbose:
+        print '  num sl mothers: %s' % num_sl_mothers
+        print '  num n2 mothers: %s' % num_n2_mothers
+        print '  num c1 mothers: %s' % num_c1_mothers
+
+    if num_sl_mothers == 2 and num_n2_mothers == 0 and num_c1_mothers == 0: return 'dc_sl_sl'
+    if num_sl_mothers == 0 and num_n2_mothers == 2 and num_c1_mothers == 0: return 'dc_n2_n2'
+    if num_sl_mothers == 0 and num_n2_mothers == 0 and num_c1_mothers == 2: return 'dc_c1_c1'
+    if num_sl_mothers == 1 and num_n2_mothers == 0 and num_c1_mothers == 1:
+        if abs(mother_pdgid_list[0]) == 1000024: return 'dc_c1_sl'
+        else:                                    return 'dc_sl_c1'
+    if num_sl_mothers == 0 and num_n2_mothers == 1 and num_c1_mothers == 1:
+        if abs(mother_pdgid_list[0]) == 1000024: return 'dc_c1_n2'
+        else:                                    return 'dc_n2_c1'
+    if num_sl_mothers == 1 and num_n2_mothers == 1 and num_c1_mothers == 0:
+        if abs(mother_pdgid_list[0]) == 1000023: return 'dc_n2_sl'
+        else:                                    return 'dc_sl_n2'
+
+    return 'dc_none'
 
 # ------------------------------------------------------------------------------
 def getMll(el_list, mu_list):
@@ -868,16 +904,16 @@ def getMll(el_list, mu_list):
     pz = 0.
     e = 0.
 
-    for el_it in xrange(len(el_list['index'])):
-        px += el_list['px'][el_it]
-        py += el_list['py'][el_it]
-        pz += el_list['pz'][el_it]
-        e  += el_list['E' ][el_it]
-    for mu_it in xrange(len(mu_list['index'])):
-        px += mu_list['px'][mu_it]
-        py += mu_list['py'][mu_it]
-        pz += mu_list['pz'][mu_it]
-        e  += mu_list['E' ][mu_it]
+    for el in el_list:
+        px += el.px
+        py += el.py
+        pz += el.pz
+        e  += el.E
+    for mu in mu_list:
+        px += mu.px
+        py += mu.py
+        pz += mu.pz
+        e  += mu.E
 
     m2 = (e*e - px*px - py*py - pz*pz)
     return math.copysign(math.sqrt(abs(m2)), m2)
@@ -887,12 +923,12 @@ def getPtll(el_list, mu_list):
     px = 0.
     py = 0.
 
-    for el_it in xrange(len(el_list['index'])):
-        px += el_list['px'][el_it]
-        py += el_list['py'][el_it]
-    for mu_it in xrange(len(mu_list['index'])):
-        px += mu_list['px'][mu_it]
-        py += mu_list['py'][mu_it]
+    for el in el_list:
+        px += el.px
+        py += el.py
+    for mu in mu_list:
+        px += mu.px
+        py += mu.py
 
     ptll2 = (px*px + py*py)
     return math.copysign(math.sqrt(abs(ptll2)), ptll2)

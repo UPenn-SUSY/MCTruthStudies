@@ -23,17 +23,17 @@ def getMT2(signal_el, signal_mu, met_x, met_y, minv = 0., verbose = False):
     signal_leptons = []
 
     # add signal electrons
-    for el_it in xrange(signal_el['num']):
+    for el in signal_el:
         signal_leptons.append( { 'm':0.511
-                               , 'px':signal_el['px'][el_it]
-                               , 'py':signal_el['py'][el_it]
+                               , 'px':el.px
+                               , 'py':el.py
                                }
                              )
     # add signal muons
-    for mu_it in xrange(signal_mu['num']):
+    for mu in signal_mu:
         signal_leptons.append( { 'm':105.7
-                               , 'px':signal_mu['px'][mu_it]
-                               , 'py':signal_mu['py'][mu_it]
+                               , 'px':mu.px
+                               , 'py':mu.py
                                }
                              )
 
