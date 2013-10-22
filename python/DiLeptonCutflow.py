@@ -17,33 +17,41 @@ ROOT.gInterpreter.GenerateDictionary("vector<vector<int> >","vector");
 
 # ==============================================================================
 # helper definitions
-decay_categories = [ 'c1_c1'
-                   , 'sl_sl'
-                   , 'c1_sl'
-                   , 'sl_c1'
-                   , 'n2_n2'
-                   , 'n2_c1'
-                   , 'c1_n2'
-                   , 'n2_sl'
-                   , 'sl_n2'
+mother_type_list = [ 'c1'
+                   , 'n2'
+                   , 'sl'
                    , 'none'
                    ]
-flavor_channels = [ 'ee_os'
-                  , 'ee_ss'
-                  , 'mm_os'
-                  , 'mm_ss'
-                  , 'em_os'
-                  , 'em_ss'
-                  , 'me_os'
-                  , 'me_ss'
-                  , 'eee'
-                  , 'eem'
-                  , 'emm'
-                  , 'mmm'
-                  , 'multi'
-                  , 'none'
+decay_categories = [ 'dc_all'
+                   , 'dc_c1_c1'
+                   , 'dc_sl_sl'
+                   , 'dc_c1_sl'
+                   , 'dc_sl_c1'
+                   , 'dc_n2_n2'
+                   , 'dc_n2_c1'
+                   , 'dc_c1_n2'
+                   , 'dc_n2_sl'
+                   , 'dc_sl_n2'
+                   , 'dc_none'
+                   ]
+flavor_channels = [ 'fc_all'
+                  , 'fc_ee_os'
+                  , 'fc_ee_ss'
+                  , 'fc_mm_os'
+                  , 'fc_mm_ss'
+                  , 'fc_em_os'
+                  , 'fc_em_ss'
+                  , 'fc_me_os'
+                  , 'fc_me_ss'
+                  , 'fc_eee'
+                  , 'fc_eem'
+                  , 'fc_emm'
+                  , 'fc_mmm'
+                  , 'fc_multi'
+                  , 'fc_none'
                   ]
 
+min_num_leptons = 2
 max_num_leptons = 4
 max_num_jets = 2
 
@@ -124,37 +132,57 @@ class EwkCutFlow(object):
     # ------------------------------------------------------------------------------
     def __init__(self, event):
         self.event = event
-        self.doObjectSelection(
-                              # verbose = True
-                              )
+        self.valid_cutflow = self.doObjectSelection(
+                                                   # verbose = True
+                                                   )
 
     # ------------------------------------------------------------------------------
     def doObjectSelection(self, verbose = False):
-
         if verbose:
             print '----------------------------------------'
             print 'doing object selection for event: %s' % self.event.EventNumber
 
         # get baseline objects
         self.baseline = getBaselineObjects( self.event, verbose)
+        self.num_baseline_el  = len(self.baseline['el'])
+        self.num_baseline_mu  = len(self.baseline['mu'])
+        self.num_baseline_jet = len(self.baseline['jet'])
+
         if verbose:
             print '  num baseline electrons: %s' % len(self.baseline['el'])
             print '  num baseline muons:     %s' % len(self.baseline['mu'])
             print '  num baseline jets:      %s' % len(self.baseline['jet'])
 
+        if self.num_baseline_el + self.num_baseline_mu < min_num_leptons:
+            return False
+
         # do overlap removal
         self.overlap_removed = doOverlapRemoval(self.baseline, verbose)
+        self.num_overlap_removed_el  = len(self.overlap_removed['el'])
+        self.num_overlap_removed_mu  = len(self.overlap_removed['mu'])
+        self.num_overlap_removed_jet = len(self.overlap_removed['jet'])
+
         if verbose:
             print '  num overlap removal electrons: %s' % len(self.overlap_removed['el'])
             print '  num overlap removal muons:     %s' % len(self.overlap_removed['mu'])
             print '  num overlap removal jets:      %s' % len(self.overlap_removed['jet'])
 
+        if self.num_overlap_removed_el + self.num_overlap_removed_mu < min_num_leptons:
+            return False
+
         # get signal objets
         self.signal = getSignalObjects(self.overlap_removed, verbose)
+        self.num_signal_el  = len(self.signal['el'])
+        self.num_signal_mu  = len(self.signal['mu'])
+        self.num_signal_jet = len(self.signal['jet'])
+
         if verbose:
             print '  num singal electrons: %s' % len(self.signal['el'])
             print '  num singal muons:     %s' % len(self.signal['mu'])
             print '  num singal jets:      %s' % len(self.signal['jet'])
+
+        if self.num_signal_el + self.num_signal_mu < min_num_leptons:
+            return False
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         # get flavor channel
@@ -213,6 +241,9 @@ class EwkCutFlow(object):
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         # checking decay categories
         self.decay_category = getDecayCategory(self.signal)
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        return True
 
     # ------------------------------------------------------------------------------
     def getMet(self):
@@ -786,18 +817,18 @@ def getFlavorChannel(signal_objects, verbose = False):
         for mu in signal_objects['mu']:
             charge_product *= mu.charge
 
-        if num_el == 2 and charge_product < 0: return 'ee_os'
+        if num_el == 2 and charge_product < 0: return 'fc_ee_os'
         if num_el == 1 and charge_product < 0:
             if signal_objects['el'][0].pt >= signal_objects['mu'][0].pt:
-                return 'em_os'
-            return 'me_os'
-        if num_el == 0 and charge_product < 0: return 'mm_os'
-        if num_el == 2 and charge_product > 0: return 'ee_ss'
+                return 'fc_em_os'
+            return 'fc_me_os'
+        if num_el == 0 and charge_product < 0: return 'fc_mm_os'
+        if num_el == 2 and charge_product > 0: return 'fc_ee_ss'
         if num_el == 1 and charge_product > 0:
             if signal_objects['el'][0].pt >= signal_objects['mu'][0].pt:
-                return 'em_ss'
-            return 'me_ss'
-        if num_el == 0 and charge_product > 0: return 'mm_ss'
+                return 'fc_em_ss'
+            return 'fc_me_ss'
+        if num_el == 0 and charge_product > 0: return 'fc_mm_ss'
 
         print 'Oh no! Di-lepton event did not fall into any channel!!!'
         print '    num el: %s' % num_el
@@ -807,19 +838,19 @@ def getFlavorChannel(signal_objects, verbose = False):
 
     # 3-lepton events
     if num_lep == 3:
-        if num_el == 3: return 'eee'
-        if num_el == 2: return 'eem'
-        if num_el == 1: return 'emm'
-        if num_el == 0: return 'mmm'
+        if num_el == 3: return 'fc_eee'
+        if num_el == 2: return 'fc_eem'
+        if num_el == 1: return 'fc_emm'
+        if num_el == 0: return 'fc_mmm'
 
         print 'Oh no! Tri-lepton event did not fall into any channel!!!'
         assert False
 
     # multi-lepton events
     if num_lep >= 4:
-        return 'multi'
+        return 'fc_multi'
 
-    return 'none'
+    return 'fc_none'
 
 # ------------------------------------------------------------------------------
 def getDecayCategory(signal_objects, verbose = False):
@@ -841,7 +872,7 @@ def getDecayCategory(signal_objects, verbose = False):
     num_c1_mothers = 0
 
     for mpl in mother_pdgid_list:
-        if mpl is None: return 'none'
+        if mpl is None: return 'dc_none'
         if abs(mpl) >= 1000011 and abs(mpl) <= 1000016: num_sl_mothers += 1
         if abs(mpl) == 1000023: num_n2_mothers += 1
         if abs(mpl) == 1000024: num_c1_mothers += 1
@@ -851,20 +882,20 @@ def getDecayCategory(signal_objects, verbose = False):
         print '  num n2 mothers: %s' % num_n2_mothers
         print '  num c1 mothers: %s' % num_c1_mothers
 
-    if num_sl_mothers == 2 and num_n2_mothers == 0 and num_c1_mothers == 0: return 'sl_sl'
-    if num_sl_mothers == 0 and num_n2_mothers == 2 and num_c1_mothers == 0: return 'n2_n2'
-    if num_sl_mothers == 0 and num_n2_mothers == 0 and num_c1_mothers == 2: return 'c1_c1'
+    if num_sl_mothers == 2 and num_n2_mothers == 0 and num_c1_mothers == 0: return 'dc_sl_sl'
+    if num_sl_mothers == 0 and num_n2_mothers == 2 and num_c1_mothers == 0: return 'dc_n2_n2'
+    if num_sl_mothers == 0 and num_n2_mothers == 0 and num_c1_mothers == 2: return 'dc_c1_c1'
     if num_sl_mothers == 1 and num_n2_mothers == 0 and num_c1_mothers == 1:
-        if abs(mother_pdgid_list[0]) == 1000024: return 'c1_sl'
-        else:                                    return 'sl_c1'
+        if abs(mother_pdgid_list[0]) == 1000024: return 'dc_c1_sl'
+        else:                                    return 'dc_sl_c1'
     if num_sl_mothers == 0 and num_n2_mothers == 1 and num_c1_mothers == 1:
-        if abs(mother_pdgid_list[0]) == 1000024: return 'c1_n2'
-        else:                                    return 'n2_c1'
+        if abs(mother_pdgid_list[0]) == 1000024: return 'dc_c1_n2'
+        else:                                    return 'dc_n2_c1'
     if num_sl_mothers == 1 and num_n2_mothers == 1 and num_c1_mothers == 0:
-        if abs(mother_pdgid_list[0]) == 1000023: return 'n2_sl'
-        else:                                    return 'sl_n2'
+        if abs(mother_pdgid_list[0]) == 1000023: return 'dc_n2_sl'
+        else:                                    return 'dc_sl_n2'
 
-    return 'none'
+    return 'dc_none'
 
 # ------------------------------------------------------------------------------
 def getMll(el_list, mu_list):
