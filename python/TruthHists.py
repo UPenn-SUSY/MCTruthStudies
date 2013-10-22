@@ -40,8 +40,8 @@ class hFlavorChannels(object):
             self.hist.GetXaxis().SetBinLabel(i+1, fc)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, flavor_channel, signal_objects, event):
-        bin_num = cutflow.flavor_channels.index(flavor_channel)
+    def fill(self, ewk_cutflow):
+        bin_num = cutflow.flavor_channels.index(ewk_cutflow.flavor_channel)
         self.hist.Fill(bin_num)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -90,19 +90,23 @@ class hPt(object):
                                         )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, flavor_channel, signal_objects, event):
+    def fill(self, ewk_cutflow):
         lep_pt_list = []
-        for el_pt in signal_objects['el']['pt']:
+        for el_pt in [el.pt for el in ewk_cutflow.signal['el']]:
             lep_pt_list.append(el_pt/1000)
-        for mu_pt in signal_objects['mu']['pt']:
+        for mu_pt in [mu.pt for mu in ewk_cutflow.signal['mu']]:
             lep_pt_list.append(mu_pt/1000)
 
         for lep_it, lep_pt in enumerate(lep_pt_list):
             if lep_it == cutflow.max_num_leptons: break
-            self.hist_pt[flavor_channel][lep_it].Fill(lep_pt)
+            self.hist_pt[ewk_cutflow.flavor_channel][lep_it].Fill(lep_pt)
         if len(lep_pt_list) >= 2:
-            self.hist_diff[flavor_channel].Fill(lep_pt_list[0]-lep_pt_list[1])
-            self.hist_2d[flavor_channel].Fill(lep_pt_list[0],lep_pt_list[1])
+            self.hist_diff[ewk_cutflow.flavor_channel].Fill( lep_pt_list[0]
+                                                           - lep_pt_list[1]
+                                                           )
+            self.hist_2d[ewk_cutflow.flavor_channel].Fill( lep_pt_list[0]
+                                                         , lep_pt_list[1]
+                                                         )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -137,17 +141,16 @@ class hEta(object):
                                         )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, flavor_channel, signal_objects, event):
+    def fill(self, ewk_cutflow):
         lep_eta_list = []
-
-        for el_eta in signal_objects['el']['eta']:
+        for el_eta in [el.eta for el in ewk_cutflow.signal['el']]:
             lep_eta_list.append(el_eta)
-        for mu_eta in signal_objects['mu']['eta']:
+        for mu_eta in [mu.eta for mu in ewk_cutflow.signal['mu']]:
             lep_eta_list.append(mu_eta)
 
         for lep_it, lep_eta in enumerate(lep_eta_list):
             if lep_it == cutflow.max_num_leptons: break
-            self.hist_eta[flavor_channel][lep_it].Fill(lep_eta)
+            self.hist_eta[ewk_cutflow.flavor_channel][lep_it].Fill(lep_eta)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -177,8 +180,8 @@ class hNumJet(object):
                                      )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, flavor_channel, signal_objects, event):
-        self.hist[flavor_channel].Fill(signal_objects['jet']['num'])
+    def fill(self, ewk_cutflow):
+        self.hist[ewk_cutflow.flavor_channel].Fill(len(ewk_cutflow.signal['jet']))
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -210,15 +213,15 @@ class hJetPt(object):
                                     )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, flavor_channel, signal_objects, event):
+    def fill(self, ewk_cutflow):
         jet_pt_list = []
-        for jet_pt in signal_objects['jet']['pt']:
+        for jet_pt in [jet.pt for jet in ewk_cutflow.signal['jet']]:
             jet_pt_list.append(jet_pt/1000)
 
         # jet_pt_list.sort(reverse=True)
         for jet_it, jet_pt in enumerate(jet_pt_list):
             if jet_it == cutflow.max_num_jets: break
-            self.hist[flavor_channel][jet_it].Fill(jet_pt)
+            self.hist[ewk_cutflow.flavor_channel][jet_it].Fill(jet_pt)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -278,28 +281,29 @@ class hMet(object):
                                                  )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, flavor_channel, signal_objects, event):
+    def fill(self, ewk_cutflow):
         # interacting type met
-        met_int = signal_objects['met']['int']
-        metrel_int = signal_objects['met']['rel_int']
+        met_int = ewk_cutflow.met['int']
+        metrel_int = ewk_cutflow.met['rel_int']
 
-        self.hist_met_int[flavor_channel].Fill(met_int)
-        self.hist_metrel_int[flavor_channel].Fill(metrel_int)
+        self.hist_met_int[ewk_cutflow.flavor_channel].Fill(met_int)
+        self.hist_metrel_int[ewk_cutflow.flavor_channel].Fill(metrel_int)
 
 
         # non interacting type met
-        met_noint = signal_objects['met']['noint']
-        metrel_noint = signal_objects['met']['rel_noint']
-        self.hist_met_noint[flavor_channel].Fill(met_noint)
-        self.hist_metrel_noint[flavor_channel].Fill(metrel_noint)
+        met_noint = ewk_cutflow.met['noint']
+        metrel_noint = ewk_cutflow.met['rel_noint']
+
+        self.hist_met_noint[ewk_cutflow.flavor_channel].Fill(met_noint)
+        self.hist_metrel_noint[ewk_cutflow.flavor_channel].Fill(metrel_noint)
 
         # difference between interacting and non-interacting type mets
-        self.hist_met_diff[flavor_channel].Fill( met_noint
-                                               - met_int
-                                               )
-        self.hist_metrel_diff[flavor_channel].Fill( metrel_noint
-                                                  - metrel_int
-                                                  )
+        self.hist_met_diff[ewk_cutflow.flavor_channel].Fill( met_noint
+                                                           - met_int
+                                                           )
+        self.hist_metrel_diff[ewk_cutflow.flavor_channel].Fill( metrel_noint
+                                                              - metrel_int
+                                                              )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -335,9 +339,9 @@ class hMll(object):
                                      )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, flavor_channel, signal_objects, event):
-        mll = signal_objects['mll']/1000
-        self.hist[flavor_channel].Fill(mll)
+    def fill(self, ewk_cutflow):
+        mll = ewk_cutflow.mll/1000
+        self.hist[ewk_cutflow.flavor_channel].Fill(mll)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -366,9 +370,10 @@ class hMt2(object):
                                      )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, flavor_channel, signal_objects, event):
-        mt2 = signal_objects['mt2']/1000
-        self.hist[flavor_channel].Fill(mt2)
+    def fill(self, ewk_cutflow):
+        # mt2 = signal_objects['mt2']/1000
+        mt2 = ewk_cutflow.mt2/1000
+        self.hist[ewk_cutflow.flavor_channel].Fill(mt2)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -397,9 +402,10 @@ class hPtll(object):
                                      )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, flavor_channel, signal_objects, event):
-        ptll = signal_objects['ptll']/1000
-        self.hist[flavor_channel].Fill(ptll)
+    def fill(self, ewk_cutflow):
+        # ptll = signal_objects['ptll']/1000
+        ptll = ewk_cutflow.ptll/1000
+        self.hist[ewk_cutflow.flavor_channel].Fill(ptll)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -428,9 +434,10 @@ class hEmmaMt(object):
                                      )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, flavor_channel, signal_objects, event):
-        emma_mt = signal_objects['emma_mt']/1000
-        self.hist[flavor_channel].Fill(emma_mt)
+    def fill(self, ewk_cutflow):
+        # emma_mt = signal_objects['emma_mt']/1000
+        emma_mt = ewk_cutflow.emma_mt/1000
+        self.hist[ewk_cutflow.flavor_channel].Fill(emma_mt)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -459,20 +466,17 @@ class hSRSS(object):
                                      )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, flavor_channel, signal_objects, event):
+    def fill(self, ewk_cutflow):
         fill_bin = []
 
-        if cutflow.isSRSS1(signal_objects): fill_bin.append(1)
-        if cutflow.isSRSS2(signal_objects): fill_bin.append(2)
-        if cutflow.isSRSS3(signal_objects): fill_bin.append(3)
-        if cutflow.isSRSS4(signal_objects): fill_bin.append(4)
-        if cutflow.isSRSS5(signal_objects): fill_bin.append(5)
+        if 'srss1' in ewk_cutflow.regions: fill_bin.append(1)
+        if 'srss2' in ewk_cutflow.regions: fill_bin.append(2)
+        if 'srss3' in ewk_cutflow.regions: fill_bin.append(3)
+        if 'srss4' in ewk_cutflow.regions: fill_bin.append(4)
+        if 'srss5' in ewk_cutflow.regions: fill_bin.append(5)
 
-        if len(fill_bin) == 0:
-            self.hist[flavor_channel].Fill(0)
-        else:
-            for fb in fill_bin:
-                self.hist[flavor_channel].Fill(fb)
+        for fb in fill_bin:
+            self.hist[ewk_cutflow.flavor_channel].Fill(fb)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -501,18 +505,15 @@ class hSROS(object):
                                      )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, flavor_channel, signal_objects, event):
+    def fill(self, ewk_cutflow):
         fill_bin = []
 
-        if cutflow.isSROSMT2a(signal_objects): fill_bin.append(1)
-        if cutflow.isSROSMT2b(signal_objects): fill_bin.append(2)
-        if cutflow.isSROSMT2c(signal_objects): fill_bin.append(3)
+        if 'srmt2a' in ewk_cutflow.regions: fill_bin.append(1)
+        if 'srmt2b' in ewk_cutflow.regions: fill_bin.append(2)
+        if 'srmt2c' in ewk_cutflow.regions: fill_bin.append(3)
 
-        if len(fill_bin) == 0:
-            self.hist[flavor_channel].Fill(0)
-        else:
-            for fb in fill_bin:
-                self.hist[flavor_channel].Fill(fb)
+        for fb in fill_bin:
+            self.hist[ewk_cutflow.flavor_channel].Fill(fb)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):

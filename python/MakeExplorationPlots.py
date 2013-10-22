@@ -66,24 +66,14 @@ def plotTruth(tree):
         # print '======================================================'
         if i % 100 == 0:
             print 'Event %d of %d' % (i, total_num_events)
-        if i > 500: break
+        # if i > 1000: break
         num_el = event.el_n
         num_mu = event.mu_staco_n
 
         ewk_cutflow = cutflow.EwkCutFlow(event)
 
-        # signal_objects = cutflow.doObjectSelection( event
-        #                                           , lep_pt_cut  = 10.e3
-        #                                           , lep_eta_cut = 2.4
-        #                                           , jet_pt_cut  = 20.e3
-        #                                           , jet_eta_cut = 2.7
-        #                                           # , verbose = True
-        #                                           )
-        # flavor_channel = cutflow.getFlavorChannel(signal_objects)
-        # decay_category = cutflow.getDecayCategory(signal_objects)
-
-        # for h in hists:
-        #     hists[h].fill(flavor_channel, signal_objects, event)
+        for h in hists:
+            hists[h].fill(ewk_cutflow)
 
     return hists
 
