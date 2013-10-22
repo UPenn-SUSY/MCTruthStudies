@@ -18,7 +18,8 @@ def getInFile(in_file):
     f = None
     t = None
     try:
-        if os.path.exists(in_file):
+        print 'Looking for input file: %s' % in_file
+        if os.path.exists(in_file) or 'root://' in in_file:
             f = ROOT.TFile.Open(in_file)
             t = f.Get('truth')
         if f is None:
