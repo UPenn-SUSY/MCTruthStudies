@@ -45,36 +45,58 @@ def defineHists():
                                        )
 
 # ------------------------------------------------------------------------------
+def addHistograms( hist_dict
+                 , decay_category = 'dc_all'
+                 , flavor_channel = 'fc_all'
+                 ):
+    selection_tag = '%s__%s' % (decay_category, flavor_channel)
+    hist_dict[selection_tag] = {}
+    hist_dict[selection_tag]['channels']       = TruthHists.hFlavorChannels(selection_tag = selection_tag)
+    hist_dict[selection_tag]['decay_category'] = TruthHists.hDecayCategory( selection_tag = selection_tag)
+    hist_dict[selection_tag]['pt']             = TruthHists.hPt(            selection_tag = selection_tag)
+    hist_dict[selection_tag]['eta']            = TruthHists.hEta(           selection_tag = selection_tag)
+    hist_dict[selection_tag]['num_jet']        = TruthHists.hNumJet(        selection_tag = selection_tag)
+    hist_dict[selection_tag]['jet_pt']         = TruthHists.hJetPt(         selection_tag = selection_tag)
+    hist_dict[selection_tag]['met']            = TruthHists.hMet(           selection_tag = selection_tag)
+    hist_dict[selection_tag]['mll']            = TruthHists.hMll(           selection_tag = selection_tag)
+    hist_dict[selection_tag]['mt2']            = TruthHists.hMt2(           selection_tag = selection_tag)
+    hist_dict[selection_tag]['ptll']           = TruthHists.hPtll(          selection_tag = selection_tag)
+    hist_dict[selection_tag]['emma_mt']        = TruthHists.hEmmaMt(        selection_tag = selection_tag)
+    hist_dict[selection_tag]['sr_ss']          = TruthHists.hSRSS(          selection_tag = selection_tag)
+    hist_dict[selection_tag]['sr_os']          = TruthHists.hSROS(          selection_tag = selection_tag)
+    hist_dict[selection_tag]['pt_by_mother']   = TruthHists.hPtByMother(    selection_tag = selection_tag)
+    hist_dict[selection_tag]['eta_by_mother']  = TruthHists.hEtaByMother(   selection_tag = selection_tag)
+
+# ------------------------------------------------------------------------------
 def plotTruth(tree):
     hists = {}
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    hists['channels'] = TruthHists.hFlavorChannels()
-    hists['pt']       = TruthHists.hPt()
-    hists['eta']      = TruthHists.hEta()
-    hists['num_jet']  = TruthHists.hNumJet()
-    hists['jet_pt']   = TruthHists.hJetPt()
-    hists['met']      = TruthHists.hMet()
-    hists['mll']      = TruthHists.hMll()
-    hists['mt2']      = TruthHists.hMt2()
-    hists['ptll']     = TruthHists.hPtll()
-    hists['emma_mt']  = TruthHists.hEmmaMt()
-    hists['sr_ss']    = TruthHists.hSRSS()
-    hists['sr_os']    = TruthHists.hSROS()
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    for dc in cutflow.decay_categories:
+        for fc in cutflow.flavor_channels:
+            addHistograms(hists, dc, fc)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     total_num_events = tree.GetEntries()
     for i, event in enumerate(tree):
         # print '======================================================'
         if i % 100 == 0:
             print 'Event %d of %d' % (i, total_num_events)
-        # if i > 1000: break
+        # if i > 500: break
         num_el = event.el_n
         num_mu = event.mu_staco_n
 
         ewk_cutflow = cutflow.EwkCutFlow(event)
+        if not ewk_cutflow.valid_cutflow:
+            continue
 
-        for h in hists:
-            hists[h].fill(ewk_cutflow)
+        for dc in cutflow.decay_categories:
+            if dc != ewk_cutflow.decay_category and dc != 'dc_all': continue
+            for fc in cutflow.flavor_channels:
+                if fc != ewk_cutflow.flavor_channel and fc != 'fc_all': continue
+                h_selection = '%s__%s' % (dc, fc)
+                if not h_selection in hists: continue
+                for h in hists[h_selection]:
+                    hists[h_selection][h].fill(ewk_cutflow)
 
     return hists
 
@@ -105,8 +127,9 @@ def main():
     print 'creating output file'
     out_file = ROOT.TFile(configs['out'], 'RECREATE')
     print 'writing hists to file'
-    for h in hists:
-        hists[h].writeToFile(out_file)
+    for h_selection in hists:
+        for h in hists[h_selection]:
+            hists[h_selection][h].writeToFile(out_file)
     out_file.Close()
 
 # ==============================================================================
