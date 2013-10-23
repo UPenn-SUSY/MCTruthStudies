@@ -15,6 +15,17 @@ import yaml
 import DiLeptonCutflow as cutflow
 
 # ==============================================================================
+region_list = [ 'srss1'
+              , 'srss2'
+              , 'srss3'
+              , 'srss4'
+              , 'srss5'
+              , 'srmt2a'
+              , 'srmt2b'
+              , 'srmt2c'
+              ]
+
+# ==============================================================================
 def readInputConfig(in_file_name):
     print 'input config file: %s' % in_file_name
     config_file = open(in_file_name)
@@ -46,51 +57,57 @@ class FileHandle(object):
         self.x_max   = x_max
 
 # ------------------------------------------------------------------------------
-def getSignalAcceptance(in_file_name, signal_region_function):
+def getSignalAcceptance(in_file_name):
     print '----------------------------------------'
     print 'Getting signal acceptance for input file: %s' % in_file_name
     f = ROOT.TFile.Open(in_file_name)
     tree = f.Get('truth')
-    total_num_events = tree.GetEntries()
-    num_sr = 0
+    total_num_events = float(tree.GetEntries())
+    acc_in_regions = {r:0. for r in region_list}
     for i, event in enumerate(tree):
         if i % 100 == 0:
             print 'Event %d of %d' % (i, total_num_events)
         # if i > 500: break
-        num_el = event.el_n
-        num_mu = event.mu_staco_n
 
-        signal_objects = cutflow.doObjectSelection( event
-                                          , lep_pt_cut  = 10.e3
-                                          , lep_eta_cut = 2.4
-                                          , jet_pt_cut  = 20.e3
-                                          , jet_eta_cut = 2.7
-                                          # , verbose = True
-                                          )
-        flavor_channel = cutflow.getFlavorChannel(signal_objects)
+        ewk_cutflow = cutflow.EwkCutFlow(event)
+        if not ewk_cutflow.valid_cutflow: continue
 
-        if signal_region_function(signal_objects):
-            num_sr += 1
-    f.Close()
-    return float(num_sr)/total_num_events
+        for region in region_list:
+            if region in ewk_cutflow.regions:
+                acc_in_regions[region] += 1
+        # if 'srmt2a' in ewk_cutflow.regions:
+        #     acc_in_regions['srmt2a'] += 1
+
+    for air in acc_in_regions: acc_in_regions[air] /= total_num_events
+    return acc_in_regions
 
 # ------------------------------------------------------------------------------
-def getSignalAcceptanceCurve(file_handle, signal_region_function):
+def getSignalAcceptanceCurve(file_handle):
     x_value = []
-    acc = []
+    acc_in_regions = {r:[] for r in region_list}
+
     for fl in file_handle.file_list:
         x_value.append(fl['x_value'])
-        acc.append(getSignalAcceptance(fl['file'], signal_region_function))
+        acc = getSignalAcceptance(fl['file'])
+        for r in region_list:
+            acc_in_regions[r].append(acc[r])
 
-    acc_curve = ROOT.TGraph( len(x_value)
-                           , array.array('d', x_value)
-                           , array.array('d', acc)
-                           )
-    acc_curve.SetName('g__acc__%s' % file_handle.title)
-    return {'curve':acc_curve, 'max':max(acc)}
+    acc_curve = {r:ROOT.TGraph( len(x_value)
+                               , array.array('d', x_value)
+                               , array.array('d', acc_in_regions[r])
+                               )
+                for r in region_list
+                }
+    for r in region_list:
+        acc_curve[r].SetName('g__acc__%s__%s' % (file_handle.title, r))
+
+    max_values = {r:max(acc_in_regions[r]) for r in region_list}
+
+    return {'curve':acc_curve, 'max':max_values}
 
 # ------------------------------------------------------------------------------
-def getSignalAcceptanceCanvas(file_handle_list, signal_region_function):
+# def getSignalAcceptanceCanvas(file_handle_list, signal_region_function):
+def getSignalAcceptanceCanvas(file_handle_list):
     # create legend
     leg_x1 = 0.20
     leg_x2 = 0.38
@@ -102,50 +119,53 @@ def getSignalAcceptanceCanvas(file_handle_list, signal_region_function):
     # big_leg_y1 = 0.98
     # big_leg_y2 = leg_y1-(0.08*len(file_handle_list))
 
-    leg     = ROOT.TLegend(leg_x1    , leg_y1    , leg_x2    , leg_y2    )
+    leg = ROOT.TLegend(leg_x1, leg_y1, leg_x2, leg_y2)
     leg.SetFillColor(0)
     # big_leg = ROOT.TLegend(big_leg_x1, big_leg_y1, big_leg_x2, big_leg_y2)
+    # big_leg.SetFillColor(0)
 
     # get acceptance values for each model, and add to TGraph
-    acc_canv = ROOT.TCanvas('c__acc')
-    acc_curve_list = []
-    y_max = 0
+    acc_canv = {r:ROOT.TCanvas('c__acc__%s' % r) for r in region_list}
+    acc_curve_list = {r:[] for r in region_list}
+    y_max = {r:0. for r in region_list}
     for fh in file_handle_list:
         label = fh.title
-        acc_curve = getSignalAcceptanceCurve(fh, signal_region_function)
-        acc_curve['curve'].SetLineStyle(fh.line)
-        acc_curve['curve'].SetLineColor(fh.color)
-        acc_curve['curve'].SetLineWidth(4)
-        acc_curve['curve'].SetMarkerStyle(fh.shape)
-        acc_curve['curve'].SetMarkerColor(fh.color)
-        acc_curve['curve'].SetMarkerSize(1.5)
-        acc_curve_list.append(acc_curve['curve'])
+        # acc_curve = getSignalAcceptanceCurve(fh, signal_region_function)
+        acc_curve = getSignalAcceptanceCurve(fh)
+        for r in region_list:
+            acc_curve['curve'][r].SetLineStyle(fh.line)
+            acc_curve['curve'][r].SetLineColor(fh.color)
+            acc_curve['curve'][r].SetLineWidth(4)
+            acc_curve['curve'][r].SetMarkerStyle(fh.shape)
+            acc_curve['curve'][r].SetMarkerColor(fh.color)
+            acc_curve['curve'][r].SetMarkerSize(1.5)
+            acc_curve_list[r].append(acc_curve['curve'][r])
 
-        leg.AddEntry(acc_curve['curve'], fh.title, 'alp')
+        leg.AddEntry(acc_curve['curve'][region_list[0]], fh.title, 'alp')
         # big_leg.AddEntry(acc_curve, fh.title, 'alp')
 
         # check maximum y value
-        local_max = acc_curve['max']
-        y_max = max(y_max, local_max)
-        print 'local_max: %s  -  y_max: %s' % (local_max, y_max)
+        local_max = {r:acc_curve['max'][r] for r in region_list}
+        for r in region_list:
+            y_max[r] = max(y_max[r], local_max[r])
 
     # Draw TGraphs onto canvas
-    drawn = False
-    acc_canv.cd()
-    for acl in acc_curve_list:
-        if not drawn:
-            acl.Draw('ALP')
-            acl.GetHistogram().GetXaxis().SetTitle(fh.x_label)
-            acl.GetHistogram().GetYaxis().SetTitle('fractional acceptance')
+    for r in region_list:
+        drawn = False
+        acc_canv[r].cd()
+        for acl in acc_curve_list[r]:
+            if not drawn:
+                acl.Draw('ALP')
+                acl.GetHistogram().GetXaxis().SetTitle(fh.x_label)
+                acl.GetHistogram().GetYaxis().SetTitle('fractional acceptance')
 
-            print 'setting plotting range!!! (0, %f)' % (1.2*y_max)
-            acl.GetHistogram().GetYaxis().SetRangeUser(0.,1.2*y_max)
+                acl.GetHistogram().GetYaxis().SetRangeUser(0.,1.4*y_max[r])
 
-            acl.Draw('ALP')
-            drawn = True
-        else:
-            acl.Draw('LPSAME')
-    leg.Draw()
+                acl.Draw('ALP')
+                drawn = True
+            else:
+                acl.Draw('LPSAME')
+        leg.Draw()
 
     return {'canv':acc_canv, 'curves':acc_curve_list, 'leg':leg}
 
@@ -157,20 +177,11 @@ def main():
     config_file_name = sys.argv[1]
     file_handles = readInputConfig(config_file_name)
 
-    # do sr-mt2a
-    acc_curve_dict = getSignalAcceptanceCanvas(file_handles, cutflow.isSROSMT2a)
+    # get acceptance curves and write to file
+    acc_curve_dict = getSignalAcceptanceCanvas(file_handles)
     out_file.cd()
-    acc_curve_dict['canv'].Write('srmt2a')
-
-    # do sr-mt2b
-    acc_curve_dict = getSignalAcceptanceCanvas(file_handles, cutflow.isSROSMT2b)
-    out_file.cd()
-    acc_curve_dict['canv'].Write('srmt2b')
-
-    # do sr-mt2c
-    acc_curve_dict = getSignalAcceptanceCanvas(file_handles, cutflow.isSROSMT2c)
-    out_file.cd()
-    acc_curve_dict['canv'].Write('srmt2c')
+    for r in region_list:
+        acc_curve_dict['canv'][r].Write(r)
 
     out_file.Close()
 
