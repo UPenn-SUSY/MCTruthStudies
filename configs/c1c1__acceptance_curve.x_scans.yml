@@ -6,17 +6,17 @@
   x_max:   1.0
   files:
     - x_value: 0.5
-      file: '/tmp/bjackson/truth_ntuples/c1n2_150.n1_0.xslep_0.5.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_150.n1_0.xslep_0.5.truth.root'
     - x_value: 0.6
-      file: '/tmp/bjackson/truth_ntuples/c1n2_150.n1_0.xslep_0.6.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_150.n1_0.xslep_0.6.truth.root'
     - x_value: 0.7
-      file: '/tmp/bjackson/truth_ntuples/c1n2_150.n1_0.xslep_0.7.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_150.n1_0.xslep_0.7.truth.root'
     - x_value: 0.8
-      file: '/tmp/bjackson/truth_ntuples/c1n2_150.n1_0.xslep_0.8.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_150.n1_0.xslep_0.8.truth.root'
     - x_value: 0.9
-      file: '/tmp/bjackson/truth_ntuples/c1n2_150.n1_0.xslep_0.9.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_150.n1_0.xslep_0.9.truth.root'
 
-- label: 'm(#chi_{1}^{#pm},#chi_{1}^{0}) = 300, 150 GeV'
+- label: 'm(#chi_{1}^{#pm},#chi_{1}^{0}) = 300, 0 GeV'
   color: 600 # kBlue
   shape: 20
   line: 1
@@ -24,30 +24,68 @@
   x_max:   1.0
   files:
     - x_value: 0.5
-      file: '/tmp/bjackson/truth_ntuples/c1n2_300.n1_150.xslep_0.5.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_0.xslep_0.5.truth.root'
     - x_value: 0.6
-      file: '/tmp/bjackson/truth_ntuples/c1n2_300.n1_150.xslep_0.6.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_0.xslep_0.6.truth.root'
     - x_value: 0.7
-      file: '/tmp/bjackson/truth_ntuples/c1n2_300.n1_150.xslep_0.7.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_0.xslep_0.7.truth.root'
     - x_value: 0.8
-      file: '/tmp/bjackson/truth_ntuples/c1n2_300.n1_150.xslep_0.8.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_0.xslep_0.8.truth.root'
     - x_value: 0.9
-      file: '/tmp/bjackson/truth_ntuples/c1n2_300.n1_150.xslep_0.9.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_0.xslep_0.9.truth.root'
 
-- label: 'm(#chi_{1}^{#pm},#chi_{1}^{0}) = 400, 0 GeV'
-  color: 602 # kBlue + 2
+# - label: 'm(#chi_{1}^{#pm},#chi_{1}^{0}) = 400, 0 GeV'
+#   color: 602 # kBlue + 2
+#   shape: 20
+#   line: 1
+#   x_label: 'x_{slepton}'
+#   x_max:   1.0
+#   files:
+#     - x_value: 0.5
+#       file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_400.n1_0.xslep_0.5.truth.root'
+#     - x_value: 0.6
+#       file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_400.n1_0.xslep_0.6.truth.root'
+#     - x_value: 0.7
+#       file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_400.n1_0.xslep_0.7.truth.root'
+#     - x_value: 0.8
+#       file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_400.n1_0.xslep_0.8.truth.root'
+#     - x_value: 0.9
+#       file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_400.n1_0.xslep_0.9.truth.root'
+
+- label: 'm(#chi_{1}^{#pm},#chi_{1}^{0}) = 300, 50 GeV'
+  color: 416 # kGreen
   shape: 20
   line: 1
   x_label: 'x_{slepton}'
   x_max:   1.0
   files:
     - x_value: 0.5
-      file: '/tmp/bjackson/truth_ntuples/c1n2_400.n1_0.xslep_0.5.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_50.xslep_0.5.truth.root'
     - x_value: 0.6
-      file: '/tmp/bjackson/truth_ntuples/c1n2_400.n1_0.xslep_0.6.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_50.xslep_0.6.truth.root'
     - x_value: 0.7
-      file: '/tmp/bjackson/truth_ntuples/c1n2_400.n1_0.xslep_0.7.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_50.xslep_0.7.truth.root'
     - x_value: 0.8
-      file: '/tmp/bjackson/truth_ntuples/c1n2_400.n1_0.xslep_0.8.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_50.xslep_0.8.truth.root'
     - x_value: 0.9
-      file: '/tmp/bjackson/truth_ntuples/c1n2_400.n1_0.xslep_0.9.truth.root'
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_50.xslep_0.9.truth.root'
+
+- label: 'm(#chi_{1}^{#pm},#chi_{1}^{0}) = 300, 150 GeV'
+  color: 632 # kRed
+  shape: 20
+  line: 1
+  x_label: 'x_{slepton}'
+  x_max:   1.0
+  files:
+    - x_value: 0.5
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_150.xslep_0.5.truth.root'
+    - x_value: 0.6
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_150.xslep_0.6.truth.root'
+    - x_value: 0.7
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_150.xslep_0.7.truth.root'
+    - x_value: 0.8
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_150.xslep_0.8.truth.root'
+    - x_value: 0.9
+      file: 'root://eosatlas//eos/atlas/user/b/bjackson/truth_ntuples/c1n2_300.n1_150.xslep_0.9.truth.root'
+
+

@@ -50,8 +50,9 @@ class FileHandle(object):
 
         keys = [lok.GetName() for lok in self.directory.GetListOfKeys()]
         print keys
-        channel_name = [lok.GetName() for lok in self.directory.GetListOfKeys() if lok.GetName().startswith('h__flavor_channel')]
-        print channel_name
+        # channel_name = [lok.GetName() for lok in self.directory.GetListOfKeys() if lok.GetName().startswith('h__flavor_channel')]
+        channel_name = [lok.GetName() for lok in self.directory.GetListOfKeys() if lok.GetName().startswith('dc_all__fc_all__flavor_channel')]
+        print 'channel_name: %s' % channel_name
         assert len(channel_name) == 1
         channel_name = channel_name[0]
 
@@ -131,11 +132,33 @@ def main():
     config_file_name = sys.argv[1]
     files = readInputConfig(config_file_name)
 
-    out_file = ROOT.TFile.Open('truth_compare.canv.root', 'RECREATE')
+    # out_file = ROOT.TFile.Open('truth_compare.canv.root', 'RECREATE')
+    out_file = ROOT.TFile.Open('truth_compare_subset.canv.root', 'RECREATE')
     out_file.cd()
     list_of_hists = files[0].getListOfHists()
-    for loh in list_of_hists:
-        print 'hist: %s' % loh
+    num_hists = len(list_of_hists)
+    for i, loh in enumerate(list_of_hists):
+        print 'hist (%d of %d): %s' % (i, num_hists, loh)
+
+        if 'srss' in loh: continue
+        if 'fc_ee_ss'  in loh: continue
+        if 'fc_em_ss'  in loh: continue
+        if 'fc_mm_ss'  in loh: continue
+        if 'fc_eee'    in loh: continue
+        if 'fc_eem'    in loh: continue
+        if 'fc_emm'    in loh: continue
+        if 'fc_mmm'    in loh: continue
+        if 'fc_multi'  in loh: continue
+        if 'fc_none'   in loh: continue
+        if 'dc_none'   in loh: continue
+        if 'dc_n2_n2'  in loh: continue
+        if 'dc_sl_n2'  in loh: continue
+        if 'dc_n2_sl'  in loh: continue
+        if 'dc_c1_n2'  in loh: continue
+        if 'dc_n2_c1'  in loh: continue
+        if 'lep_eta_3' in loh: continue
+        if 'lep_pt_3'  in loh: continue
+
         hm = HistMerger( files, loh, False )
         hm.canvas.Write()
 
