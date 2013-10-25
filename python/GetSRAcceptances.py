@@ -5,6 +5,7 @@ import os.path
 import optparse
 import time
 import array
+import math
 
 import ROOT
 import rootlogon
@@ -63,7 +64,9 @@ def getSignalAcceptance(in_file_name):
     f = ROOT.TFile.Open(in_file_name)
     tree = f.Get('truth')
     total_num_events = float(tree.GetEntries())
+    num_in_regions = {r:0. for r in region_list}
     acc_in_regions = {r:0. for r in region_list}
+    err_in_regions = {r:0. for r in region_list}
     for i, event in enumerate(tree):
         if i % 100 == 0:
             print 'Event %d of %d' % (i, total_num_events)
@@ -74,28 +77,35 @@ def getSignalAcceptance(in_file_name):
 
         for region in region_list:
             if region in ewk_cutflow.regions:
-                acc_in_regions[region] += 1
-        # if 'srmt2a' in ewk_cutflow.regions:
-        #     acc_in_regions['srmt2a'] += 1
+                num_in_regions[region] += 1
 
-    for air in acc_in_regions: acc_in_regions[air] /= total_num_events
-    return acc_in_regions
+    for r in region_list:
+        acc_in_regions[r] = float(num_in_regions[r])/float(total_num_events)
+        if num_in_regions[r] == 0:
+            err_in_regions[r] = 0.
+        else:
+            err_in_regions[r] = acc_in_regions[r] * math.sqrt( 1/float(num_in_regions[r]) + 1/float(total_num_events) )
+    return {'acc':acc_in_regions, 'err':err_in_regions}
 
 # ------------------------------------------------------------------------------
 def getSignalAcceptanceCurve(file_handle):
     x_value = []
     acc_in_regions = {r:[] for r in region_list}
+    err_in_regions = {r:[] for r in region_list}
 
     for fl in file_handle.file_list:
         x_value.append(fl['x_value'])
         acc = getSignalAcceptance(fl['file'])
         for r in region_list:
-            acc_in_regions[r].append(acc[r])
+            acc_in_regions[r].append(acc['acc'][r])
+            err_in_regions[r].append(acc['err'][r])
 
-    acc_curve = {r:ROOT.TGraph( len(x_value)
-                               , array.array('d', x_value)
-                               , array.array('d', acc_in_regions[r])
-                               )
+    acc_curve = {r:ROOT.TGraphErrors( len(x_value)
+                                    , array.array('d', x_value)
+                                    , array.array('d', acc_in_regions[r])
+                                    , array.array('d', [0.]*len(x_value))
+                                    , array.array('d', err_in_regions[r])
+                                    )
                 for r in region_list
                 }
     for r in region_list:
