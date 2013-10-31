@@ -1,0 +1,21 @@
+# ------------------------------------------------------------------------------
+- label: '(300,50) x=0.05'
+  file:  'C1C1_plots/out_hist.c1n2_300.n1_50.0.xslep_0.05.root'
+  dir:   ''
+  color: 632 # kRed
+  shape:  22
+  line:   3
+
+- label: '(300,50) x=0.50'
+  file:  'C1C1_plots/out_hist.c1n2_300.n1_50.0.xslep_0.5.root'
+  dir:   ''
+  color: 632 # kRed
+  shape:  22
+  line:   1
+
+- label: '(300,50) x=0.95'
+  file:  'C1C1_plots/out_hist.c1n2_300.n1_50.0.xslep_0.95.root'
+  dir:   ''
+  color: 632 # kRed
+  shape:  22
+  line:   8
