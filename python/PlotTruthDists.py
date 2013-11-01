@@ -50,7 +50,6 @@ class FileHandle(object):
 
         keys = [lok.GetName() for lok in self.directory.GetListOfKeys()]
         print keys
-        # channel_name = [lok.GetName() for lok in self.directory.GetListOfKeys() if lok.GetName().startswith('h__flavor_channel')]
         channel_name = [lok.GetName() for lok in self.directory.GetListOfKeys() if lok.GetName().startswith('dc_all__fc_all__flavor_channel')]
         print 'channel_name: %s' % channel_name
         assert len(channel_name) == 1
@@ -69,7 +68,6 @@ class FileHandle(object):
         this_hist_name = 'clone_%s' % hist_name
         if normalize:
             this_hist_name += '_norm'
-        print 'title: %s - dir_name: %s - hist_name: %s' % (self.title, self.directory_name, hist_name)
         hist = self.directory.Get(hist_name).Clone(this_hist_name)
         if normalize and hist.Integral() != 0.:
             hist.Scale(1./hist.Integral())
@@ -108,9 +106,7 @@ class HistMerger(object):
 
         canvas_name = hist_name.replace('h__', 'c__')
         if normalize:
-            print 'old canvas name: %s' % canvas_name
             canvas_name = canvas_name + "_norm"
-            print 'new canvas name: %s' % canvas_name
         self.canvas = ROOT.TCanvas(canvas_name)
         self.stack.Draw('nostack')
         self.legend.Draw()
@@ -124,7 +120,7 @@ class HistMerger(object):
             h.SetMarkerColor(fh.color)
             h.SetLineStyle(fh.line)
             h.SetLineColor(fh.color)
-            h.SetLineWidth(3)
+            h.SetLineWidth(4)
 
 
 # ------------------------------------------------------------------------------
@@ -132,32 +128,35 @@ def main():
     config_file_name = sys.argv[1]
     files = readInputConfig(config_file_name)
 
-    # out_file = ROOT.TFile.Open('truth_compare.canv.root', 'RECREATE')
-    out_file = ROOT.TFile.Open('truth_compare_subset.canv.root', 'RECREATE')
+    out_file = ROOT.TFile.Open('truth_compare.canv.root', 'RECREATE')
     out_file.cd()
     list_of_hists = files[0].getListOfHists()
     num_hists = len(list_of_hists)
     for i, loh in enumerate(list_of_hists):
         print 'hist (%d of %d): %s' % (i, num_hists, loh)
 
-        if 'srss' in loh: continue
-        if 'fc_ee_ss'  in loh: continue
-        if 'fc_em_ss'  in loh: continue
-        if 'fc_mm_ss'  in loh: continue
-        if 'fc_eee'    in loh: continue
-        if 'fc_eem'    in loh: continue
-        if 'fc_emm'    in loh: continue
-        if 'fc_mmm'    in loh: continue
-        if 'fc_multi'  in loh: continue
-        if 'fc_none'   in loh: continue
-        if 'dc_none'   in loh: continue
-        if 'dc_n2_n2'  in loh: continue
-        if 'dc_sl_n2'  in loh: continue
-        if 'dc_n2_sl'  in loh: continue
-        if 'dc_c1_n2'  in loh: continue
-        if 'dc_n2_c1'  in loh: continue
-        if 'lep_eta_3' in loh: continue
-        if 'lep_pt_3'  in loh: continue
+        # uncomment if you want just a subset of plots
+        # if 'srss' in loh: continue
+        # if 'fc_ee_ss'  in loh: continue
+        # if 'fc_em_ss'  in loh: continue
+        # if 'fc_mm_ss'  in loh: continue
+        # if 'fc_eee'    in loh: continue
+        # if 'fc_eem'    in loh: continue
+        # if 'fc_emm'    in loh: continue
+        # if 'fc_mmm'    in loh: continue
+        # if 'fc_multi'  in loh: continue
+        # if 'fc_none'   in loh: continue
+        # if 'dc_none'   in loh: continue
+        # if 'dc_n2_n2'  in loh: continue
+        # if 'dc_sl_n2'  in loh: continue
+        # if 'dc_n2_sl'  in loh: continue
+        # if 'dc_c1_n2'  in loh: continue
+        # if 'dc_n2_c1'  in loh: continue
+        # if 'lep_eta_2' in loh: continue
+        # if 'lep_pt_2'  in loh: continue
+        # if 'lep_eta_3' in loh: continue
+        # if 'lep_pt_3'  in loh: continue
+        if 'mother'    in loh and 'dc_all' not in loh: continue
 
         hm = HistMerger( files, loh, False )
         hm.canvas.Write()
@@ -166,8 +165,15 @@ def main():
         hm_norm.canvas.Write()
 
         if 'channel' in loh:
-            print 'leg: %s' % loh
             hm.leg_canvas.Write('c__leg')
+
+        hm.canvas.Clear()
+        hm_norm.canvas.Clear()
+        hm.leg_canvas.Clear()
+        for h in hm.hists:
+            h.Delete()
+        for h in hm_norm.hists:
+            h.Delete()
     out_file.Close()
 
 # ==============================================================================
