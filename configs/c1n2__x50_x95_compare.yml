@@ -4,72 +4,72 @@
   color: 602 # kBlue+2
   shape: 20 # kFullCircle
   line:  1
- 
- 
+
+
 - label: '(300,50) x=0.50'
   file:  'C1N2_plots/out_hists.144885_x50.root'
   dir:   ''
   color: 602 # kBlue+2
   shape: 24 # kOpenCircle
   line:  8
- 
- 
+
+
 - label: '(200,50) x=0.95'
   file:  'C1N2_plots/out_hists.144880_x95.root'
   dir:   ''
   color: 418 # kGreen+2
   shape: 22 # kFullTriangleUp
   line:  1
- 
- 
+
+
 - label: '(200,50) x=0.50'
   file:  'C1N2_plots/out_hists.144880_x50.root'
   dir:   ''
   color: 418 # kGreen+2
   shape: 26 # kOpenTriangleUp
   line:  8
- 
- 
+
+
 - label: '(300,200) x=0.95'
   file:  'C1N2_plots/out_hists.144888_x95.root'
   dir:   ''
   color: 634 # kRed+2
   shape: 21 # kFullSquare
   line:  1
- 
- 
+
+
 - label: '(300,200) x=0.50'
   file:  'C1N2_plots/out_hists.144888_x50.root'
   dir:   ''
   color: 634 # kRed+2
   shape: 25 # kOpenSquare
   line:  8
- 
- 
+
+
 - label: '(207.5,142.5) x=0.95'
   file:  'C1N2_plots/out_hists.176539_x95.root'
   dir:   ''
   color: 618 # kMagenta+2
   shape: 25 # ROOT.kFullTriangleDown
   line:  1
- 
- 
+
+
 - label: '(207.5,142.5) x=0.50'
   file:  'C1N2_plots/out_hists.176539_x50.root'
   dir:   ''
   color: 618 # kMagenta+2
   shape: 23 # ROOT.kOpenTriangleDown
   line:  8
- 
- 
+
+
 - label: '(207.5,142.5) x=0.95'
   file:  'C1N2_plots/out_hists.179579_x95.root'
   dir:   ''
   color: 432 # kCyan
   shape: 33
   line:  1
- 
- 
+
+
 - label: '(207.5,142.5) x=0.50'
   file:  'C1N2_plots/out_hists.179579_x50.root'
   dir:   ''
