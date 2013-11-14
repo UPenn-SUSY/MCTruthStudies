@@ -27,6 +27,7 @@ namespace TruthNtuple
 
       virtual void processEvent();
 
+    protected:
       TTree          *fChain;   //!pointer to the analyzed TTree or TChain
       Int_t           fCurrent; //!current Tree number in a TChain
 
@@ -669,6 +670,11 @@ namespace TruthNtuple
       TBranch        *b_ph_truth_barcode;   //!
 
     private:
+
+      friend class Particle;
+      friend class Electron;
+      friend class Muon;
+      friend class Jet;
   };
 }
 

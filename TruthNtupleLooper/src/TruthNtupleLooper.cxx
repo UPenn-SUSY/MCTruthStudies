@@ -9,6 +9,7 @@
 
 // #include "TH2.h"
 
+#include "include/ObjectDefs.h"
 #include "ProgressBar/include/ProgressBar.h"
 
 // -----------------------------------------------------------------------------
@@ -687,4 +688,10 @@ void TruthNtuple::TruthNtupleLooper::Loop()
 void TruthNtuple::TruthNtupleLooper::processEvent()
 {
   // do nothing
+  for (unsigned long el_index = 0; el_index != el_n; ++el_index) {
+    Electron test_el = Electron(this, el_index);
+  }
+  for (unsigned long mu_index = 0; mu_index != mu_staco_n; ++mu_index) {
+    Muon test_mu = Muon(this, mu_index);
+  }
 }
