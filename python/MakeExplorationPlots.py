@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+# ==============================================================================
+# = usage ./MakeExplorationPlots.py <INPUT_TRUTH_NTUPLE> <OUT_FILE>
+# ==============================================================================
+
 
 import sys
 import os.path
