@@ -86,11 +86,14 @@ namespace TruthNtuple
       Jet(const TruthNtuple::TruthNtupleLooper*, unsigned int jet_index);
 
       void setTheta(double);
+      void setIsBJet(bool);
 
       double getTheta();
+      bool getIsBJet();
 
     protected:
       double m_theta;
+      bool m_is_b_jet;
 
   };
 }

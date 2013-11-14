@@ -5,6 +5,7 @@ INCDIR  := $(PWD)/include
 EXECUTABLE := $(PWD)/TruhtNtupleLooper
 
 LOCAL_LIBS_PATH += $(SH_LIB_PATH)/libProgressBar.so
+LOCAL_LIBS_PATH += $(SH_LIB_PATH)/libTruthRecordHelpers.so
 
 INCLUDES += -I../
 INCLUDES += -I./

@@ -688,10 +688,18 @@ void TruthNtuple::TruthNtupleLooper::Loop()
 void TruthNtuple::TruthNtupleLooper::processEvent()
 {
   // do nothing
-  for (unsigned long el_index = 0; el_index != el_n; ++el_index) {
+  for (int el_index = 0; el_index != el_n; ++el_index) {
     Electron test_el = Electron(this, el_index);
+    std::cout << "electron parent: " << test_el.getParentPdgid() << "\n";
+    if (test_el.getParentPdgid() == 0) std::cout << "\tel pt: " << test_el.getPt() << "\n";
   }
-  for (unsigned long mu_index = 0; mu_index != mu_staco_n; ++mu_index) {
+  for (int mu_index = 0; mu_index != mu_staco_n; ++mu_index) {
     Muon test_mu = Muon(this, mu_index);
+    std::cout << "muon parent: " << test_mu.getParentPdgid() << "\n";
+    if (test_mu.getParentPdgid() == 0) std::cout << "\tmu pt: " << test_mu.getPt() << "\n";
+  }
+  for (int jet_index = 0; jet_index != jet_AntiKt4TruthJets_n; ++jet_index) {
+    Jet test_jet = Jet(this, jet_index);
+    std::cout << "is b-jet: " << test_jet.getIsBJet() << "\n";
   }
 }

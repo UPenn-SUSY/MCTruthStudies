@@ -1,5 +1,6 @@
 #include "include/ObjectDefs.h"
 #include "include/TruthNtupleLooper.h"
+#include "TruthRecordHelpers/include/ParentFinder.h"
 
 #include <iostream>
 #include <math.h>
@@ -130,7 +131,12 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
   setPz(    tnl->el_pz->at(el_index));
   setCharge(tnl->el_charge->at(el_index));
 
-  setParentPdgid(0);
+  setParentPdgid(TruthRecordHelpers::getParentPdgIdFromBarcode( tnl->el_barcode->at(el_index)
+                                                              , tnl->mc_barcode
+                                                              , tnl->mc_pdgId
+                                                              , tnl->mc_parent_index
+                                                              )
+                );
 }
 
 // -----------------------------------------------------------------------------
@@ -173,7 +179,12 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
   setPz(    tnl->mu_staco_pz->at(mu_index));
   setCharge(tnl->mu_staco_charge->at(mu_index));
 
-  setParentPdgid(0);
+  setParentPdgid(TruthRecordHelpers::getParentPdgIdFromBarcode( tnl->mu_staco_barcode->at(mu_index)
+                                                              , tnl->mc_barcode
+                                                              , tnl->mc_pdgId
+                                                              , tnl->mc_parent_index
+                                                              )
+                );
 }
 
 // -----------------------------------------------------------------------------
@@ -217,6 +228,8 @@ TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
   setPx( m_pt*cos(m_phi));
   setPy( m_pt*sin(m_phi));
   setPz( m_pt*sin(m_theta));
+
+  setIsBJet(false);
 }
 
 // -----------------------------------------------------------------------------
@@ -226,7 +239,19 @@ void TruthNtuple::Jet::setTheta(double val)
 }
 
 // -----------------------------------------------------------------------------
+void TruthNtuple::Jet::setIsBJet(bool val)
+{
+  m_is_b_jet = val;
+}
+
+// -----------------------------------------------------------------------------
 double TruthNtuple::Jet::getTheta()
 {
   return m_theta;
+}
+
+// -----------------------------------------------------------------------------
+bool TruthNtuple::Jet::getIsBJet()
+{
+  return m_is_b_jet;
 }
