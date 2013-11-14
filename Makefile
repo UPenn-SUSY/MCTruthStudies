@@ -1,7 +1,7 @@
 # ======================
 # = top level Makefile =
 # ======================
-DIRS = mt2
+DIRS = mt2 TruthRecordHelpers
 
 all::build link
 

@@ -10,7 +10,7 @@ import ROOT
 import rootlogon
 import metaroot
 
-import DiLeptonCutflow as cutflow
+import BMinusLCutflow as cutflow
 
 # ------------------------------------------------------------------------------
 def writeToDir(hist, out_file, dir_name):
@@ -42,8 +42,8 @@ class hFlavorChannels(object):
             self.hist.GetXaxis().SetBinLabel(i+1, fc)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
-        bin_num = cutflow.flavor_channels.index(ewk_cutflow.flavor_channel)
+    def fill(self, processed_cutflow):
+        bin_num = cutflow.flavor_channels.index(processed_cutflow.flavor_channel)
         self.hist.Fill(bin_num)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -71,8 +71,8 @@ class hDecayCategory(object):
             self.hist_all.GetXaxis().SetBinLabel(i+1, dc)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
-        bin_num = cutflow.decay_categories.index(ewk_cutflow.decay_category)
+    def fill(self, processed_cutflow):
+        bin_num = cutflow.decay_categories.index(processed_cutflow.decay_category)
         self.hist_all.Fill(bin_num)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -80,10 +80,39 @@ class hDecayCategory(object):
         writeToDir(self.hist_all, out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
-class hPt(object):
+class hNumLepton(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
-                , title = 'pt'
+                , title = 'num leptons'
+                , dir_name = ''
+                , selection_tag = 'all'
+                ):
+        num_bins = 10
+        x_min = -0.5
+        x_max = num_bins - 0.5
+
+        self.dir_name = dir_name
+        self.selection_tag = selection_tag
+
+        self.hist   = []
+        self.hist = ROOT.TH1F( '%s__num_leptons' % self.selection_tag
+                             , '%s - %s; Lepton Multiplicity' % (title, self.selection_tag)
+                             , num_bins, x_min, x_max
+                             )
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def fill(self, processed_cutflow):
+        self.hist.Fill(len(processed_cutflow.signal['el']) + len(processed_cutflow.signal['mu']))
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def writeToFile(self, out_file):
+        writeToDir(self.hist, out_file, self.dir_name)
+
+# ------------------------------------------------------------------------------
+class hLeptonPt(object):
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def __init__( self
+                , title = 'lepton p_{T}'
                 , dir_name = ''
                 , selection_tag = 'all'
                 ):
@@ -93,6 +122,19 @@ class hPt(object):
 
         self.dir_name = dir_name
         self.selection_tag = selection_tag
+
+        self.hist_all = ROOT.TH1F( '%s__lep_pt_all' % (self.selection_tag)
+                                 , '%s - %s -- all leptons; p_{T} [GeV]' % (title, self.selection_tag)
+                                 , num_bins, x_min, x_max
+                                 )
+        self.hist_el = ROOT.TH1F( '%s__lep_pt_el' % (self.selection_tag)
+                                , '%s - %s -- all electrons; p_{T}^{e} [GeV]' % (title, self.selection_tag)
+                                , num_bins, x_min, x_max
+                                )
+        self.hist_mu = ROOT.TH1F( '%s__lep_pt_mu' % (self.selection_tag)
+                                , '%s - %s -- all muons; p_{T}^{#mu} [GeV]' % (title, self.selection_tag)
+                                , num_bins, x_min, x_max
+                                )
 
         self.hist_pt = []
         for num_lep in xrange(cutflow.max_num_leptons):
@@ -119,13 +161,19 @@ class hPt(object):
                                 )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
+    def fill(self, processed_cutflow):
         # get lepton pt values
         lep_pt_list = []
-        for el_pt in [el.pt for el in ewk_cutflow.signal['el']]:
-            lep_pt_list.append(el_pt/1000)
-        for mu_pt in [mu.pt for mu in ewk_cutflow.signal['mu']]:
-            lep_pt_list.append(mu_pt/1000)
+        for el_pt in [el.pt for el in processed_cutflow.signal['el']]:
+            to_fill = el_pt/1000.
+            lep_pt_list.append(to_fill)
+            self.hist_all.Fill(to_fill)
+            self.hist_el.Fill(to_fill)
+        for mu_pt in [mu.pt for mu in processed_cutflow.signal['mu']]:
+            to_fill = mu_pt/1000.
+            lep_pt_list.append(to_fill)
+            self.hist_all.Fill(to_fill)
+            self.hist_mu.Fill(to_fill)
 
         # fill histograms
         for lep_it, lep_pt in enumerate(lep_pt_list):
@@ -141,16 +189,19 @@ class hPt(object):
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
+        writeToDir(self.hist_all, out_file, self.dir_name)
+        writeToDir(self.hist_el , out_file, self.dir_name)
+        writeToDir(self.hist_mu , out_file, self.dir_name)
         for num_lep in xrange(cutflow.max_num_leptons):
             writeToDir(self.hist_pt[num_lep], out_file, self.dir_name)
         writeToDir(self.hist_diff, out_file, self.dir_name)
         writeToDir(self.hist_2d  , out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
-class hEta(object):
+class hLeptonEta(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
-                , title = 'eta'
+                , title = 'lepton #eta'
                 , dir_name = ''
                 , selection_tag = 'all'
                 ):
@@ -161,6 +212,19 @@ class hEta(object):
         self.dir_name = dir_name
         self.selection_tag = selection_tag
 
+        self.hist_all = ROOT.TH1F( '%s__lep_eta_all' % (self.selection_tag)
+                                 , '%s - %s -- all leptons; #eta' % (title, self.selection_tag)
+                                 , num_bins, x_min, x_max
+                                 )
+        self.hist_el = ROOT.TH1F( '%s__lep_eta_el' % (self.selection_tag)
+                                , '%s - %s -- all electrons; #eta' % (title, self.selection_tag)
+                                , num_bins, x_min, x_max
+                                )
+        self.hist_mu = ROOT.TH1F( '%s__lep_eta_mu' % (self.selection_tag)
+                                , '%s - %s -- all muons; #eta' % (title, self.selection_tag)
+                                , num_bins, x_min, x_max
+                                )
+
         self.hist_eta = []
         for num_lep in xrange(cutflow.max_num_leptons):
             self.hist_eta.append( ROOT.TH1F( '%s__lep_eta_%d' % (self.selection_tag, num_lep)
@@ -170,12 +234,16 @@ class hEta(object):
                                 )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
+    def fill(self, processed_cutflow):
         lep_eta_list = []
-        for el_eta in [el.eta for el in ewk_cutflow.signal['el']]:
+        for el_eta in [el.eta for el in processed_cutflow.signal['el']]:
             lep_eta_list.append(el_eta)
-        for mu_eta in [mu.eta for mu in ewk_cutflow.signal['mu']]:
+            self.hist_all.Fill(el_eta)
+            self.hist_el.Fill(el_eta)
+        for mu_eta in [mu.eta for mu in processed_cutflow.signal['mu']]:
             lep_eta_list.append(mu_eta)
+            self.hist_all.Fill(mu_eta)
+            self.hist_mu.Fill(mu_eta)
 
         for lep_it, lep_eta in enumerate(lep_eta_list):
             if lep_it == cutflow.max_num_leptons: break
@@ -183,14 +251,17 @@ class hEta(object):
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
+        writeToDir(self.hist_all, out_file, self.dir_name)
+        writeToDir(self.hist_el , out_file, self.dir_name)
+        writeToDir(self.hist_mu , out_file, self.dir_name)
         for num_lep in xrange(cutflow.max_num_leptons):
             writeToDir(self.hist_eta[num_lep], out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
-class hPtByMother(object):
+class hLeptonPtByMother(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
-                , title = 'pt_by_mother'
+                , title = 'lepton p_{T} by mother'
                 , dir_name = ''
                 , selection_tag = 'all'
                 ):
@@ -212,13 +283,13 @@ class hPtByMother(object):
                                                  )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
+    def fill(self, processed_cutflow):
         lep_pt_list = []
         lep_mother_list = []
-        for el in ewk_cutflow.signal['el']:
+        for el in processed_cutflow.signal['el']:
             lep_pt_list.append(el.pt/1000.)
             lep_mother_list.append(el.parent_pdgid)
-        for mu in ewk_cutflow.signal['mu']:
+        for mu in processed_cutflow.signal['mu']:
             lep_pt_list.append(mu.pt/1000.)
             lep_mother_list.append(mu.parent_pdgid)
 
@@ -233,6 +304,7 @@ class hPtByMother(object):
             if   abs(lep_mother) >= 1000011 and abs(lep_mother) <= 1000016: mother = 'sl'
             elif abs(lep_mother) == 1000023: mother = 'n2'
             elif abs(lep_mother) == 1000024: mother = 'c1'
+            elif abs(lep_mother) == 1000006: mother = 'st'
             else: mother = 'none'
             self.hist_pt[mother][lep_it].Fill(lep_pt)
 
@@ -243,10 +315,10 @@ class hPtByMother(object):
                 writeToDir(self.hist_pt[mother_type][num_lep], out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
-class hEtaByMother(object):
+class hLeptonEtaByMother(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def __init__( self
-                , title = 'eta_by_mother'
+                , title = 'lepton #eta by mother'
                 , dir_name = ''
                 , selection_tag = 'all'
                 ):
@@ -268,13 +340,13 @@ class hEtaByMother(object):
                                                  )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
+    def fill(self, processed_cutflow):
         lep_eta_list = []
         lep_mother_list = []
-        for el in ewk_cutflow.signal['el']:
+        for el in processed_cutflow.signal['el']:
             lep_eta_list.append(el.eta)
             lep_mother_list.append(el.parent_pdgid)
-        for mu in ewk_cutflow.signal['mu']:
+        for mu in processed_cutflow.signal['mu']:
             lep_eta_list.append(mu.eta)
             lep_mother_list.append(mu.parent_pdgid)
 
@@ -290,6 +362,7 @@ class hEtaByMother(object):
             if   abs(lep_mother) >= 1000011 and abs(lep_mother) <= 1000016: mother = 'sl'
             elif abs(lep_mother) == 1000023: mother = 'n2'
             elif abs(lep_mother) == 1000024: mother = 'c1'
+            elif abs(lep_mother) == 1000006: mother = 'st'
             else: mother = 'none'
             self.hist_eta[mother][lep_it].Fill(lep_eta)
 
@@ -321,8 +394,8 @@ class hNumJet(object):
                              )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
-        self.hist.Fill(len(ewk_cutflow.signal['jet']))
+    def fill(self, processed_cutflow):
+        self.hist.Fill(len(processed_cutflow.signal['jet']))
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
@@ -352,9 +425,9 @@ class hJetPt(object):
                             )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
+    def fill(self, processed_cutflow):
         jet_pt_list = []
-        for jet_pt in [jet.pt for jet in ewk_cutflow.signal['jet']]:
+        for jet_pt in [jet.pt for jet in processed_cutflow.signal['jet']]:
             jet_pt_list.append(jet_pt/1000)
 
         # jet_pt_list.sort(reverse=True)
@@ -410,17 +483,17 @@ class hMet(object):
                                          )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
+    def fill(self, processed_cutflow):
         # interacting type met
-        met_int = ewk_cutflow.met['int']
-        metrel_int = ewk_cutflow.met['rel_int']
+        met_int = processed_cutflow.met['int']
+        metrel_int = processed_cutflow.met['rel_int']
 
         self.hist_met_int.Fill(met_int)
         self.hist_metrel_int.Fill(metrel_int)
 
         # non interacting type met
-        met_noint = ewk_cutflow.met['noint']
-        metrel_noint = ewk_cutflow.met['rel_noint']
+        met_noint = processed_cutflow.met['noint']
+        metrel_noint = processed_cutflow.met['rel_noint']
 
         self.hist_met_noint.Fill(met_noint)
         self.hist_metrel_noint.Fill(metrel_noint)
@@ -465,13 +538,50 @@ class hMll(object):
                              )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
-        mll = ewk_cutflow.mll/1000
+    def fill(self, processed_cutflow):
+        mll = processed_cutflow.mll/1000
         self.hist.Fill(mll)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def writeToFile(self, out_file):
         writeToDir(self.hist, out_file, self.dir_name)
+
+# ------------------------------------------------------------------------------
+class hMbl(object):
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def __init__( self
+                , title = 'mbl'
+                , dir_name = ''
+                , selection_tag = 'all'
+                ):
+        num_bins = 40
+        x_min = 0
+        x_max = 400
+
+        self.dir_name = dir_name
+        self.selection_tag = selection_tag
+
+        self.hist_mbl = ROOT.TH1F( '%s__mbl_mbl' % self.selection_tag
+                                 , '%s - %s -- mbl; m_{bl} [GeV]' % (title, self.selection_tag)
+                                 , num_bins, x_min, x_max
+                                 )
+
+        self.hist_truth = ROOT.TH1F( '%s__mbl_truth' % self.selection_tag
+                                   , '%s - %s -- mbl truth; m_{bl}^{truth} [GeV]' % (title, self.selection_tag)
+                                   , num_bins, x_min, x_max
+                                   )
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def fill(self, processed_cutflow):
+        for mbl in processed_cutflow.mbl_list:
+            self.hist_mbl.Fill(mbl/1000.)
+        for mbl_truth in processed_cutflow.mbl_truth_list:
+            self.hist_truth.Fill(mbl_truth/1000.)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def writeToFile(self, out_file):
+        writeToDir(self.hist_mbl  , out_file, self.dir_name)
+        writeToDir(self.hist_truth, out_file, self.dir_name)
 
 # ------------------------------------------------------------------------------
 class hMt2(object):
@@ -495,8 +605,8 @@ class hMt2(object):
                              )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
-        mt2 = ewk_cutflow.mt2/1000.
+    def fill(self, processed_cutflow):
+        mt2 = processed_cutflow.mt2/1000.
         self.hist.Fill(mt2)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -524,8 +634,8 @@ class hPtll(object):
                              )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
-        ptll = ewk_cutflow.ptll/1000.
+    def fill(self, processed_cutflow):
+        ptll = processed_cutflow.ptll/1000.
         self.hist.Fill(ptll)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -553,8 +663,8 @@ class hEmmaMt(object):
                              )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
-        emma_mt = ewk_cutflow.emma_mt/1000.
+    def fill(self, processed_cutflow):
+        emma_mt = processed_cutflow.emma_mt/1000.
         self.hist.Fill(emma_mt)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -582,14 +692,14 @@ class hSRSS(object):
                              )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
+    def fill(self, processed_cutflow):
         fill_bin = []
 
-        if 'srss1' in ewk_cutflow.regions: fill_bin.append(1)
-        if 'srss2' in ewk_cutflow.regions: fill_bin.append(2)
-        if 'srss3' in ewk_cutflow.regions: fill_bin.append(3)
-        if 'srss4' in ewk_cutflow.regions: fill_bin.append(4)
-        if 'srss5' in ewk_cutflow.regions: fill_bin.append(5)
+        if 'srss1' in processed_cutflow.regions: fill_bin.append(1)
+        if 'srss2' in processed_cutflow.regions: fill_bin.append(2)
+        if 'srss3' in processed_cutflow.regions: fill_bin.append(3)
+        if 'srss4' in processed_cutflow.regions: fill_bin.append(4)
+        if 'srss5' in processed_cutflow.regions: fill_bin.append(5)
 
         for fb in fill_bin:
             self.hist.Fill(fb)
@@ -620,12 +730,12 @@ class hSROS(object):
                              )
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    def fill(self, ewk_cutflow):
+    def fill(self, processed_cutflow):
         fill_bin = []
 
-        if 'srmt2a' in ewk_cutflow.regions: fill_bin.append(1)
-        if 'srmt2b' in ewk_cutflow.regions: fill_bin.append(2)
-        if 'srmt2c' in ewk_cutflow.regions: fill_bin.append(3)
+        if 'srmt2a' in processed_cutflow.regions: fill_bin.append(1)
+        if 'srmt2b' in processed_cutflow.regions: fill_bin.append(2)
+        if 'srmt2c' in processed_cutflow.regions: fill_bin.append(3)
 
         for fb in fill_bin:
             self.hist.Fill(fb)

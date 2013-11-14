@@ -13,7 +13,7 @@ import metaroot
 
 import yaml
 
-import DiLeptonCutflow as cutflow
+import BMinusLCutflow as cutflow
 
 # ==============================================================================
 region_list = [ 'srss1'

@@ -14,7 +14,7 @@ import ROOT
 import rootlogon
 import metaroot
 
-import DiLeptonCutflow as cutflow
+import BMinusLCutflow as cutflow
 import TruthHists
 
 # ------------------------------------------------------------------------------
@@ -55,21 +55,23 @@ def addHistograms( hist_dict
                  ):
     selection_tag = '%s__%s' % (decay_category, flavor_channel)
     hist_dict[selection_tag] = {}
-    hist_dict[selection_tag]['channels']       = TruthHists.hFlavorChannels(selection_tag = selection_tag)
-    hist_dict[selection_tag]['decay_category'] = TruthHists.hDecayCategory( selection_tag = selection_tag)
-    hist_dict[selection_tag]['pt']             = TruthHists.hPt(            selection_tag = selection_tag)
-    hist_dict[selection_tag]['eta']            = TruthHists.hEta(           selection_tag = selection_tag)
+    # hist_dict[selection_tag]['channels']       = TruthHists.hFlavorChannels(selection_tag = selection_tag)
+    # hist_dict[selection_tag]['decay_category'] = TruthHists.hDecayCategory( selection_tag = selection_tag)
+    hist_dict[selection_tag]['num_lepton']     = TruthHists.hNumLepton(     selection_tag = selection_tag)
+    hist_dict[selection_tag]['lepton_pt']      = TruthHists.hLeptonPt(      selection_tag = selection_tag)
+    hist_dict[selection_tag]['lepton_eta']     = TruthHists.hLeptonEta(     selection_tag = selection_tag)
     hist_dict[selection_tag]['num_jet']        = TruthHists.hNumJet(        selection_tag = selection_tag)
     hist_dict[selection_tag]['jet_pt']         = TruthHists.hJetPt(         selection_tag = selection_tag)
     hist_dict[selection_tag]['met']            = TruthHists.hMet(           selection_tag = selection_tag)
     hist_dict[selection_tag]['mll']            = TruthHists.hMll(           selection_tag = selection_tag)
-    hist_dict[selection_tag]['mt2']            = TruthHists.hMt2(           selection_tag = selection_tag)
-    hist_dict[selection_tag]['ptll']           = TruthHists.hPtll(          selection_tag = selection_tag)
-    hist_dict[selection_tag]['emma_mt']        = TruthHists.hEmmaMt(        selection_tag = selection_tag)
-    hist_dict[selection_tag]['sr_ss']          = TruthHists.hSRSS(          selection_tag = selection_tag)
-    hist_dict[selection_tag]['sr_os']          = TruthHists.hSROS(          selection_tag = selection_tag)
-    hist_dict[selection_tag]['pt_by_mother']   = TruthHists.hPtByMother(    selection_tag = selection_tag)
-    hist_dict[selection_tag]['eta_by_mother']  = TruthHists.hEtaByMother(   selection_tag = selection_tag)
+    hist_dict[selection_tag]['mbl']            = TruthHists.hMbl(           selection_tag = selection_tag)
+    # hist_dict[selection_tag]['mt2']            = TruthHists.hMt2(           selection_tag = selection_tag)
+    # hist_dict[selection_tag]['ptll']           = TruthHists.hPtll(          selection_tag = selection_tag)
+    # hist_dict[selection_tag]['emma_mt']        = TruthHists.hEmmaMt(        selection_tag = selection_tag)
+    # hist_dict[selection_tag]['sr_ss']          = TruthHists.hSRSS(          selection_tag = selection_tag)
+    # hist_dict[selection_tag]['sr_os']          = TruthHists.hSROS(          selection_tag = selection_tag)
+    # hist_dict[selection_tag]['pt_by_mother']   = TruthHists.hPtByMother(    selection_tag = selection_tag)
+    # hist_dict[selection_tag]['eta_by_mother']  = TruthHists.hEtaByMother(   selection_tag = selection_tag)
 
 # ------------------------------------------------------------------------------
 def plotTruth(tree):
@@ -85,11 +87,11 @@ def plotTruth(tree):
         # print '======================================================'
         if i % 100 == 0:
             print 'Event %d of %d' % (i, total_num_events)
-        # if i > 500: break
+        if i > 500: break
         num_el = event.el_n
         num_mu = event.mu_staco_n
 
-        ewk_cutflow = cutflow.EwkCutFlow(event)
+        ewk_cutflow = cutflow.BMinusLCutFlow(event)
         if not ewk_cutflow.valid_cutflow:
             continue
 

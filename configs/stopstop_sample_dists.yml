@@ -1,0 +1,6 @@
+- label: 'sample MC'
+  file:  <FILL IN FILE NAME>
+  dir:   ''
+  color: 602 # kBlue+2
+  shape: 20 # kFullCircle
+  line:  1
