@@ -2,7 +2,7 @@ LIBRARY := TruthNtupleLooper
 OBJDIR  := $(PWD)/obj
 SRCDIR  := $(PWD)/src
 INCDIR  := $(PWD)/include
-EXECUTABLE := $(PWD)/NtupleLooper
+EXECUTABLE := $(PWD)/TruhtNtupleLooper
 
 LOCAL_LIBS_PATH += $(SH_LIB_PATH)/libProgressBar.so
 
