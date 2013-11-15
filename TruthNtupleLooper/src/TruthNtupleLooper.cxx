@@ -680,7 +680,34 @@ void TruthNtuple::TruthNtupleLooper::Loop()
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
 
+    clearObjects();
+    constructObjects();
     processEvent();
+  }
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::TruthNtupleLooper::clearObjects()
+{
+  m_el_list.clear();
+  m_mu_list.clear();
+  m_jet_list.clear();
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::TruthNtupleLooper::constructObjects()
+{
+  for (int el_index = 0; el_index != el_n; ++el_index) {
+    Electron this_el = Electron(this, el_index);
+    m_el_list.push_back(this_el);
+  }
+  for (int mu_index = 0; mu_index != mu_staco_n; ++mu_index) {
+    Muon this_mu = Muon(this, mu_index);
+    m_mu_list.push_back(this_mu);
+  }
+  for (int jet_index = 0; jet_index != jet_AntiKt4TruthJets_n; ++jet_index) {
+    Jet this_jet = Jet(this, jet_index);
+    m_jet_list.push_back(this_jet);
   }
 }
 
@@ -688,18 +715,4 @@ void TruthNtuple::TruthNtupleLooper::Loop()
 void TruthNtuple::TruthNtupleLooper::processEvent()
 {
   // do nothing
-  for (int el_index = 0; el_index != el_n; ++el_index) {
-    Electron test_el = Electron(this, el_index);
-    std::cout << "electron parent: " << test_el.getParentPdgid() << "\n";
-    if (test_el.getParentPdgid() == 0) std::cout << "\tel pt: " << test_el.getPt() << "\n";
-  }
-  for (int mu_index = 0; mu_index != mu_staco_n; ++mu_index) {
-    Muon test_mu = Muon(this, mu_index);
-    std::cout << "muon parent: " << test_mu.getParentPdgid() << "\n";
-    if (test_mu.getParentPdgid() == 0) std::cout << "\tmu pt: " << test_mu.getPt() << "\n";
-  }
-  for (int jet_index = 0; jet_index != jet_AntiKt4TruthJets_n; ++jet_index) {
-    Jet test_jet = Jet(this, jet_index);
-    std::cout << "is b-jet: " << test_jet.getIsBJet() << "\n";
-  }
 }

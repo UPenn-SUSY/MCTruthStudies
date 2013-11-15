@@ -1,6 +1,8 @@
 #include "include/ObjectDefs.h"
 #include "include/TruthNtupleLooper.h"
 #include "TruthRecordHelpers/include/ParentFinder.h"
+// #include "TruthRecordHelpers/include/JetFlavorFinder.h"
+#include "TruthRecordHelpers/src/JetFlavorFinder.cxx"
 
 #include <iostream>
 #include <math.h>
@@ -68,51 +70,56 @@ void TruthNtuple::Particle::setPz(double val)
 
 
 // -----------------------------------------------------------------------------
-unsigned int TruthNtuple::Particle::getIndex()
+unsigned int TruthNtuple::Particle::getIndex() const
 {
   return m_index;
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtuple::Particle::getPt()
+double TruthNtuple::Particle::getPt() const
 {
   return m_pt;
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtuple::Particle::getEta()
+double TruthNtuple::Particle::getEta() const
 {
   return m_eta;
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtuple::Particle::getPhi()
+double TruthNtuple::Particle::getPhi() const
 {
   return m_phi;
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtuple::Particle::getE()
+double TruthNtuple::Particle::getE() const
 {
   return m_e;
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtuple::Particle::getPx()
+double TruthNtuple::Particle::getPx() const
 {
   return m_px;
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtuple::Particle::getPy()
+double TruthNtuple::Particle::getPy() const
 {
   return m_py;
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtuple::Particle::getPz()
+double TruthNtuple::Particle::getPz() const
 {
   return m_pz;
+}
+
+// -----------------------------------------------------------------------------
+TruthNtuple::Electron::Electron()
+{
 }
 
 // -----------------------------------------------------------------------------
@@ -146,7 +153,7 @@ void TruthNtuple::Electron::setCharge(double val)
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtuple::Electron::getCharge()
+double TruthNtuple::Electron::getCharge() const
 {
   return m_charge;
 }
@@ -158,9 +165,14 @@ void TruthNtuple::Electron::setParentPdgid(int val)
 }
 //
 // -----------------------------------------------------------------------------
-int TruthNtuple::Electron::getParentPdgid()
+int TruthNtuple::Electron::getParentPdgid() const
 {
   return m_parent_pdgid;
+}
+
+// -----------------------------------------------------------------------------
+TruthNtuple::Muon::Muon()
+{
 }
 
 // -----------------------------------------------------------------------------
@@ -194,7 +206,7 @@ void TruthNtuple::Muon::setCharge(double val)
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtuple::Muon::getCharge()
+double TruthNtuple::Muon::getCharge() const
 {
   return m_charge;
 }
@@ -206,9 +218,14 @@ void TruthNtuple::Muon::setParentPdgid(int val)
 }
 
 // -----------------------------------------------------------------------------
-int TruthNtuple::Muon::getParentPdgid()
+int TruthNtuple::Muon::getParentPdgid() const
 {
   return m_parent_pdgid;
+}
+
+// -----------------------------------------------------------------------------
+TruthNtuple::Jet::Jet()
+{
 }
 
 // -----------------------------------------------------------------------------
@@ -229,7 +246,17 @@ TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
   setPy( m_pt*sin(m_phi));
   setPz( m_pt*sin(m_theta));
 
-  setIsBJet(false);
+  setIsBJet( TruthRecordHelpers::isBJet( m_eta
+                                       , m_phi
+                                       , tnl->mc_pdgId
+                                       , tnl->mc_status
+                                       , tnl->mc_barcode
+                                       , tnl->mc_pt
+                                       , tnl->mc_eta
+                                       , tnl->mc_phi
+                                       // , false
+                                       )
+           );
 }
 
 // -----------------------------------------------------------------------------
@@ -245,13 +272,13 @@ void TruthNtuple::Jet::setIsBJet(bool val)
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtuple::Jet::getTheta()
+double TruthNtuple::Jet::getTheta() const
 {
   return m_theta;
 }
 
 // -----------------------------------------------------------------------------
-bool TruthNtuple::Jet::getIsBJet()
+bool TruthNtuple::Jet::getIsBJet() const
 {
   return m_is_b_jet;
 }

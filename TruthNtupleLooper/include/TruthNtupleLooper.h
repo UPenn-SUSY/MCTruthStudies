@@ -8,6 +8,8 @@
 // Header file for the classes stored in the TTree if any.
 #include <vector>
 
+#include "include/ObjectDefs.h"
+
 // =============================================================================
 class TBranch;
 
@@ -25,9 +27,15 @@ namespace TruthNtuple
       virtual void     Loop();
       virtual Bool_t   Notify();
 
+      virtual void clearObjects();
+      virtual void constructObjects();
       virtual void processEvent();
 
     protected:
+      std::vector<TruthNtuple::Electron> m_el_list;
+      std::vector<TruthNtuple::Muon>     m_mu_list;
+      std::vector<TruthNtuple::Jet>      m_jet_list;
+
       TTree          *fChain;   //!pointer to the analyzed TTree or TChain
       Int_t           fCurrent; //!current Tree number in a TChain
 

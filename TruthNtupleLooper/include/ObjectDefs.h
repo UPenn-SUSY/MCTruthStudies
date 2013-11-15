@@ -25,14 +25,14 @@ namespace TruthNtuple
       void setPy(double);
       void setPz(double);
 
-      unsigned int getIndex();
-      double getPt();
-      double getEta();
-      double getPhi();
-      double getE();
-      double getPx();
-      double getPy();
-      double getPz();
+      unsigned int getIndex() const;
+      double getPt() const;
+      double getEta() const;
+      double getPhi() const;
+      double getE() const;
+      double getPx() const;
+      double getPy() const;
+      double getPz() const;
 
     protected:
       unsigned int m_index;
@@ -49,13 +49,14 @@ namespace TruthNtuple
   class Electron : public Particle
   {
     public:
+      Electron();
       Electron(const TruthNtuple::TruthNtupleLooper*, unsigned int el_index);
 
       void setCharge(double);
       void setParentPdgid(int);
 
-      double getCharge();
-      int getParentPdgid();
+      double getCharge() const;
+      int getParentPdgid() const;
 
     protected:
       double m_charge;
@@ -66,13 +67,14 @@ namespace TruthNtuple
   class Muon : public Particle
   {
     public:
+      Muon();
       Muon(const TruthNtuple::TruthNtupleLooper*, unsigned int mu_index);
 
       void setCharge(double);
       void setParentPdgid(int);
 
-      double getCharge();
-      int getParentPdgid();
+      double getCharge() const;
+      int getParentPdgid() const;
 
     protected:
       double m_charge;
@@ -83,13 +85,14 @@ namespace TruthNtuple
   class Jet : public Particle
   {
     public:
+      Jet();
       Jet(const TruthNtuple::TruthNtupleLooper*, unsigned int jet_index);
 
       void setTheta(double);
       void setIsBJet(bool);
 
-      double getTheta();
-      bool getIsBJet();
+      double getTheta() const;
+      bool getIsBJet() const;
 
     protected:
       double m_theta;

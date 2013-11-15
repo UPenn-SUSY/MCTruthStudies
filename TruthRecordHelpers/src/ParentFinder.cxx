@@ -3,7 +3,6 @@
 #include "include/ParentFinder.h"
 
 #include "TPython.h"
-// #include "PyObject.h"
 
 // =============================================================================
 namespace TruthRecordHelpers
@@ -62,25 +61,3 @@ namespace TruthRecordHelpers
     return mother;
   }
 }
-
-// extern "C" {
-//   int getParentPdgIdFromBarcode( int barcode
-//                                , const std::vector<int>* mc_barcode
-//                                , const std::vector<int>* mc_pdg_id
-//                                , const std::vector<std::vector<int> >* mc_parent_index
-//                                , bool verbose = false
-//                                )
-//   {
-//     if (verbose) {
-//       std::cout << "getParentPdgIdFromBarcode()\n";
-//     }
-//     std::cout << "I got barcode: " << barcode << "\n";
-//     std::cout << "I got a pointer to the barcode list: " << mc_barcode << "\n";
-// 
-//     return TruthRecordHelpers::getParentPdgIdFromBarcode( barcode
-//                                                         , mc_barcode
-//                                                         , mc_pdg_id
-//                                                         , mc_parent_index
-//                                                         );
-//   }
-// }
