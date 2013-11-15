@@ -13,12 +13,6 @@ from ctypes import c_void_p
 
 import ROOT
 
-# this_script_loc = os.path.realpath(__file__)
-# lib_loc = '%s/../lib/libTruthRecordHelpers.so' % os.path.dirname(this_script_loc)
-# print 'this_script_loc: %s' % this_script_loc
-# print 'lib_loc: %s' % lib_loc
-# truth_record_helpers_lib = cdll.LoadLibrary(lib_loc)
-
 # ------------------------------------------------------------------------------
 def getParentPdgID(event, particle_index):
     original_pdgid = event.mc_pdgId.at(particle_index)
@@ -53,42 +47,9 @@ def getParentPdgID(event, particle_index):
 
 # ------------------------------------------------------------------------------
 def getParentPdgIDFromBarcode(event, barcode):
-    # return truth_helpers.getParentPdgIdFromBarcode( barcode
-    #                                               , event.mc_barcode
-    #                                               , event.mc_pdgId
-    #                                               , event.mc_parent_index
-    #                                               , verbose = False
-    #                                               )
-
     mc_index = None
     for index in reversed(xrange(event.mc_n)):
         if event.mc_barcode.at(index) == barcode:
             mc_index = index
             return getParentPdgID(event, mc_index)
     return None
-
-
-# # ------------------------------------------------------------------------------
-# def getParentPdgIdFromBarcode( barcode
-#                              , mc_barcode
-#                              , mc_pdg_id
-#                              , mc_parent_index
-#                              , verbose = False
-#                              ):
-#     return truth_record_helpers_lib.getParentPdgIdFromBarcode( barcode
-#                                                              , mc_barcode
-#                                                              , mc_pdg_id
-#                                                              , mc_parent_index
-#                                                              , verbose
-#                                                              )
-# 
-# def getParentPdgId( mc_index
-#                   , mc_mc_pdg_id
-#                   , mc_parent_index
-#                   , verbose
-#                   ):
-#     return truth_record_helpers_lib.getParentPdgId( mc_index
-#                                                   , mc_mc_pdg_id
-#                                                   , mc_parent_index
-#                                                   , verbose
-#                                                   )
