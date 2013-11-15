@@ -561,7 +561,7 @@ class hMbl(object):
         self.dir_name = dir_name
         self.selection_tag = selection_tag
 
-        self.hist_mbl = ROOT.TH1F( '%s__mbl_mbl' % self.selection_tag
+        self.hist_mbl = ROOT.TH1F( '%s__mbl' % self.selection_tag
                                  , '%s - %s -- mbl; m_{bl} [GeV]' % (title, self.selection_tag)
                                  , num_bins, x_min, x_max
                                  )

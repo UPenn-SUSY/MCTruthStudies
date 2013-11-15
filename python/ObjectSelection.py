@@ -411,6 +411,10 @@ def getSignalObjects( baseline_objects
         jet_pt  = signal_jet[jet_it].pt
         jet_eta = signal_jet[jet_it].eta
 
+        if not signal_jet[jet_it].is_b_jet:
+            to_remove_jet.append(jet_it)
+            continue
+
         if jet_pt < signal_jet_pt_cut:
             if verbose:
                 print '  jet %d failed pt cut (%f < %f)' % ( jet_it

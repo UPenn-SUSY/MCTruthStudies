@@ -87,7 +87,7 @@ def plotTruth(tree):
         # print '======================================================'
         if i % 100 == 0:
             print 'Event %d of %d' % (i, total_num_events)
-        if i > 500: break
+        # if i > 500: break
         num_el = event.el_n
         num_mu = event.mu_staco_n
 
