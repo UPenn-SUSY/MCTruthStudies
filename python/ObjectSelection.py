@@ -123,7 +123,7 @@ def doOverlapRemoval(baseline, verbose = False):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # do e-e overlap removal
     el_to_remove_ee = []
-    dr_cut_ee = 0.1
+    dr_cut_ee = 0.05
     for i_ee in xrange(len(overlap_removed_el)):
         eta_i_ee = overlap_removed_el[i_ee].eta
         phi_i_ee = overlap_removed_el[i_ee].eta
@@ -248,7 +248,7 @@ def doOverlapRemoval(baseline, verbose = False):
     # do e-mu overlap removal
     el_to_remove_em = []
     mu_to_remove_em = []
-    dr_cut_em = 0.1
+    dr_cut_em = 0.01
     for el_it_em in xrange(len(overlap_removed_el)):
         eta_el_em = overlap_removed_el[el_it_em].eta
         phi_el_em = overlap_removed_el[el_it_em].phi
