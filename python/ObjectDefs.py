@@ -61,3 +61,9 @@ class Jet(object):
         self.px           = self.pt*math.cos(self.phi)
         self.py           = self.pt*math.sin(self.phi)
         self.pz           = self.pt*math.sin(self.theta)
+        self.is_b_jet     = truth_helpers.isBJet( self
+                                                , event.mc_pdgId
+                                                , event.mc_pt
+                                                , event.mc_eta
+                                                , event.mc_phi
+                                                )

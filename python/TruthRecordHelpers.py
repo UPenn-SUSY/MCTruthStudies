@@ -4,6 +4,7 @@ import sys
 import os.path
 import optparse
 import time
+import math
 
 import array
 
@@ -53,3 +54,29 @@ def getParentPdgIDFromBarcode(event, barcode):
             mc_index = index
             return getParentPdgID(event, mc_index)
     return None
+
+# ------------------------------------------------------------------------------
+def isBJet( my_jet
+          , mc_pdg_id
+          , mc_pt
+          , mc_eta
+          , mc_phi
+          ):
+    pt_cut_value = 10.e3
+    delta_r_cut = 0.30
+
+    my_jet_eta = my_jet.eta
+    my_jet_phi = my_jet.phi
+
+    for mc_it in xrange(len(mc_pdg_id)):
+        if mc_pt.at(mc_it) < pt_cut_value or abs(mc_pdg_id.at(mc_it)) != 5:
+            continue
+        delta_eta = abs(abs(my_jet_eta) - abs(mc_eta.at(mc_it)))
+        delta_phi = abs(abs(my_jet_phi) - abs(mc_phi.at(mc_it)))
+        while delta_phi > 3.14159:
+            delta_phi -= 3.14159
+        delta_r = math.sqrt( delta_eta*delta_eta + delta_phi*delta_phi)
+
+        if delta_r < delta_r_cut:
+            return True
+    return False
