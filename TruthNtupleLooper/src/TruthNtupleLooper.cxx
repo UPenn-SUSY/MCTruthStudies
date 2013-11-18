@@ -10,6 +10,7 @@
 // #include "TH2.h"
 
 #include "include/ObjectDefs.h"
+#include "include/OverlapRemoval.h"
 #include "ProgressBar/include/ProgressBar.h"
 
 // -----------------------------------------------------------------------------
@@ -711,10 +712,49 @@ void TruthNtuple::TruthNtupleLooper::constructObjects()
     m_jet_list.push_back(this_jet);
   }
   m_met.setMetNoint(MET_Truth_NonInt_etx, MET_Truth_NonInt_ety);
+
+
 }
 
 // -----------------------------------------------------------------------------
 void TruthNtuple::TruthNtupleLooper::processEvent()
 {
-  // do nothing
+  std::vector<TruthNtuple::Electron*> el_baseline_list;
+  std::vector<TruthNtuple::Electron*> el_signal_list;
+  for (size_t el_it = 0; el_it != m_el_list.size(); ++el_it)
+    el_baseline_list.push_back(&m_el_list.at(el_it));
+
+  std::vector<TruthNtuple::Muon*> mu_baseline_list;
+  std::vector<TruthNtuple::Muon*> mu_signal_list;
+  for (size_t mu_it = 0; mu_it != m_mu_list.size(); ++mu_it)
+    mu_baseline_list.push_back(&m_mu_list.at(mu_it));
+
+  std::vector<TruthNtuple::Jet*> jet_baseline_list;
+  std::vector<TruthNtuple::Jet*> jet_signal_list;
+  for (size_t jet_it = 0; jet_it != m_jet_list.size(); ++jet_it)
+    jet_baseline_list.push_back(&m_jet_list.at(jet_it));
+
+  TruthNtuple::OverlapRemoval overlap_removal;
+  overlap_removal.setDrEE(0.05);
+  overlap_removal.setDrEJ(0.20);
+  overlap_removal.setDrJE(0.40);
+  overlap_removal.setDrJM(0.40);
+  overlap_removal.setDrEM(0.01);
+  overlap_removal.setDrMM(0.05);
+  overlap_removal.doOverlapRemoval( el_baseline_list, mu_baseline_list, jet_baseline_list
+                                  , el_signal_list  , mu_signal_list  , jet_signal_list
+                                  );
+
+  std::cout << "num el  -- (nominal): " << m_el_list.size() 
+            << " -- (before): " << el_baseline_list.size()
+            << " -- (after): "  << el_signal_list.size()
+            << "\n";
+  std::cout << "num mu  -- (nominal): " << m_mu_list.size()
+            << " -- (before): " << mu_baseline_list.size()
+            << " -- (after): "  << mu_signal_list.size()
+            << "\n";
+  std::cout << "num jet -- (nominal): " << m_jet_list.size()
+            << " -- (before): " << jet_baseline_list.size()
+            << " -- (after): " << jet_signal_list.size()
+            << "\n";
 }
