@@ -297,3 +297,42 @@ bool TruthNtuple::Jet::getIsBJet() const
 {
   return m_is_b_jet;
 }
+
+// -----------------------------------------------------------------------------
+TruthNtuple::Met::Met() : m_met_etx_noint(0.)
+                        , m_met_ety_noint(0.)
+                        , m_met_et_noint(0.)
+{
+}
+
+// -----------------------------------------------------------------------------
+TruthNtuple::Met::Met(double met_etx_noint, double met_ety_noint) : m_met_etx_noint(met_etx_noint)
+                                                                  , m_met_ety_noint(met_etx_noint)
+                                                                  , m_met_et_noint( sqrt( met_etx_noint*met_etx_noint
+                                                                                        + met_etx_noint*met_etx_noint
+                                                                                        )
+                                                                                  )
+{
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Met::clear()
+{
+  m_met_etx_noint = 0;
+  m_met_ety_noint = 0;
+  m_met_et_noint = 0;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Met::setMetNoint(double met_etx, double met_ety)
+{
+  m_met_etx_noint = met_etx;
+  m_met_ety_noint = met_ety;
+  m_met_et_noint = sqrt( met_etx*met_etx + met_ety*met_ety );
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::Met::getMetNoint() const
+{
+  return m_met_et_noint;
+}

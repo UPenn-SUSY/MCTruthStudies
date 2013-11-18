@@ -35,6 +35,7 @@ namespace TruthNtuple
       std::vector<TruthNtuple::Electron> m_el_list;
       std::vector<TruthNtuple::Muon>     m_mu_list;
       std::vector<TruthNtuple::Jet>      m_jet_list;
+      TruthNtuple::Met                   m_met;
 
       TTree          *fChain;   //!pointer to the analyzed TTree or TChain
       Int_t           fCurrent; //!current Tree number in a TChain

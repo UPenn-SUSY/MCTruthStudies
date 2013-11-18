@@ -114,6 +114,27 @@ namespace TruthNtuple
       bool m_is_b_jet;
 
   };
+
+  // =============================================================================
+  class Met
+  {
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    public:
+      Met();
+      Met(double met_etx_noint, double met_ety_noint);
+      void clear();
+
+      void setMetNoint(double met_etx, double met_ety);
+
+      double getMetNoint() const;
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    protected:
+      double m_met_etx_noint;
+      double m_met_ety_noint;
+      double m_met_et_noint;
+
+  };
 }
 
 #endif

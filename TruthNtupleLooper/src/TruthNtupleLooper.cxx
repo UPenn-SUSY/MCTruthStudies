@@ -692,6 +692,7 @@ void TruthNtuple::TruthNtupleLooper::clearObjects()
   m_el_list.clear();
   m_mu_list.clear();
   m_jet_list.clear();
+  m_met.clear();
 }
 
 // -----------------------------------------------------------------------------
@@ -709,6 +710,7 @@ void TruthNtuple::TruthNtupleLooper::constructObjects()
     Jet this_jet = Jet(this, jet_index);
     m_jet_list.push_back(this_jet);
   }
+  m_met.setMetNoint(MET_Truth_NonInt_etx, MET_Truth_NonInt_ety);
 }
 
 // -----------------------------------------------------------------------------
