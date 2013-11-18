@@ -1,7 +1,6 @@
 #ifndef OVERLAPREMOVAL_H
 #define OVERLAPREMOVAL_H
 
-#include <iostream>
 #include <vector>
 
 // =============================================================================
@@ -54,30 +53,6 @@ namespace TruthNtuple
   };
 }
 
-namespace TruthNtuple
-{
-  // -----------------------------------------------------------------------------
-  template <class T>
-    void OverlapRemoval::removeObjects( std::vector<T*>& objects
-                                     , const std::vector<bool>& to_remove
-                                     )
-    {
-      if (objects.size() != to_remove.size()) {
-        std::cout << "ERROR! object vector size does not equal to remove size"
-                  << "\n  objects size: " << objects.size()
-                  << "\n  to_remove size: " << to_remove.size()
-                  << "\n";
-
-      }
-
-      typename std::vector<T*>::iterator objects_begin = objects.begin();
-      for (size_t it = 0; it != to_remove.size(); ++it) {
-        size_t this_index = to_remove.size() - it - 1;
-        if (to_remove.at(this_index)) {
-          objects.erase(objects_begin + this_index);
-        }
-      }
-    }
-}
+#include "OverlapRemoval.icc"
 
 #endif
