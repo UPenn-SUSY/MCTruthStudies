@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
-#include "TruthRecordHelpers/include/JetFlavorFinder.h"
+#include "include/JetFlavorFinder.h"
+#include "TruthNtupleLooper/include/Calculators.h"
 
 // =============================================================================
 namespace TruthRecordHelpers
