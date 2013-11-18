@@ -7,16 +7,16 @@
 namespace TruthRecordHelpers
 {
   // -----------------------------------------------------------------------------
-  bool isBJet( const float my_jet_eta
-             , const float my_jet_phi
-             , const std::vector<int>* mc_pdgId
-             , const std::vector<int>* /*mc_status*/
-             , const std::vector<int>* /*mc_barcode*/
-             , const std::vector<float>* mc_pt
-             , const std::vector<float>* mc_eta
-             , const std::vector<float>* mc_phi
-             , bool verbose
-             )
+  int isBJet( const float my_jet_eta
+            , const float my_jet_phi
+            , const std::vector<int>* mc_pdgId
+            , const std::vector<int>* /*mc_status*/
+            , const std::vector<int>* /*mc_barcode*/
+            , const std::vector<float>* mc_pt
+            , const std::vector<float>* mc_eta
+            , const std::vector<float>* mc_phi
+            , bool verbose
+            )
   {
     // double delta_r_b   = 999.;
     // double delta_r_c   = 999.;
@@ -45,7 +45,7 @@ namespace TruthRecordHelpers
       double delta_r = sqrt(delta_eta*delta_eta + delta_phi*delta_phi);
 
       if (abs(mc_pdgId->at(mc_it)) == 5 && delta_r < delta_r_cut) {
-        return true;
+        return mc_it;
       }
 
       /*
@@ -62,6 +62,6 @@ namespace TruthRecordHelpers
        return true;
        */
 
-    return false;
+    return -1;
   }
 }

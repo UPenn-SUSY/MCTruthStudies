@@ -1,8 +1,7 @@
 #include "include/ObjectDefs.h"
 #include "include/TruthNtupleLooper.h"
 #include "TruthRecordHelpers/include/ParentFinder.h"
-// #include "TruthRecordHelpers/include/JetFlavorFinder.h"
-#include "TruthRecordHelpers/src/JetFlavorFinder.cxx"
+#include "TruthRecordHelpers/include/JetFlavorFinder.h"
 
 #include <iostream>
 #include <math.h>
@@ -68,6 +67,12 @@ void TruthNtuple::Particle::setPz(double val)
   m_pz = val;
 }
 
+// -----------------------------------------------------------------------------
+void TruthNtuple::Particle::setParentPdgid(int val)
+{
+  m_parent_pdgid = val;
+}
+
 
 // -----------------------------------------------------------------------------
 unsigned int TruthNtuple::Particle::getIndex() const
@@ -118,8 +123,50 @@ double TruthNtuple::Particle::getPz() const
 }
 
 // -----------------------------------------------------------------------------
+int TruthNtuple::Particle::getParentPdgid() const
+{
+  return m_parent_pdgid;
+}
+
+// -----------------------------------------------------------------------------
+TruthNtuple::Lepton::Lepton()
+{
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Lepton::setIsElectron(bool val)
+{
+  m_is_electron = val;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Lepton::setCharge(double val)
+{
+  m_charge = val;
+}
+
+// -----------------------------------------------------------------------------
+bool TruthNtuple::Lepton::isElectron() const
+{
+  return m_is_electron;
+}
+
+// -----------------------------------------------------------------------------
+bool TruthNtuple::Lepton::isMuon() const
+{
+  return !m_is_electron;
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::Lepton::getCharge() const
+{
+  return m_charge;
+}
+
+// -----------------------------------------------------------------------------
 TruthNtuple::Electron::Electron()
 {
+  setIsElectron(true);
 }
 
 // -----------------------------------------------------------------------------
@@ -127,6 +174,8 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
                                , unsigned int el_index
                                )
 {
+  setIsElectron(true);
+
   setIndex(el_index);
 
   setPt(    tnl->el_pt->at(el_index));
@@ -147,32 +196,9 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
 }
 
 // -----------------------------------------------------------------------------
-void TruthNtuple::Electron::setCharge(double val)
-{
-  m_charge = val;
-}
-
-// -----------------------------------------------------------------------------
-double TruthNtuple::Electron::getCharge() const
-{
-  return m_charge;
-}
-
-// -----------------------------------------------------------------------------
-void TruthNtuple::Electron::setParentPdgid(int val)
-{
-  m_parent_pdgid = val;
-}
-//
-// -----------------------------------------------------------------------------
-int TruthNtuple::Electron::getParentPdgid() const
-{
-  return m_parent_pdgid;
-}
-
-// -----------------------------------------------------------------------------
 TruthNtuple::Muon::Muon()
 {
+  setIsElectron(false);
 }
 
 // -----------------------------------------------------------------------------
@@ -180,6 +206,8 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
                        , unsigned int mu_index
                        )
 {
+  setIsElectron(false);
+
   setIndex(mu_index);
 
   setPt(    tnl->mu_staco_pt->at(mu_index));
@@ -197,30 +225,6 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
                                                               , tnl->mc_parent_index
                                                               )
                 );
-}
-
-// -----------------------------------------------------------------------------
-void TruthNtuple::Muon::setCharge(double val)
-{
-  m_charge = val;
-}
-
-// -----------------------------------------------------------------------------
-double TruthNtuple::Muon::getCharge() const
-{
-  return m_charge;
-}
-
-// -----------------------------------------------------------------------------
-void TruthNtuple::Muon::setParentPdgid(int val)
-{
-  m_parent_pdgid = val;
-}
-
-// -----------------------------------------------------------------------------
-int TruthNtuple::Muon::getParentPdgid() const
-{
-  return m_parent_pdgid;
 }
 
 // -----------------------------------------------------------------------------
@@ -246,17 +250,28 @@ TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
   setPy( m_pt*sin(m_phi));
   setPz( m_pt*sin(m_theta));
 
-  setIsBJet( TruthRecordHelpers::isBJet( m_eta
-                                       , m_phi
-                                       , tnl->mc_pdgId
-                                       , tnl->mc_status
-                                       , tnl->mc_barcode
-                                       , tnl->mc_pt
-                                       , tnl->mc_eta
-                                       , tnl->mc_phi
-                                       // , false
-                                       )
-           );
+  int b_jet_index = TruthRecordHelpers::isBJet( m_eta
+                                              , m_phi
+                                              , tnl->mc_pdgId
+                                              , tnl->mc_status
+                                              , tnl->mc_barcode
+                                              , tnl->mc_pt
+                                              , tnl->mc_eta
+                                              , tnl->mc_phi
+                                              // , false
+                                              );
+  if (b_jet_index >= 0) {
+    setIsBJet(true);
+    setParentPdgid( TruthRecordHelpers::getParentPdgId( b_jet_index
+                                                      , tnl->mc_pdgId
+                                                      , tnl->mc_parent_index
+                                                      )
+                  );
+  }
+  else {
+    setIsBJet(false);
+    setParentPdgid(0);
+  }
 }
 
 // -----------------------------------------------------------------------------
