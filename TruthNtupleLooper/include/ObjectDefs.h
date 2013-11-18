@@ -133,7 +133,6 @@ namespace TruthNtuple
       double m_met_etx_noint;
       double m_met_ety_noint;
       double m_met_et_noint;
-
   };
 }
 

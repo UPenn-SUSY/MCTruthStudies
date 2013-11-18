@@ -4,9 +4,9 @@
 #include "include/ObjectDefs.h"
 
 // -----------------------------------------------------------------------------
-double TruthNtupleLooper::invariantMass( const TruthNtuple::Particle* p1
-                                       , const TruthNtuple::Particle* p2
-                                       )
+double TruthNtuple::invariantMass( const TruthNtuple::Particle* p1
+                                 , const TruthNtuple::Particle* p2
+                                 )
 {
   double px = p1->getPx() + p2->getPx();
   double py = p1->getPy() + p2->getPy();
@@ -18,9 +18,9 @@ double TruthNtupleLooper::invariantMass( const TruthNtuple::Particle* p1
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtupleLooper::ptDiObject( const TruthNtuple::Particle* p1
-                                    , const TruthNtuple::Particle* p2
-                                    )
+double TruthNtuple::ptDiObject( const TruthNtuple::Particle* p1
+                              , const TruthNtuple::Particle* p2
+                              )
 {
   double px = p1->getPx() + p2->getPx();
   double py = p1->getPy() + p2->getPy();
@@ -30,9 +30,9 @@ double TruthNtupleLooper::ptDiObject( const TruthNtuple::Particle* p1
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtupleLooper::emmaMt( const TruthNtuple::Particle* p1
-                                , const TruthNtuple::Particle* p2
-                                )
+double TruthNtuple::emmaMt( const TruthNtuple::Particle* p1
+                          , const TruthNtuple::Particle* p2
+                          )
 {
   double mll = invariantMass(p1, p2);
   double ptll = ptDiObject(p1, p2);
@@ -42,29 +42,29 @@ double TruthNtupleLooper::emmaMt( const TruthNtuple::Particle* p1
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtupleLooper::deltaEta( const TruthNtuple::Particle* p1
-                                  , const TruthNtuple::Particle* p2
-                                  )
+double TruthNtuple::deltaEta( const TruthNtuple::Particle* p1
+                            , const TruthNtuple::Particle* p2
+                            )
 {
   return deltaEta(p1->getEta(), p2->getEta());
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtupleLooper::deltaEta(double eta1, double eta2)
+double TruthNtuple::deltaEta(double eta1, double eta2)
 {
   return fabs( fabs(eta1) - fabs(eta2) );
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtupleLooper::deltaPhi( const TruthNtuple::Particle* p1
-                                  , const TruthNtuple::Particle* p2
-                                  )
+double TruthNtuple::deltaPhi( const TruthNtuple::Particle* p1
+                            , const TruthNtuple::Particle* p2
+                            )
 {
   return deltaPhi(p1->getPhi(), p2->getPhi());
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtupleLooper::deltaPhi(double phi1, double phi2)
+double TruthNtuple::deltaPhi(double phi1, double phi2)
 {
   double delta_phi = fabs( phi1 - phi2 );
   while (delta_phi > 3.14159265359) {
@@ -74,20 +74,20 @@ double TruthNtupleLooper::deltaPhi(double phi1, double phi2)
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtupleLooper::deltaR( const TruthNtuple::Particle* p1
-                                , const TruthNtuple::Particle* p2
-                                )
+double TruthNtuple::deltaR( const TruthNtuple::Particle* p1
+                          , const TruthNtuple::Particle* p2
+                          )
 {
   // return 1.;
   return deltaR(p1->getEta(), p1->getPhi(), p2->getEta(), p2->getPhi());
 }
 
 // -----------------------------------------------------------------------------
-double TruthNtupleLooper::deltaR( double eta1
-                                , double phi1
-                                , double eta2
-                                , double phi2
-                                )
+double TruthNtuple::deltaR( double eta1
+                          , double phi1
+                          , double eta2
+                          , double phi2
+                          )
 {
   double delta_phi = deltaPhi(phi1, phi2);
   double delta_eta = deltaEta(eta1, eta2);

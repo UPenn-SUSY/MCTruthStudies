@@ -12,7 +12,7 @@ namespace TruthNtuple
 }
 
 // =============================================================================
-namespace TruthNtupleLooper
+namespace TruthNtuple
 {
   double invariantMass( const TruthNtuple::Particle*
                       , const TruthNtuple::Particle*

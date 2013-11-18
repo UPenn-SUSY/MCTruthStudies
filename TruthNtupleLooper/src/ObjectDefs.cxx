@@ -309,7 +309,7 @@ TruthNtuple::Met::Met() : m_met_etx_noint(0.)
 TruthNtuple::Met::Met(double met_etx_noint, double met_ety_noint) : m_met_etx_noint(met_etx_noint)
                                                                   , m_met_ety_noint(met_etx_noint)
                                                                   , m_met_et_noint( sqrt( met_etx_noint*met_etx_noint
-                                                                                        + met_etx_noint*met_etx_noint
+                                                                                        + met_ety_noint*met_ety_noint
                                                                                         )
                                                                                   )
 {
