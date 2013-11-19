@@ -17,6 +17,11 @@ namespace TruthNtuple
   // class Met;
 }
 
+namespace HistogramHandlers
+{
+  class Handle;
+}
+
 // =============================================================================
 namespace BMinusL
 {
@@ -48,17 +53,18 @@ namespace BMinusL
       std::vector<TruthNtuple::Muon*>     m_daughter_mu;
       std::vector<TruthNtuple::Jet*>      m_daughter_jet;
 
+      TruthNtuple::Met m_met;
+
+      std::vector<HistogramHandlers::Handle*> m_histograms;
+
       // TODO move thise to Histogram handler once it is completed
-      TH1D* m_h_num_lep;
-      TH1D* m_h_num_jet;
+      // TH1D* m_h_lep_pt_0;
+      // TH1D* m_h_lep_pt_1;
+      // TH2D* m_h_lep_pt_2d;
 
-      TH1D* m_h_lep_pt_0;
-      TH1D* m_h_lep_pt_1;
-      TH2D* m_h_lep_pt_2d;
-
-      TH1D* m_h_lep_eta_0;
-      TH1D* m_h_lep_eta_1;
-      TH2D* m_h_lep_eta_2d;
+      // TH1D* m_h_lep_eta_0;
+      // TH1D* m_h_lep_eta_1;
+      // TH2D* m_h_lep_eta_2d;
 
       TH1D* m_h_lep_phi_0;
       TH1D* m_h_lep_phi_1;
