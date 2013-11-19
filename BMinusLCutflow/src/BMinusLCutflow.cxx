@@ -55,6 +55,8 @@ void BMinusL::Cutflow::clearObjects()
 {
   TruthNtuple::TruthNtupleLooper::clearObjects();
 
+  m_flavor_channel = TruthNtuple::FLAVOR_NONE;
+
   m_selected_el.clear();
   m_selected_mu.clear();
   m_selected_jet.clear();
@@ -73,7 +75,21 @@ void BMinusL::Cutflow::processEvent()
   size_t num_mu = m_daughter_mu.size();
   size_t num_jet = m_daughter_jet.size();
 
-  // std::cout << "num el: " << num_el << " -- num mu: " << num_mu << " -- num jet: " << num_jet << "\n";
+  if (num_el == 2 && num_mu == 0) {
+    m_flavor_channel = TruthNtuple::FLAVOR_EE;
+  }
+  else if (num_el == 0 && num_mu == 2) {
+    m_flavor_channel = TruthNtuple::FLAVOR_MM;
+  }
+  else if (num_el == 1 && num_mu == 1) {
+    if (m_daughter_el.at(0)->getPt() >= m_daughter_mu.at(0)->getPt())
+      m_flavor_channel = TruthNtuple::FLAVOR_EM;
+    else
+      m_flavor_channel = TruthNtuple::FLAVOR_ME;
+  }
+  else {
+    m_flavor_channel = TruthNtuple::FLAVOR_NONE;
+  }
 
   m_h_num_lep->Fill(num_el + num_mu);
   m_h_num_jet->Fill(num_jet);
@@ -87,7 +103,7 @@ void BMinusL::Cutflow::processEvent()
   double lep_0_phi = 0;
   double lep_1_phi = 0;
 
-  if (num_el == 2 && num_mu == 0) {
+  if (m_flavor_channel == TruthNtuple::FLAVOR_EE) {
     lep_0_pt = m_daughter_el.at(0)->getPt()/1.e3;
     lep_1_pt = m_daughter_el.at(1)->getPt()/1.e3;
 
@@ -97,7 +113,7 @@ void BMinusL::Cutflow::processEvent()
     lep_0_phi = m_daughter_el.at(0)->getPhi();
     lep_1_phi = m_daughter_el.at(1)->getPhi();
   }
-  else if (num_el == 0 && num_mu == 2) {
+  else if (m_flavor_channel == TruthNtuple::FLAVOR_MM) {
     lep_0_pt = m_daughter_mu.at(0)->getPt()/1.e3;
     lep_1_pt = m_daughter_mu.at(1)->getPt()/1.e3;
 
@@ -107,7 +123,9 @@ void BMinusL::Cutflow::processEvent()
     lep_0_phi = m_daughter_mu.at(0)->getPhi();
     lep_1_phi = m_daughter_mu.at(1)->getPhi();
   }
-  else if (num_el == 1 && num_mu == 1) {
+  else if (  m_flavor_channel == TruthNtuple::FLAVOR_EM
+          || m_flavor_channel == TruthNtuple::FLAVOR_ME
+          ) {
     lep_0_pt = m_daughter_el.at(0)->getPt()/1.e3;
     lep_1_pt = m_daughter_mu.at(0)->getPt()/1.e3;
 

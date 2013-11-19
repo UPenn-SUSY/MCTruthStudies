@@ -1,6 +1,7 @@
 #ifndef BMINUSLCUTFLOW_H
 #define BMINUSLCUTFLOW_H
 
+#include "TruthNtupleLooper/include/TruthNtupleEnums.h"
 #include "TruthNtupleLooper/include/TruthNtupleLooper.h"
 
 // =============================================================================
@@ -34,6 +35,8 @@ namespace BMinusL
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
       void doObjectSelection();
+
+      TruthNtuple::FLAVOR_CHANNEL m_flavor_channel;
 
       // objects passing selection criterial
       std::vector<TruthNtuple::Electron*> m_selected_el;

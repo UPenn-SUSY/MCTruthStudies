@@ -1,7 +1,8 @@
 # ======================
 # = top level Makefile =
 # ======================
-DIRS = ProgressBar TruthNtupleLooper mt2 TruthRecordHelpers BMinusLCutflow
+DIRS = ProgressBar TruthNtupleLooper mt2 TruthRecordHelpers BMinusLCutflow \
+	   HistogramHandlers
 
 all::build link
 
