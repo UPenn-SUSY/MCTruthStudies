@@ -53,6 +53,6 @@ namespace TruthNtuple
   };
 }
 
-#include "OverlapRemoval.icc"
+#include "TruthNtupleLooper/include/OverlapRemoval.icc"
 
 #endif

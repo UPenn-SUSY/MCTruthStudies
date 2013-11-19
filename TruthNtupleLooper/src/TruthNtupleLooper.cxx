@@ -1,4 +1,4 @@
-#include "include/TruthNtupleLooper.h"
+#include "TruthNtupleLooper/include/TruthNtupleLooper.h"
 
 #include <iostream>
 #include <iomanip>
@@ -9,8 +9,8 @@
 
 // #include "TH2.h"
 
-#include "include/ObjectDefs.h"
-#include "include/OverlapRemoval.h"
+#include "TruthNtupleLooper/include/ObjectDefs.h"
+#include "TruthNtupleLooper/include/OverlapRemoval.h"
 #include "ProgressBar/include/ProgressBar.h"
 
 // -----------------------------------------------------------------------------

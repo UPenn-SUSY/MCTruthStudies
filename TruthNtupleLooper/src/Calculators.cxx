@@ -1,7 +1,7 @@
-#include "include/Calculators.h"
+#include "TruthNtupleLooper/include/Calculators.h"
 #include <math.h>
 
-#include "include/ObjectDefs.h"
+#include "TruthNtupleLooper/include/ObjectDefs.h"
 
 // -----------------------------------------------------------------------------
 double TruthNtuple::invariantMass( const TruthNtuple::Particle* p1

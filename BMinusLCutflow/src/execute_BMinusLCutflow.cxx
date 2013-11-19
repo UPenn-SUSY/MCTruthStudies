@@ -3,13 +3,13 @@
 #include "TFile.h"
 #include "TTree.h"
 
-#include "include/TruthNtupleLooper.h"
+#include "include/BMinusLCutflow.h"
 
 
 // -----------------------------------------------------------------------------
 void help()
 {
-  std::cout << "usage:\n\t./TruthNtupleLooper <INPUT FILE NAME>\n\n";
+  std::cout << "usage:\n\t./Cutflow <INPUT FILE NAME>\n\n";
 }
 
 // -----------------------------------------------------------------------------
@@ -24,11 +24,13 @@ int main(int argc, char** argv)
   TFile* f = new TFile(argv[1]);
   TTree* t = static_cast<TTree*>(f->Get("truth"));
 
-  std::cout << "retrieved tree from file. constructing TruthNtupleLooper object\n";
-  TruthNtuple::TruthNtupleLooper tnl(t);
+  std::cout << "retrieved tree from file. constructing Cutflow object\n";
+  BMinusL::Cutflow bmlcf(t);
   std::cout << "Preparing to loop over events!\n";
-  tnl.Loop();
+  bmlcf.Loop();
   std::cout << "done!\n";
+
+  bmlcf.writeToFile();
 
   delete f;
 }

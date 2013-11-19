@@ -8,7 +8,7 @@
 // Header file for the classes stored in the TTree if any.
 #include <vector>
 
-#include "include/ObjectDefs.h"
+#include "TruthNtupleLooper/include/ObjectDefs.h"
 
 // =============================================================================
 class TBranch;
