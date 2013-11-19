@@ -32,7 +32,7 @@ namespace TruthRecordHelpers
   }
 
   // -----------------------------------------------------------------------------
-  int getParentPdgId( int mc_index
+  int getParentIndex( int mc_index
                     , const std::vector<int>* mc_pdg_id
                     , const std::vector<std::vector<int> >* mc_parent_index
                     , bool verbose
@@ -42,6 +42,8 @@ namespace TruthRecordHelpers
     int current_index = mc_index;
     int mother = 0;
 
+    // this counter is just to prevent infinite loops. mother == 0 check should
+    // get us out of this loop!
     for (unsigned int itr = 0; itr != 100 && mother == 0; ++itr) {
       size_t num_parents = mc_parent_index->at(current_index).size();
 
@@ -55,9 +57,49 @@ namespace TruthRecordHelpers
         }
         else {
           mother = parent_pdgid;
+          return parent_index;
         }
       }
     }
-    return mother;
+    return -1;
+  }
+
+  // -----------------------------------------------------------------------------
+  int getParentPdgId( int mc_index
+                    , const std::vector<int>* mc_pdg_id
+                    , const std::vector<std::vector<int> >* mc_parent_index
+                    , bool verbose
+                    )
+  {
+    int parent_index = getParentIndex( mc_index
+                                     , mc_pdg_id
+                                     , mc_parent_index
+                                     , verbose
+                                     );
+    return getParentPdgIdFromIndex(parent_index, mc_pdg_id, verbose);
+  }
+
+  // -----------------------------------------------------------------------------
+  int getParentPdgIdFromIndex( int parent_index
+                             , const std::vector<int>* mc_pdg_id
+                             , bool verbose
+                             )
+  {
+    if (parent_index < 0) {
+      return 0;
+    }
+    return mc_pdg_id->at(parent_index);
+  }
+
+  // -----------------------------------------------------------------------------
+  int getParentBarcodeFromIndex( int parent_index
+                               , const std::vector<int>* mc_barcode
+                               , bool verbose
+                               )
+  {
+    if (parent_index < 0) {
+      return 0;
+    }
+    return mc_barcode->at(parent_index);
   }
 }
