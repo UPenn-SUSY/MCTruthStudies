@@ -1,8 +1,8 @@
 #ifndef BMINUSLCUTFLOW_H
 #define BMINUSLCUTFLOW_H
 
-#include "TruthNtupleLooper/include/TruthNtupleEnums.h"
 #include "TruthNtupleLooper/include/TruthNtupleLooper.h"
+#include "TruthNtupleLooper/include/TruthNtupleEnums.h"
 
 // =============================================================================
 class TTree;

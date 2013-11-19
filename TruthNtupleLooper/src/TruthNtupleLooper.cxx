@@ -9,6 +9,7 @@
 
 // #include "TH2.h"
 
+#include "TruthNtupleLooper/include/TruthNtupleEnums.h"
 #include "TruthNtupleLooper/include/ObjectDefs.h"
 #include "TruthNtupleLooper/include/OverlapRemoval.h"
 #include "ProgressBar/include/ProgressBar.h"

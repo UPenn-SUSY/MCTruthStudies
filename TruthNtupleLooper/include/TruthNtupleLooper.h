@@ -8,7 +8,6 @@
 // Header file for the classes stored in the TTree if any.
 #include <vector>
 
-#include "TruthNtupleLooper/include/TruthNtupleEnums.h"
 #include "TruthNtupleLooper/include/ObjectDefs.h"
 
 // =============================================================================

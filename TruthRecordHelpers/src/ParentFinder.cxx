@@ -35,7 +35,7 @@ namespace TruthRecordHelpers
   int getParentIndex( int mc_index
                     , const std::vector<int>* mc_pdg_id
                     , const std::vector<std::vector<int> >* mc_parent_index
-                    , bool verbose
+                    , bool /*verbose*/
                     )
   {
     int original_pdgid = mc_pdg_id->at(mc_index);
@@ -82,7 +82,7 @@ namespace TruthRecordHelpers
   // -----------------------------------------------------------------------------
   int getParentPdgIdFromIndex( int parent_index
                              , const std::vector<int>* mc_pdg_id
-                             , bool verbose
+                             , bool /*verbose*/
                              )
   {
     if (parent_index < 0) {
@@ -94,7 +94,7 @@ namespace TruthRecordHelpers
   // -----------------------------------------------------------------------------
   int getParentBarcodeFromIndex( int parent_index
                                , const std::vector<int>* mc_barcode
-                               , bool verbose
+                               , bool /*verbose*/
                                )
   {
     if (parent_index < 0) {
