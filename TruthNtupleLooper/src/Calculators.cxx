@@ -3,6 +3,8 @@
 
 #include "TruthNtupleLooper/include/ObjectDefs.h"
 
+static const double PI = 3.14159265359;
+
 // -----------------------------------------------------------------------------
 double TruthNtuple::invariantMass( const TruthNtuple::Particle* p1
                                  , const TruthNtuple::Particle* p2
@@ -72,8 +74,11 @@ double TruthNtuple::deltaPhi( const TruthNtuple::Particle* p1
 double TruthNtuple::deltaPhi(double phi1, double phi2)
 {
   double delta_phi = fabs( phi1 - phi2 );
-  while (delta_phi > 3.14159265359) {
-    delta_phi -= 3.14159265359;
+  while (delta_phi > 2*PI) {
+    delta_phi -= 2*PI;
+  }
+  if (delta_phi > PI) {
+    delta_phi = 2*PI - delta_phi;
   }
   return delta_phi;
 }

@@ -1,5 +1,7 @@
-#include "include/ObjectDefs.h"
-#include "include/TruthNtupleLooper.h"
+#include "TruthNtupleLooper/include/ObjectDefs.h"
+#include "TruthNtupleLooper/include/TruthNtupleLooper.h"
+#include "TruthNtupleLooper/include/Calculators.h"
+
 #include "TruthRecordHelpers/include/ParentFinder.h"
 #include "TruthRecordHelpers/include/JetFlavorFinder.h"
 
@@ -412,9 +414,18 @@ void TruthNtuple::Jet::print(TruthNtuple::TruthNtupleLooper* tnl) const
   if (m_is_b_jet && tnl != NULL) {
     std::cout << "\tb quark itr: "    << m_b_quark_index
               << "\tb quark pdg id: " << tnl->mc_pdgId->at(m_b_quark_index)
+              << "\n"
               << "\tb quark pt: "     << tnl->mc_pt->at(   m_b_quark_index)
               << "\tb quark eta: "    << tnl->mc_eta->at(  m_b_quark_index)
               << "\tb quark phi: "    << tnl->mc_phi->at(  m_b_quark_index)
+              << "\n"
+              << "\tdetaR(jet, quark): " << TruthNtuple::deltaR( m_eta
+                                                               , m_phi
+                                                               , tnl->mc_eta->at(m_b_quark_index)
+                                                               , tnl->mc_phi->at(m_b_quark_index)
+                                                               )
+              << "\tdetaEta(jet, quark): " << TruthNtuple::deltaEta(m_eta, tnl->mc_eta->at(m_b_quark_index))
+              << "\tdetaPhi(jet, quark): " << TruthNtuple::deltaPhi(m_phi, tnl->mc_phi->at(m_b_quark_index))
               << "\n";
   }
 }
