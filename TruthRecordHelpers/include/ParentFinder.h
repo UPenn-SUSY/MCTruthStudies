@@ -18,7 +18,7 @@ namespace TruthRecordHelpers
                                , const std::vector<std::vector<int> >* mc_parent_index
                                , bool verbose = false
                                );
-  
+
   // from the particle barcode, get the parent pdg
   int getParentPdgIdFromBarcode( int barcode
                                , const std::vector<int>* mc_barcode

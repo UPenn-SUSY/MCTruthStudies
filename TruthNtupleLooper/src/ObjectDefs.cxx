@@ -220,20 +220,20 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
   setPz(    tnl->el_pz->at(el_index));
   setCharge(tnl->el_charge->at(el_index));
 
-  // setParentIndex(TruthRecordHelpers::getParentIndexFromBarcode( tnl->el_barcode->at(el_index)
-  //                                                             , tnl->mc_barcode
-  //                                                             , tnl->mc_pdgId
-  //                                                             , tnl->mc_parent_index
-  //                                                             )
-  //               );
-  // setParentPdgid(tnl->mc_pdgId->at(m_parent_index));
-  // setParentBarcode(tnl->mc_barcode->at(m_parent_index));
-  setParentPdgid(TruthRecordHelpers::getParentPdgIdFromBarcode( tnl->el_barcode->at(el_index)
+  setParentIndex(TruthRecordHelpers::getParentIndexFromBarcode( tnl->el_barcode->at(el_index)
                                                               , tnl->mc_barcode
                                                               , tnl->mc_pdgId
                                                               , tnl->mc_parent_index
                                                               )
                 );
+  if (m_parent_index >= 0) {
+    setParentPdgid(tnl->mc_pdgId->at(m_parent_index));
+    setParentBarcode(tnl->mc_barcode->at(m_parent_index));
+  }
+  else {
+    setParentPdgid(0);
+    setParentBarcode(0);
+  }
 }
 
 // =============================================================================
@@ -263,12 +263,20 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
   setPz(    tnl->mu_staco_pz->at(mu_index));
   setCharge(tnl->mu_staco_charge->at(mu_index));
 
-  setParentPdgid(TruthRecordHelpers::getParentPdgIdFromBarcode( tnl->mu_staco_barcode->at(mu_index)
+  setParentIndex(TruthRecordHelpers::getParentIndexFromBarcode( tnl->mu_staco_barcode->at(mu_index)
                                                               , tnl->mc_barcode
                                                               , tnl->mc_pdgId
                                                               , tnl->mc_parent_index
                                                               )
                 );
+  if (m_parent_index >= 0) {
+    setParentPdgid(tnl->mc_pdgId->at(m_parent_index));
+    setParentBarcode(tnl->mc_barcode->at(m_parent_index));
+  }
+  else {
+    setParentPdgid(0);
+    setParentBarcode(0);
+  }
 }
 
 // =============================================================================
@@ -309,11 +317,20 @@ TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
                                               );
   if (b_jet_index >= 0) {
     setIsBJet(true);
-    setParentPdgid( TruthRecordHelpers::getParentPdgId( b_jet_index
-                                                      , tnl->mc_pdgId
-                                                      , tnl->mc_parent_index
-                                                      )
+
+    setParentIndex(TruthRecordHelpers::getParentIndex( b_jet_index
+                                                     , tnl->mc_pdgId
+                                                     , tnl->mc_parent_index
+                                                     )
                   );
+    if (m_parent_index >= 0) {
+      setParentPdgid(tnl->mc_pdgId->at(m_parent_index));
+      setParentBarcode(tnl->mc_barcode->at(m_parent_index));
+    }
+    else {
+      setParentPdgid(0);
+      setParentBarcode(0);
+    }
   }
   else {
     setIsBJet(false);
