@@ -1,6 +1,8 @@
 #ifndef CALCULATORS_H
 #define CALCULATORS_H
 
+#include <vector>
+
 // =============================================================================
 namespace TruthNtuple
 {
@@ -43,6 +45,15 @@ namespace TruthNtuple
                , double eta2
                , double phi2
                );
+  // get mbl using one of our methods:
+  //    0: truth matching to parent barcode
+  //    1: dphi matching
+  //    1: dphi matching
+  //    2: dr matching
+  std::vector<double> getMbl( const std::vector<Lepton*>&
+                            , const std::vector<Jet*>&
+                            , unsigned int mbl_method = 0
+                            );
 }
 
 #endif

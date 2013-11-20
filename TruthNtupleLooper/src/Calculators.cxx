@@ -14,7 +14,7 @@ double TruthNtuple::invariantMass( const TruthNtuple::Particle* p1
   double e  = p1->getE()  + p2->getE();
 
   double m2 = e*e - px*px - py*py - pz*pz;
-  return m2*m2/fabs(m2);
+  return m2/sqrt(fabs(m2));
 }
 
 // -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ double TruthNtuple::emmaMt( const TruthNtuple::Particle* p1
   double ptll = ptDiObject(p1, p2);
 
   double emma_mt_2 = mll*mll + ptll*ptll;
-  return emma_mt_2*emma_mt_2/fabs(emma_mt_2);
+  return emma_mt_2/sqrt(fabs(emma_mt_2));
 }
 
 // -----------------------------------------------------------------------------
@@ -93,3 +93,45 @@ double TruthNtuple::deltaR( double eta1
   double delta_eta = deltaEta(eta1, eta2);
   return sqrt( delta_phi*delta_phi + delta_eta*delta_eta );
 }
+
+// -----------------------------------------------------------------------------
+std::vector<double> TruthNtuple::getMbl( const std::vector<Lepton*>& leptons
+                                       , const std::vector<Jet*>& jets
+                                       , unsigned int mbl_method
+                                       )
+{
+  const size_t num_lep = leptons.size();
+  const size_t num_jet = jets.size();
+
+  std::vector<double> mbl_list;
+
+  if (mbl_method == 0) {
+    // TODO implement truth matching method
+  }
+  else if (mbl_method == 1) {
+    // TODO implement dphi matching method
+  }
+  else if (mbl_method == 2) {
+    for (size_t lep_it = 0; lep_it != num_lep; ++lep_it) {
+      float min_dr = 999;
+      float dr = 999;
+      int chosen_jet_it = -1;
+      for (size_t jet_it = 0; jet_it != num_jet; ++jet_it) {
+        dr = TruthNtuple::deltaR(leptons.at(lep_it), jets.at(jet_it));
+        if (dr < min_dr) {
+          min_dr = dr;
+          chosen_jet_it = jet_it;
+        }
+      }
+      if (chosen_jet_it >= 0) {
+        mbl_list.push_back( TruthNtuple::invariantMass( leptons.at(lep_it)
+                                                      , jets.at(chosen_jet_it)
+                                                      )
+                          );
+      }
+    }
+  }
+
+  return mbl_list;
+}
+
