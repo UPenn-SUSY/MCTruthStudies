@@ -56,10 +56,6 @@ namespace BMinusL
       TruthNtuple::Met m_met;
 
       std::vector<HistogramHandlers::Handle*> m_histograms;
-
-      // TODO move thise to Histogram handler once it is completed
-      TH1D* m_h_mbl_truth;
-      TH1D* m_h_mbl_paired;
   };
 }
 

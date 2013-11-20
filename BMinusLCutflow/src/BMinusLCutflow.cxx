@@ -22,10 +22,7 @@ BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
   m_histograms.push_back(new HistogramHandlers::JetPt());
   m_histograms.push_back(new HistogramHandlers::JetEta());
   m_histograms.push_back(new HistogramHandlers::JetPhi());
-
-  // TODO set up hist handle classes
-  m_h_mbl_truth  = new TH1D("h_mbl_truth" , "mbl truth          ; m_{bl} [GeV];        Entries", 50, 0, 500);
-  m_h_mbl_paired = new TH1D("h_mbl_paired", "mbl paired         ; m_{bl} [GeV];        Entries", 50, 0, 500);
+  m_histograms.push_back(new HistogramHandlers::Mbl());
 }
 
 // -----------------------------------------------------------------------------
