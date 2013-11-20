@@ -6,6 +6,9 @@
 #include <iostream>
 #include <math.h>
 
+// =============================================================================
+// = Particle
+// =============================================================================
 // -----------------------------------------------------------------------------
 TruthNtuple::Particle::Particle()
 {
@@ -73,6 +76,18 @@ void TruthNtuple::Particle::setParentPdgid(int val)
   m_parent_pdgid = val;
 }
 
+// -----------------------------------------------------------------------------
+void TruthNtuple::Particle::setParentIndex(int val)
+{
+  m_parent_index = val;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Particle::setParentBarcode(int val)
+{
+  m_parent_barcode = val;
+}
+
 
 // -----------------------------------------------------------------------------
 unsigned int TruthNtuple::Particle::getIndex() const
@@ -129,10 +144,25 @@ int TruthNtuple::Particle::getParentPdgid() const
 }
 
 // -----------------------------------------------------------------------------
+int TruthNtuple::Particle::getParentIndex() const
+{
+  return m_parent_index;
+}
+
+// -----------------------------------------------------------------------------
+int TruthNtuple::Particle::getParentBarcode() const
+{
+  return m_parent_barcode;
+}
+
+// -----------------------------------------------------------------------------
 TruthNtuple::Lepton::Lepton()
 {
 }
 
+// =============================================================================
+// = Lepton
+// =============================================================================
 // -----------------------------------------------------------------------------
 void TruthNtuple::Lepton::setIsElectron(bool val)
 {
@@ -163,6 +193,9 @@ double TruthNtuple::Lepton::getCharge() const
   return m_charge;
 }
 
+// =============================================================================
+// = Electron
+// =============================================================================
 // -----------------------------------------------------------------------------
 TruthNtuple::Electron::Electron()
 {
@@ -187,6 +220,14 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
   setPz(    tnl->el_pz->at(el_index));
   setCharge(tnl->el_charge->at(el_index));
 
+  // setParentIndex(TruthRecordHelpers::getParentIndexFromBarcode( tnl->el_barcode->at(el_index)
+  //                                                             , tnl->mc_barcode
+  //                                                             , tnl->mc_pdgId
+  //                                                             , tnl->mc_parent_index
+  //                                                             )
+  //               );
+  // setParentPdgid(tnl->mc_pdgId->at(m_parent_index));
+  // setParentBarcode(tnl->mc_barcode->at(m_parent_index));
   setParentPdgid(TruthRecordHelpers::getParentPdgIdFromBarcode( tnl->el_barcode->at(el_index)
                                                               , tnl->mc_barcode
                                                               , tnl->mc_pdgId
@@ -195,6 +236,9 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
                 );
 }
 
+// =============================================================================
+// = Muon
+// =============================================================================
 // -----------------------------------------------------------------------------
 TruthNtuple::Muon::Muon()
 {
@@ -227,6 +271,9 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
                 );
 }
 
+// =============================================================================
+// = Jet
+// =============================================================================
 // -----------------------------------------------------------------------------
 TruthNtuple::Jet::Jet()
 {

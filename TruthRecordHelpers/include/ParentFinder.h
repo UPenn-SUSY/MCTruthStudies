@@ -5,12 +5,24 @@
 
 namespace TruthRecordHelpers
 {
+  int getParentIndexFromBarcode( int barcode
+                               , const std::vector<int>* mc_barcode
+                               , const std::vector<int>* mc_pdg_id
+                               , const std::vector<std::vector<int> >* mc_parent_index
+                               , bool verbose = false
+                               );
   int getParentPdgIdFromBarcode( int barcode
                                , const std::vector<int>* mc_barcode
                                , const std::vector<int>* mc_pdg_id
                                , const std::vector<std::vector<int> >* mc_parent_index
                                , bool verbose = false
                                );
+  int getParentBarcodeFromBarcode( int barcode
+                                 , const std::vector<int>* mc_barcode
+                                 , const std::vector<int>* mc_pdg_id
+                                 , const std::vector<std::vector<int> >* mc_parent_index
+                                 , bool verbose = false
+                                 );
 
   int getParentIndex( int mc_index
                     , const std::vector<int>* mc_mc_pdg_id

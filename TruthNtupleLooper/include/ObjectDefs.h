@@ -26,6 +26,8 @@ namespace TruthNtuple
       void setPy(double);
       void setPz(double);
       void setParentPdgid(int);
+      void setParentIndex(int);
+      void setParentBarcode(int);
 
       unsigned int getIndex() const;
       double getPt() const;
@@ -36,6 +38,8 @@ namespace TruthNtuple
       double getPy() const;
       double getPz() const;
       int getParentPdgid() const;
+      int getParentIndex() const;
+      int getParentBarcode() const;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
@@ -48,6 +52,8 @@ namespace TruthNtuple
       double       m_py;
       double       m_pz;
       int m_parent_pdgid;
+      int m_parent_index;
+      int m_parent_barcode;
   };
 
   // =============================================================================

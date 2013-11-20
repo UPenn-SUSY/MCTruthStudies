@@ -107,9 +107,34 @@ std::vector<double> TruthNtuple::getMbl( const std::vector<Lepton*>& leptons
 
   if (mbl_method == 0) {
     // TODO implement truth matching method
+    for (size_t lep_it = 0; lep_it != num_lep; ++lep_it) {
+      int lep_parent_pdgid   = leptons.at(lep_it)->getParentPdgid();
+      // int lep_parent_index   = leptons.at(lep_it)->getParentIndex();
+      // int lep_parent_barcode = leptons.at(lep_it)->getParentBarcode();
+
+      int chosen_jet_it = -1;
+      for (size_t jet_it = 0; jet_it != num_jet; ++jet_it) {
+        int jet_parent_pdgid   = jets.at(jet_it)->getParentPdgid();
+        // int jet_parent_index   = jets.at(jet_it)->getParentIndex();
+        // int jet_parent_barcode = jets.at(jet_it)->getParentBarcode();
+
+        if (lep_parent_pdgid != jet_parent_pdgid) continue;
+
+        // if (lep_parent_barcode == jet_parent_barcode) {
+        //   chosen_jet_it = jet_it;
+        //   break;
+        // }
+
+      }
+      if (chosen_jet_it >= 0) {
+        mbl_list.push_back( TruthNtuple::invariantMass( leptons.at(lep_it)
+                                                      , jets.at(chosen_jet_it)
+                                                      )
+                          );
+      }
+    }
   }
   else if (mbl_method == 1) {
-    // TODO implement dphi matching method
     for (size_t lep_it = 0; lep_it != num_lep; ++lep_it) {
       float min_dphi = -1;
       float dphi = -1;
