@@ -110,6 +110,24 @@ std::vector<double> TruthNtuple::getMbl( const std::vector<Lepton*>& leptons
   }
   else if (mbl_method == 1) {
     // TODO implement dphi matching method
+    for (size_t lep_it = 0; lep_it != num_lep; ++lep_it) {
+      float min_dphi = -1;
+      float dphi = -1;
+      int chosen_jet_it = -1;
+      for (size_t jet_it = 0; jet_it != num_jet; ++jet_it) {
+        dphi = TruthNtuple::deltaPhi(leptons.at(lep_it), jets.at(jet_it));
+        if (dphi > min_dphi) {
+          min_dphi = dphi;
+          chosen_jet_it = jet_it;
+        }
+      }
+      if (chosen_jet_it >= 0) {
+        mbl_list.push_back( TruthNtuple::invariantMass( leptons.at(lep_it)
+                                                      , jets.at(chosen_jet_it)
+                                                      )
+                          );
+      }
+    }
   }
   else if (mbl_method == 2) {
     for (size_t lep_it = 0; lep_it != num_lep; ++lep_it) {
