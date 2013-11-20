@@ -27,7 +27,7 @@ namespace TruthRecordHelpers
     // int barcode_b = 0;
     // int barcode_c = 0;
 
-    const double pt_cut_value = 10.e3;
+    const double pt_cut_value = 5.e3;
     const float delta_r_cut = 0.30;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
