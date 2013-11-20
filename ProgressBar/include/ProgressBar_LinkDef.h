@@ -13,5 +13,6 @@
 //
 // #pragma link C++ class MySuperClass+;
 #pragma link C++ class ProgressBar+;
+// #pragma link C++ class std::pair<std::string,std::string>+;
 
 #endif // __CINT__

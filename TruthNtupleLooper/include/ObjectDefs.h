@@ -41,6 +41,8 @@ namespace TruthNtuple
       int getParentIndex() const;
       int getParentBarcode() const;
 
+      virtual void printGeneralInfo() const;
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
       unsigned int m_index;
@@ -69,6 +71,8 @@ namespace TruthNtuple
       bool isElectron() const;
       bool isMuon() const;
       double getCharge() const;
+
+      virtual void print() const;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
@@ -113,6 +117,8 @@ namespace TruthNtuple
 
       double getTheta() const;
       bool getIsBJet() const;
+
+      virtual void print() const;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:

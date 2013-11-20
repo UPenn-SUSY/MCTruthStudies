@@ -12,10 +12,9 @@
 // want to generate a dictionary, here. The usual format is:
 //
 // #pragma link C++ class MySuperClass+;
-// #pragma link C++ class RunSusyCutFlow+;
-
-#pragma link C++ class TruthNtuple::TruthNtupleLooper+;
+#pragma link C++ class BMinusL::Cutflow+;
 #pragma link C++ class std::vector<unsigned long long>+;
+// #pragma link C++ class std::pair<std::string,std::string>+;
 
 
 #endif // __CINT__

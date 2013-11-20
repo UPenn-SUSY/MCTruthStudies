@@ -125,7 +125,8 @@ $(EXECUTABLE) :
 	@echo "- building executable $@"
 	@echo "------------------------------------------------------------"
 
-	@$(CXX) -v $(SH_LIB_FILE) $(LOCAL_LIBS_PATH) $(BONUS_LIB_PATH) $(ROOTLIBS) -lMinuit -o $@
+	# @$(CXX) -v $(SH_LIB_FILE) $(LOCAL_LIBS_PATH) $(BONUS_LIB_PATH) $(ROOTLIBS) -lMinuit -o $@
+	@$(CXX) -v $(SH_LIB_FILE) $(LOCAL_LIBS_PATH) $(BONUS_LIB_PATH) $(ROOTLIBS) -lMinuit -lTreePlayer -o $@
 	@echo ""
 
 # rule to clean up environment

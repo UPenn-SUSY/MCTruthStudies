@@ -156,13 +156,33 @@ int TruthNtuple::Particle::getParentBarcode() const
 }
 
 // -----------------------------------------------------------------------------
-TruthNtuple::Lepton::Lepton()
+void TruthNtuple::Particle::printGeneralInfo() const
 {
+  std::cout << "\tindex: " << m_index
+            << "\n"
+            << "\tpt: " << m_pt
+            << "\teta: " << m_eta
+            << "\tphi: " << m_phi
+            << "\tE: " << m_e
+            << "\n"
+            << "\tpx: " << m_px
+            << "\tpy: " << m_py
+            << "\tpz: " << m_pz
+            << "\n"
+            << "\tparent pdg id: "  << m_parent_pdgid
+            << "\tparent index: "   << m_parent_index
+            << "\tparent barcode: " << m_parent_barcode
+            << "\n";
 }
 
 // =============================================================================
 // = Lepton
 // =============================================================================
+// -----------------------------------------------------------------------------
+TruthNtuple::Lepton::Lepton()
+{
+}
+
 // -----------------------------------------------------------------------------
 void TruthNtuple::Lepton::setIsElectron(bool val)
 {
@@ -191,6 +211,15 @@ bool TruthNtuple::Lepton::isMuon() const
 double TruthNtuple::Lepton::getCharge() const
 {
   return m_charge;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Lepton::print() const
+{
+  std::cout << "lepton (" << (m_is_electron ? "electron" : "muon") << ")"
+            << "\tcharge: " << m_charge
+            << "\n";
+  printGeneralInfo();
 }
 
 // =============================================================================
@@ -362,6 +391,16 @@ bool TruthNtuple::Jet::getIsBJet() const
   return m_is_b_jet;
 }
 
+// -----------------------------------------------------------------------------
+void TruthNtuple::Jet::print() const
+{
+  std::cout << "Jet (b jet: " << m_is_b_jet << ")" << "\n";
+  printGeneralInfo();
+}
+
+// =============================================================================
+// = Met
+// =============================================================================
 // -----------------------------------------------------------------------------
 TruthNtuple::Met::Met() : m_met_etx_noint(0.)
                         , m_met_ety_noint(0.)
