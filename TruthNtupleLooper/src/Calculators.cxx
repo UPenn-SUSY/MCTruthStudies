@@ -74,13 +74,12 @@ double TruthNtuple::deltaPhi( const TruthNtuple::Particle* p1
 double TruthNtuple::deltaPhi(double phi1, double phi2)
 {
   double delta_phi = fabs( phi1 - phi2 );
-  while (delta_phi > 2*PI) {
+  while (delta_phi > PI)
     delta_phi -= 2*PI;
-  }
-  if (delta_phi > PI) {
-    delta_phi = 2*PI - delta_phi;
-  }
-  return delta_phi;
+  while (delta_phi < -PI)
+    delta_phi += 2*PI;
+
+  return fabs(delta_phi);
 }
 
 // -----------------------------------------------------------------------------
