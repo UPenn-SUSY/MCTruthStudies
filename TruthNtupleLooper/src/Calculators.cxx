@@ -52,7 +52,12 @@ double TruthNtuple::deltaEta( const TruthNtuple::Particle* p1
 // -----------------------------------------------------------------------------
 double TruthNtuple::deltaEta(double eta1, double eta2)
 {
-  return fabs( fabs(eta1) - fabs(eta2) );
+  // if (eta2 > eta1) {
+  //   double tmp = eta1;
+  //   eta1 = eta2;
+  //   eta2 = eta1;
+  // }
+  return fabs( eta1 - eta2 );
 }
 
 // -----------------------------------------------------------------------------

@@ -38,12 +38,9 @@ namespace TruthRecordHelpers
          ) {
         continue;
       }
-      double delta_eta = fabs(fabs(mc_eta->at(mc_it)) - fabs(my_jet_eta));
-      double delta_phi = fabs(fabs(mc_phi->at(mc_it)) - fabs(my_jet_phi));
-      while (delta_phi > 3.14159) {
-        delta_phi -= 3.14159;
-      }
-      double delta_r = sqrt(delta_eta*delta_eta + delta_phi*delta_phi);
+      double delta_r = TruthNtuple::deltaR( my_jet_eta, my_jet_phi
+                                          , mc_eta->at(mc_it), mc_phi->at(mc_it)
+                                          );
 
       if (abs(mc_pdgId->at(mc_it)) == 5 && delta_r < delta_r_cut) {
         return mc_it;
