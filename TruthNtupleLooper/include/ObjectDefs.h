@@ -72,7 +72,7 @@ namespace TruthNtuple
       bool isMuon() const;
       double getCharge() const;
 
-      virtual void print() const;
+      virtual void print(TruthNtuple::TruthNtupleLooper* tnl = 0) const;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
@@ -114,17 +114,19 @@ namespace TruthNtuple
 
       void setTheta(double);
       void setIsBJet(bool);
+      void setBQuarkIndex(int);
 
       double getTheta() const;
       bool getIsBJet() const;
+      int getBQuarkIndex() const;
 
-      virtual void print() const;
+      virtual void print(TruthNtuple::TruthNtupleLooper* tnl = 0) const;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
       double m_theta;
       bool m_is_b_jet;
-
+      int m_b_quark_index;
   };
 
   // =============================================================================

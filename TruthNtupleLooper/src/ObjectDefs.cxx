@@ -214,7 +214,7 @@ double TruthNtuple::Lepton::getCharge() const
 }
 
 // -----------------------------------------------------------------------------
-void TruthNtuple::Lepton::print() const
+void TruthNtuple::Lepton::print(TruthNtuple::TruthNtupleLooper* /*tnl*/) const
 {
   std::cout << "lepton (" << (m_is_electron ? "electron" : "muon") << ")"
             << "\tcharge: " << m_charge
@@ -334,20 +334,21 @@ TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
   setPy( m_pt*sin(m_phi));
   setPz( m_pt*sin(m_theta));
 
-  int b_jet_index = TruthRecordHelpers::isBJet( m_eta
-                                              , m_phi
-                                              , tnl->mc_pdgId
-                                              , tnl->mc_status
-                                              , tnl->mc_barcode
-                                              , tnl->mc_pt
-                                              , tnl->mc_eta
-                                              , tnl->mc_phi
-                                              // , false
-                                              );
-  if (b_jet_index >= 0) {
+  setBQuarkIndex(TruthRecordHelpers::isBJet( m_eta
+                                           , m_phi
+                                           , tnl->mc_pdgId
+                                           , tnl->mc_status
+                                           , tnl->mc_barcode
+                                           , tnl->mc_pt
+                                           , tnl->mc_eta
+                                           , tnl->mc_phi
+                                           // , false
+                                           )
+                );
+  if (m_b_quark_index >= 0) {
     setIsBJet(true);
 
-    setParentIndex(TruthRecordHelpers::getParentIndex( b_jet_index
+    setParentIndex(TruthRecordHelpers::getParentIndex( m_b_quark_index
                                                      , tnl->mc_pdgId
                                                      , tnl->mc_parent_index
                                                      )
@@ -380,6 +381,12 @@ void TruthNtuple::Jet::setIsBJet(bool val)
 }
 
 // -----------------------------------------------------------------------------
+void TruthNtuple::Jet::setBQuarkIndex(int val)
+{
+  m_b_quark_index = val;
+}
+
+// -----------------------------------------------------------------------------
 double TruthNtuple::Jet::getTheta() const
 {
   return m_theta;
@@ -392,10 +399,24 @@ bool TruthNtuple::Jet::getIsBJet() const
 }
 
 // -----------------------------------------------------------------------------
-void TruthNtuple::Jet::print() const
+int TruthNtuple::Jet::getBQuarkIndex() const
+{
+  return m_b_quark_index;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Jet::print(TruthNtuple::TruthNtupleLooper* tnl) const
 {
   std::cout << "Jet (b jet: " << m_is_b_jet << ")" << "\n";
   printGeneralInfo();
+  if (m_is_b_jet && tnl != NULL) {
+    std::cout << "\tb quark itr: "    << m_b_quark_index
+              << "\tb quark pdg id: " << tnl->mc_pdgId->at(m_b_quark_index)
+              << "\tb quark pt: "     << tnl->mc_pt->at(   m_b_quark_index)
+              << "\tb quark eta: "    << tnl->mc_eta->at(  m_b_quark_index)
+              << "\tb quark phi: "    << tnl->mc_phi->at(  m_b_quark_index)
+              << "\n";
+  }
 }
 
 // =============================================================================

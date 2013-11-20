@@ -85,13 +85,13 @@ void BMinusL::Cutflow::processEvent()
             << "\n";
 
   for (size_t el_it = 0; el_it != num_el; ++el_it) {
-    m_daughter_el.at(el_it)->print();
+    m_daughter_el.at(el_it)->print(this);
   }
   for (size_t mu_it = 0; mu_it != num_mu; ++mu_it) {
-    m_daughter_mu.at(mu_it)->print();
+    m_daughter_mu.at(mu_it)->print(this);
   }
   for (size_t jet_it = 0; jet_it != num_jet; ++jet_it) {
-    m_daughter_jet.at(jet_it)->print();
+    m_daughter_jet.at(jet_it)->print(this);
   }
 
   size_t num_hists = m_histograms.size();
