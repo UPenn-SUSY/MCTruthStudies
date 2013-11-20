@@ -19,33 +19,11 @@ BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
   m_histograms.push_back(new HistogramHandlers::LeptonPt());
   m_histograms.push_back(new HistogramHandlers::LeptonEta());
   m_histograms.push_back(new HistogramHandlers::LeptonPhi());
-
+  m_histograms.push_back(new HistogramHandlers::JetPt());
+  m_histograms.push_back(new HistogramHandlers::JetEta());
+  m_histograms.push_back(new HistogramHandlers::JetPhi());
 
   // TODO set up hist handle classes
-  // m_h_lep_pt_0   = new TH1D("h_lep_pt_0"  , "lep pt - leading   ; p_{T}^{0} [GeV];     Entries        ", 50, 0, 500);
-  // m_h_lep_pt_1   = new TH1D("h_lep_pt_1"  , "lep pt - subleading; p_{T}^{1} [GeV];     Entries        ", 50, 0, 500);
-  // m_h_lep_pt_2d  = new TH2D("h_lep_pt_2d" , "lep pt             ; p_{T}^{0} [GeV];     p_{T}^{1} [GeV]", 50, 0, 500, 50, 0, 500);
-
-  // m_h_lep_eta_0   = new TH1D("h_lep_eta_0"  , "lep eta - leading   ; #eta^{0};     Entries ", 50, -5, 5);
-  // m_h_lep_eta_1   = new TH1D("h_lep_eta_1"  , "lep eta - subleading; #eta^{1};     Entries ", 50, -5, 5);
-  // m_h_lep_eta_2d  = new TH2D("h_lep_eta_2d" , "lep eta             ; #eta^{0};     #eta^{1}", 50, -5, 5, 50, -5, 5);
-
-  m_h_lep_phi_0   = new TH1D("h_lep_phi_0"  , "lep phi - leading   ; #phi^{0};     Entries ", 32, -3.2, 3.2);
-  m_h_lep_phi_1   = new TH1D("h_lep_phi_1"  , "lep phi - subleading; #phi^{1};     Entries ", 32, -3.2, 3.2);
-  m_h_lep_phi_2d  = new TH2D("h_lep_phi_2d" , "lep phi             ; #phi^{0};     #phi^{1}", 32, -3.2, 3.2, 32, -3.2, 3.2);
-
-  m_h_jet_pt_0   = new TH1D("h_jet_pt_0"  , "jet pt - leading   ; p_{T}^{0} [GeV];     Entries", 50, 0, 500);
-  m_h_jet_pt_1   = new TH1D("h_jet_pt_1"  , "jet pt - subleading; p_{T}^{1} [GeV];     Entries", 50, 0, 500);
-  m_h_jet_pt_2d  = new TH2D("h_jet_pt_2d" , "jet pt             ; p_{T}^{0} [GeV];     p_{T}^{1} [GeV]", 50, 0, 500, 50, 0, 500);
-
-  m_h_jet_eta_0   = new TH1D("h_jet_eta_0"  , "jet eta - leading   ; #eta^{0};     Entries ", 50, -5, 5);
-  m_h_jet_eta_1   = new TH1D("h_jet_eta_1"  , "jet eta - subleading; #eta^{1};     Entries ", 50, -5, 5);
-  m_h_jet_eta_2d  = new TH2D("h_jet_eta_2d" , "jet eta             ; #eta^{0};     #eta^{1}", 50, -5, 5, 50, -5, 5);
-
-  m_h_jet_phi_0   = new TH1D("h_jet_phi_0"  , "jet phi - leading   ; #phi^{0};     Entries ", 32, -3.2, 3.2);
-  m_h_jet_phi_1   = new TH1D("h_jet_phi_1"  , "jet phi - subleading; #phi^{1};     Entries ", 32, -3.2, 3.2);
-  m_h_jet_phi_2d  = new TH2D("h_jet_phi_2d" , "jet phi             ; #phi^{0};     #phi^{1}", 32, -3.2, 3.2, 32, -3.2, 3.2);
-
   m_h_mbl_truth  = new TH1D("h_mbl_truth" , "mbl truth          ; m_{bl} [GeV];        Entries", 50, 0, 500);
   m_h_mbl_paired = new TH1D("h_mbl_paired", "mbl paired         ; m_{bl} [GeV];        Entries", 50, 0, 500);
 }
@@ -81,7 +59,7 @@ void BMinusL::Cutflow::processEvent()
 
   size_t num_el = m_daughter_el.size();
   size_t num_mu = m_daughter_mu.size();
-  size_t num_jet = m_daughter_jet.size();
+  // size_t num_jet = m_daughter_jet.size();
 
   if (num_el == 2 && num_mu == 0) {
     m_flavor_channel = TruthNtuple::FLAVOR_EE;
@@ -109,108 +87,6 @@ void BMinusL::Cutflow::processEvent()
                                   , m_met
                                   );
   }
-
-
-
-  double lep_0_pt = 0;
-  double lep_1_pt = 0;
-
-  double lep_0_eta = 0;
-  double lep_1_eta = 0;
-
-  double lep_0_phi = 0;
-  double lep_1_phi = 0;
-
-  if (m_flavor_channel == TruthNtuple::FLAVOR_EE) {
-    lep_0_pt = m_daughter_el.at(0)->getPt()/1.e3;
-    lep_1_pt = m_daughter_el.at(1)->getPt()/1.e3;
-
-    lep_0_eta = m_daughter_el.at(0)->getEta();
-    lep_1_eta = m_daughter_el.at(1)->getEta();
-
-    lep_0_phi = m_daughter_el.at(0)->getPhi();
-    lep_1_phi = m_daughter_el.at(1)->getPhi();
-  }
-  else if (m_flavor_channel == TruthNtuple::FLAVOR_MM) {
-    lep_0_pt = m_daughter_mu.at(0)->getPt()/1.e3;
-    lep_1_pt = m_daughter_mu.at(1)->getPt()/1.e3;
-
-    lep_0_eta = m_daughter_mu.at(0)->getEta();
-    lep_1_eta = m_daughter_mu.at(1)->getEta();
-
-    lep_0_phi = m_daughter_mu.at(0)->getPhi();
-    lep_1_phi = m_daughter_mu.at(1)->getPhi();
-  }
-  else if (  m_flavor_channel == TruthNtuple::FLAVOR_EM
-          || m_flavor_channel == TruthNtuple::FLAVOR_ME
-          ) {
-    lep_0_pt = m_daughter_el.at(0)->getPt()/1.e3;
-    lep_1_pt = m_daughter_mu.at(0)->getPt()/1.e3;
-
-    lep_0_eta = m_daughter_el.at(0)->getEta();
-    lep_1_eta = m_daughter_mu.at(0)->getEta();
-
-    lep_0_phi = m_daughter_el.at(0)->getPhi();
-    lep_1_phi = m_daughter_mu.at(0)->getPhi();
-  }
-
-  if (lep_0_pt < lep_1_pt) {
-    double tmp_pt = lep_0_pt;
-    lep_0_pt = lep_1_pt;
-    lep_1_pt = tmp_pt;
-
-    double tmp_eta = lep_0_eta;
-    lep_0_eta = lep_1_eta;
-    lep_1_eta = tmp_eta;
-
-    double tmp_phi = lep_0_phi;
-    lep_0_phi = lep_1_phi;
-    lep_1_phi = tmp_phi;
-  }
-
-  // m_h_lep_pt_0->Fill(lep_0_pt);
-  // m_h_lep_pt_1->Fill(lep_1_pt);
-  // m_h_lep_pt_2d->Fill(lep_0_pt, lep_1_pt);
-
-  // m_h_lep_eta_0->Fill(lep_0_eta);
-  // m_h_lep_eta_1->Fill(lep_1_eta);
-  // m_h_lep_eta_2d->Fill(lep_0_eta, lep_1_eta);
-
-  m_h_lep_phi_0->Fill(lep_0_phi);
-  m_h_lep_phi_1->Fill(lep_1_phi);
-  m_h_lep_phi_2d->Fill(lep_0_phi, lep_1_phi);
-
-  double jet_0_pt = 0;
-  double jet_1_pt = 0;
-
-  double jet_0_eta = 0;
-  double jet_1_eta = 0;
-
-  double jet_0_phi = 0;
-  double jet_1_phi = 0;
-
-  if (num_jet > 0) {
-    jet_0_pt  = m_daughter_jet.at(0)->getPt()/1.e3;
-    jet_0_eta = m_daughter_jet.at(0)->getEta();
-    jet_0_phi = m_daughter_jet.at(0)->getPhi();
-
-    m_h_jet_pt_0->Fill(jet_0_pt);
-    m_h_jet_eta_0->Fill(jet_0_eta);
-    m_h_jet_phi_0->Fill(jet_0_phi);
-  }
-  if (num_jet > 1) {
-    jet_1_pt = m_daughter_jet.at(1)->getPt()/1.e3;
-    jet_1_eta = m_daughter_jet.at(1)->getEta();
-    jet_1_phi = m_daughter_jet.at(1)->getPhi();
-
-    m_h_jet_pt_1->Fill(jet_1_pt);
-    m_h_jet_eta_1->Fill(jet_1_eta);
-    m_h_jet_phi_1->Fill(jet_1_phi);
-
-    m_h_jet_pt_2d->Fill( jet_0_pt , jet_1_pt );
-    m_h_jet_eta_2d->Fill(jet_0_eta, jet_1_eta);
-    m_h_jet_phi_2d->Fill(jet_0_phi, jet_1_phi);
-  }
 }
 
 // -----------------------------------------------------------------------------
@@ -223,37 +99,6 @@ void BMinusL::Cutflow::writeToFile()
   for (size_t hist_it = 0; hist_it != num_hists; ++hist_it) {
     m_histograms.at(hist_it)->write(f);
   }
-
-
-
-  // m_h_lep_pt_0->Write();
-  // m_h_lep_pt_1->Write();
-  // m_h_lep_pt_2d->Write();
-
-  // m_h_lep_eta_0->Write();
-  // m_h_lep_eta_1->Write();
-  // m_h_lep_eta_2d->Write();
-
-  m_h_lep_phi_0->Write();
-  m_h_lep_phi_1->Write();
-  m_h_lep_phi_2d->Write();
-
-  m_h_jet_pt_0->Write();
-  m_h_jet_pt_1->Write();
-  m_h_jet_pt_2d->Write();
-
-  m_h_jet_eta_0->Write();
-  m_h_jet_eta_1->Write();
-  m_h_jet_eta_2d->Write();
-
-  m_h_jet_phi_0->Write();
-  m_h_jet_phi_1->Write();
-  m_h_jet_phi_2d->Write();
-
-  m_h_mbl_truth->Write();
-  m_h_mbl_paired->Write();
-
-  f->Close();
 }
 
 // -----------------------------------------------------------------------------

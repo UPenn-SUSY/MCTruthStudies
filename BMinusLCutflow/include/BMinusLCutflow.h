@@ -58,30 +58,6 @@ namespace BMinusL
       std::vector<HistogramHandlers::Handle*> m_histograms;
 
       // TODO move thise to Histogram handler once it is completed
-      // TH1D* m_h_lep_pt_0;
-      // TH1D* m_h_lep_pt_1;
-      // TH2D* m_h_lep_pt_2d;
-
-      // TH1D* m_h_lep_eta_0;
-      // TH1D* m_h_lep_eta_1;
-      // TH2D* m_h_lep_eta_2d;
-
-      TH1D* m_h_lep_phi_0;
-      TH1D* m_h_lep_phi_1;
-      TH2D* m_h_lep_phi_2d;
-
-      TH1D* m_h_jet_pt_0;
-      TH1D* m_h_jet_pt_1;
-      TH2D* m_h_jet_pt_2d;
-
-      TH1D* m_h_jet_eta_0;
-      TH1D* m_h_jet_eta_1;
-      TH2D* m_h_jet_eta_2d;
-
-      TH1D* m_h_jet_phi_0;
-      TH1D* m_h_jet_phi_1;
-      TH2D* m_h_jet_phi_2d;
-
       TH1D* m_h_mbl_truth;
       TH1D* m_h_mbl_paired;
   };

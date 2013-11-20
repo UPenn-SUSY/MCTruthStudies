@@ -16,7 +16,7 @@ namespace TruthRecordHelpers
             , const std::vector<float>* mc_pt
             , const std::vector<float>* mc_eta
             , const std::vector<float>* mc_phi
-            , bool verbose
+            , bool /*verbose*/
             )
   {
     // double delta_r_b   = 999.;
