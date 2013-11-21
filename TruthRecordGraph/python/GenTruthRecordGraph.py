@@ -17,35 +17,46 @@ def pickEvent(tree, event_number):
 
 # ------------------------------------------------------------------------------
 def printTruthRecord(event, max_depth):
-    out_file = file('event.gv', 'w')
+    out_file = file('event.dot', 'w')
     out_file.write('graph truth_record {\n')
+    out_file.write('  size="30,30";\n')
 
     out_file.write(constructGraph(event, 0, 0, max_depth))
-
-    # out_file.write('  1 [label="a"];\n')
-    # out_file.write('  2 [label="b"];\n')
-    # out_file.write('  3 [label="c"];\n')
-    # out_file.write('  4 [label="d"];\n')
-
-    # out_file.write('  1 -- 2;\n')
-    # out_file.write('  1 -- 3;\n')
-    # out_file.write('  3 -- 4;\n')
 
     out_file.write('}\n')
     out_file.close()
 
 # ------------------------------------------------------------------------------
+def getStyleString(current_pdgid):
+    style_string = ''
+    color = {'text':'black', 'fill':'white'}
+    if abs(current_pdgid) >= 1e6:
+        style_string = ', style=filled, color=lightblue'
+    if abs(current_pdgid) == 5:
+        style_string = ', style=filled, color=springgreen'
+    if abs(current_pdgid) == 11 or abs(current_pdgid) == 13:
+        style_string = ', style=filled, color=orange'
+
+    return style_string
+
+# ------------------------------------------------------------------------------
 def constructGraph(event, current_index, current_depth, max_depth):
-    label_block = ''
+    # label_block = ''
     labels = {}
-    draw_labels = {}
-    # this_graph_block = '\n'
+    draw_label = {}
     for mc_index in xrange(event.mc_barcode.size()):
-        # print 'checking mcindex: %s' % mc_index
         current_barcode = event.mc_barcode.at(mc_index)
         current_pdgid   = event.mc_pdgId.at(mc_index)
 
-        label_block += '  bc_%s [label="%s"];\n' % (current_barcode, current_pdgid)
+        style_string = getStyleString(current_pdgid)
+
+        draw_label[current_barcode] = False
+        labels[current_barcode] = '  bc_%s [label="bc: %s pdg: %s"%s];\n' % ( current_barcode
+                                                                            , current_barcode
+                                                                            , current_pdgid
+                                                                            , style_string
+                                                                            )
+
 
     decay_block = ''
     # # max_itr = min(event.mc_barcode.size(), max_depth)
@@ -54,20 +65,24 @@ def constructGraph(event, current_index, current_depth, max_depth):
         current_barcode = event.mc_barcode.at(mc_index)
         child_indices = event.mc_child_index.at(mc_index)
         parent_indices = event.mc_parent_index.at(mc_index)
-        # print 'child indices: %s' % child_indices
-        print 'num child indices: %s' % child_indices.size()
-        print 'num parent indices: %s' % parent_indices.size()
 
         for ci in child_indices:
-            print ci
             child_barcode = event.mc_barcode.at(ci)
-            label_block += '  bc_%s -- bc_%s;\n' % (current_barcode, child_barcode)
+            decay_block += '  bc_%s -- bc_%s;\n' % (current_barcode, child_barcode)
 
+            draw_label[current_barcode] = True
+            draw_label[child_barcode] = True
+
+    label_block = ''
+    for l in labels:
+        if draw_label[l]:
+            label_block += labels[l]
 
     this_graph_block = '\n'
     this_graph_block += label_block
     this_graph_block += '\n'
     this_graph_block += decay_block
+    this_graph_block += '\n'
 
     return this_graph_block
 
