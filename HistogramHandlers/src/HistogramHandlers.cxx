@@ -562,6 +562,26 @@ HistogramHandlers::JetPt::JetPt() : HistogramHandlers::Handle()
                                 , bins, min, max
                                 )
                       );
+    m_h_pt_2.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                  + "__jet_pt_2"
+                                  ).c_str()
+                                , ( "p_{T} - "
+                                  + TruthNtuple::FlavorChannelStrings[fc_it]
+                                  + "; p_{T}^{2} [GeV] ; Entries"
+                                  ).c_str()
+                                , bins, min, max
+                                )
+                      );
+    m_h_pt_3.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                  + "__jet_pt_3"
+                                  ).c_str()
+                                , ( "p_{T} - "
+                                  + TruthNtuple::FlavorChannelStrings[fc_it]
+                                  + "; p_{T}^{3} [GeV] ; Entries"
+                                  ).c_str()
+                                , bins, min, max
+                                )
+                      );
     m_h_pt_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "__jet_pt_diff"
                                      ).c_str()
