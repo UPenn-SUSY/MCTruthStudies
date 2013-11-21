@@ -19,11 +19,12 @@ namespace TruthRecordHelpers
             , bool /*verbose*/
             )
   {
-    // double delta_r_b   = 999.;
+    double delta_r_b   = 999.;
     // double delta_r_c   = 999.;
     // double delta_r_tau = 999.;
-    // double delta_r     = 999.;
+    double delta_r     = 999.;
 
+    int index_b = -1;
     // int barcode_b = 0;
     // int barcode_c = 0;
 
@@ -31,19 +32,25 @@ namespace TruthRecordHelpers
     const float delta_r_cut = 0.30;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // loop over mc record
     size_t num_mc_records = mc_pdgId->size();
     for (size_t mc_it = 0; mc_it != num_mc_records; ++mc_it) {
+      // check that mc particle passes pt cut
       if (  mc_pt->at(mc_it) < pt_cut_value
           && abs(mc_pdgId->at(mc_it)) != 5
          ) {
         continue;
       }
-      double delta_r = TruthNtuple::deltaR( my_jet_eta, my_jet_phi
-                                          , mc_eta->at(mc_it), mc_phi->at(mc_it)
-                                          );
+      // find dR between jet and mc particle
+      delta_r = TruthNtuple::deltaR( my_jet_eta, my_jet_phi
+                                   , mc_eta->at(mc_it), mc_phi->at(mc_it)
+                                   );
 
-      if (abs(mc_pdgId->at(mc_it)) == 5 && delta_r < delta_r_cut) {
-        return mc_it;
+      // if this particle is a b-quark, and it is closer than previous b quarks,
+      // make this the selected b-quark
+      if (abs(mc_pdgId->at(mc_it)) == 5 && delta_r < delta_r_b) {
+        delta_r_b = delta_r;
+        index_b = mc_it;
       }
 
       /*
@@ -55,10 +62,9 @@ namespace TruthRecordHelpers
       */
     }
 
-    /*
-       if (delta_r_b < delta_r_cut)
-       return true;
-       */
+    // if there is a b-quark close to our jet, return b-quark index
+    if (delta_r_b < delta_r_cut)
+      return index_b;
 
     return -1;
   }

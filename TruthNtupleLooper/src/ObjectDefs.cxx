@@ -171,8 +171,8 @@ void TruthNtuple::Particle::printGeneralInfo() const
             << "\tpy: " << m_py
             << "\tpz: " << m_pz
             << "\n"
-            << "\tparent pdg id: "  << m_parent_pdgid
             << "\tparent index: "   << m_parent_index
+            << "\tparent pdg id: "  << m_parent_pdgid
             << "\tparent barcode: " << m_parent_barcode
             << "\n";
 }
@@ -412,6 +412,14 @@ void TruthNtuple::Jet::print(TruthNtuple::TruthNtupleLooper* tnl) const
   std::cout << "Jet (b jet: " << m_is_b_jet << ")" << "\n";
   printGeneralInfo();
   if (m_is_b_jet && tnl != NULL) {
+    int immediate_parent_index   = tnl->mc_parent_index->at(m_b_quark_index).at(0);
+    int immediate_parent_pdgid   = tnl->mc_pdgId->at(immediate_parent_index);
+    int immediate_parent_barcode = tnl->mc_barcode->at(immediate_parent_index);
+
+    std::cout << "\timmediate parent index: "   << immediate_parent_index
+              << "\timmediate parent pdg id: "  << immediate_parent_pdgid
+              << "\timmediate parent barcode: " << immediate_parent_barcode
+              << "\n";
     std::cout << "\tb quark itr: "    << m_b_quark_index
               << "\tb quark pdg id: " << tnl->mc_pdgId->at(m_b_quark_index)
               << "\tquark status: " << tnl->mc_status->at(m_b_quark_index)

@@ -6,7 +6,9 @@
 
 #include <iostream>
 
-// -----------------------------------------------------------------------------
+// =============================================================================
+// = Handle
+// =============================================================================
 HistogramHandlers::Handle::Handle()
 {
   // do nothing
@@ -29,7 +31,9 @@ void HistogramHandlers::Handle::write(TFile*)
   // do nothing
 }
 
-// -----------------------------------------------------------------------------
+// =============================================================================
+// = Object Multiplicity
+// =============================================================================
 HistogramHandlers::ObjectMultiplicity::ObjectMultiplicity() : HistogramHandlers::Handle()
 {
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
