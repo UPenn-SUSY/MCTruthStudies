@@ -5,8 +5,12 @@
 #include "TruthRecordHelpers/include/ParentFinder.h"
 #include "TruthRecordHelpers/include/JetFlavorFinder.h"
 
+#include <vector>
 #include <iostream>
 #include <math.h>
+
+// =============================================================================
+static const double PI = 3.14159265359;
 
 // =============================================================================
 // = Particle
@@ -416,12 +420,9 @@ void TruthNtuple::Jet::print(TruthNtuple::TruthNtupleLooper* tnl) const
     int immediate_parent_pdgid   = tnl->mc_pdgId->at(immediate_parent_index);
     int immediate_parent_barcode = tnl->mc_barcode->at(immediate_parent_index);
 
-    std::cout << "\timmediate parent index: "   << immediate_parent_index
-              << "\timmediate parent pdg id: "  << immediate_parent_pdgid
-              << "\timmediate parent barcode: " << immediate_parent_barcode
-              << "\n";
-    std::cout << "\tb quark itr: "    << m_b_quark_index
+    std::cout << "\tb quark index: "    << m_b_quark_index
               << "\tb quark pdg id: " << tnl->mc_pdgId->at(m_b_quark_index)
+              << "\tb quark barcode: " << tnl->mc_barcode->at(m_b_quark_index)
               << "\tquark status: " << tnl->mc_status->at(m_b_quark_index)
               << "\n"
               << "\tb quark pt: "     << tnl->mc_pt->at(   m_b_quark_index)
@@ -435,6 +436,10 @@ void TruthNtuple::Jet::print(TruthNtuple::TruthNtupleLooper* tnl) const
                                                                )
               << "\tdetaEta(jet, quark): " << TruthNtuple::deltaEta(m_eta, tnl->mc_eta->at(m_b_quark_index))
               << "\tdetaPhi(jet, quark): " << TruthNtuple::deltaPhi(m_phi, tnl->mc_phi->at(m_b_quark_index))
+              << "\n";
+    std::cout << "\timmediate parent index: "   << immediate_parent_index
+              << "\timmediate parent pdg id: "  << immediate_parent_pdgid
+              << "\timmediate parent barcode: " << immediate_parent_barcode
               << "\n";
   }
 }
@@ -452,11 +457,8 @@ TruthNtuple::Met::Met() : m_met_etx_noint(0.)
 // -----------------------------------------------------------------------------
 TruthNtuple::Met::Met(double met_etx_noint, double met_ety_noint) : m_met_etx_noint(met_etx_noint)
                                                                   , m_met_ety_noint(met_etx_noint)
-                                                                  , m_met_et_noint( sqrt( met_etx_noint*met_etx_noint
-                                                                                        + met_ety_noint*met_ety_noint
-                                                                                        )
-                                                                                  )
 {
+  setMetNoint(met_etx_noint, met_ety_noint);
 }
 
 // -----------------------------------------------------------------------------
@@ -465,6 +467,8 @@ void TruthNtuple::Met::clear()
   m_met_etx_noint = 0;
   m_met_ety_noint = 0;
   m_met_et_noint = 0;
+  m_met_phi_noint = 0;
+  m_met_rel_noint = 0;
 }
 
 // -----------------------------------------------------------------------------
@@ -473,10 +477,60 @@ void TruthNtuple::Met::setMetNoint(double met_etx, double met_ety)
   m_met_etx_noint = met_etx;
   m_met_ety_noint = met_ety;
   m_met_et_noint = sqrt( met_etx*met_etx + met_ety*met_ety );
+  m_met_phi_noint = atan2(m_met_ety_noint, m_met_etx_noint);
+  m_met_rel_noint = 0;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Met::calculateMetRelNoint(const std::vector<TruthNtuple::Particle*>& particles)
+{
+  double min_dphi = 999.;
+  double dphi = 999.;
+
+  size_t num_particles = particles.size();
+  for (size_t p_itr = 0; p_itr != num_particles; ++p_itr) {
+    dphi = TruthNtuple::deltaPhi( particles.at(p_itr)->getPhi()
+                                , m_met_phi_noint
+                                );
+    if (dphi < min_dphi)
+      min_dphi = dphi;
+  }
+
+  m_met_rel_noint = m_met_et_noint;
+  if (min_dphi < PI) {
+    m_met_rel_noint *= sin(min_dphi);
+  }
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Met::calculateMetRelNoint( const std::vector<TruthNtuple::Electron*>& electrons
+                                           , const std::vector<TruthNtuple::Muon*>& muons
+                                           , const std::vector<TruthNtuple::Jet*>& jets
+                                           )
+{
+  std::vector<TruthNtuple::Particle*> particles;
+  particles.reserve(electrons.size() + muons.size() + jets.size());
+  particles.insert(particles.end(), electrons.begin(), electrons.end());
+  particles.insert(particles.end(), muons.begin(), muons.end());
+  particles.insert(particles.end(), jets.begin(), jets.end());
+
+  return calculateMetRelNoint(particles);
 }
 
 // -----------------------------------------------------------------------------
 double TruthNtuple::Met::getMetNoint() const
 {
   return m_met_et_noint;
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::Met::getMetPhiNoint() const
+{
+  return m_met_phi_noint;
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::Met::getMetRelNoint() const
+{
+  return m_met_rel_noint;
 }

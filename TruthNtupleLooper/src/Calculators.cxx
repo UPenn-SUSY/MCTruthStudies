@@ -3,6 +3,7 @@
 
 #include "TruthNtupleLooper/include/ObjectDefs.h"
 
+// =============================================================================
 static const double PI = 3.14159265359;
 
 // -----------------------------------------------------------------------------
@@ -115,16 +116,15 @@ std::vector<double> TruthNtuple::getMbl( const std::vector<Lepton*>& leptons
   std::vector<double> mbl_list;
 
   if (mbl_method == 0) {
-    // TODO implement truth matching method
     for (size_t lep_it = 0; lep_it != num_lep; ++lep_it) {
       int lep_parent_pdgid   = leptons.at(lep_it)->getParentPdgid();
-      int lep_parent_index   = leptons.at(lep_it)->getParentIndex();
+      // int lep_parent_index   = leptons.at(lep_it)->getParentIndex();
       int lep_parent_barcode = leptons.at(lep_it)->getParentBarcode();
 
       int chosen_jet_it = -1;
       for (size_t jet_it = 0; jet_it != num_jet; ++jet_it) {
         int jet_parent_pdgid   = jets.at(jet_it)->getParentPdgid();
-        int jet_parent_index   = jets.at(jet_it)->getParentIndex();
+        // int jet_parent_index   = jets.at(jet_it)->getParentIndex();
         int jet_parent_barcode = jets.at(jet_it)->getParentBarcode();
 
         if (lep_parent_pdgid != jet_parent_pdgid) continue;

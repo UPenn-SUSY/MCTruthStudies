@@ -1,6 +1,8 @@
 #ifndef ObjectDefs_H
 #define ObjectDefs_H
 
+#include <vector>
+
 // =============================================================================
 namespace TruthNtuple
 {
@@ -139,14 +141,24 @@ namespace TruthNtuple
       void clear();
 
       void setMetNoint(double met_etx, double met_ety);
+      void calculateMetRelNoint(const std::vector<TruthNtuple::Particle*>&);
+      void calculateMetRelNoint( const std::vector<TruthNtuple::Electron*>&
+                               , const std::vector<TruthNtuple::Muon*>&
+                               , const std::vector<TruthNtuple::Jet*>&
+                               );
 
       double getMetNoint() const;
+      double getMetPhiNoint() const;
+      double getMetRelNoint() const;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
       double m_met_etx_noint;
       double m_met_ety_noint;
       double m_met_et_noint;
+      double m_met_phi_noint;
+
+      double m_met_rel_noint;
   };
 }
 

@@ -153,4 +153,5 @@ void BMinusL::Cutflow::doObjectSelection()
   }
 
   m_met.setMetNoint(MET_Truth_NonInt_etx, MET_Truth_NonInt_ety);
+  m_met.calculateMetRelNoint( m_daughter_el, m_daughter_mu, m_daughter_jet);
 }

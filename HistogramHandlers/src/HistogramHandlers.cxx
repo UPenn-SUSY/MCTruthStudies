@@ -1037,7 +1037,7 @@ void HistogramHandlers::Met::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_chan
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
       m_h_met.at(fc)->Fill(met.getMetNoint()/1.e3);
-      // m_h_met.at(fc)->Fill(met.getMetNointRel()/1.e3);
+      m_h_metrel.at(fc)->Fill(met.getMetRelNoint()/1.e3);
     }
   }
 }
