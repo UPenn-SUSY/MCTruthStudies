@@ -11,7 +11,7 @@ namespace TruthRecordHelpers
   int isBJet( const float my_jet_eta
             , const float my_jet_phi
             , const std::vector<int>* mc_pdgId
-            , const std::vector<int>* /*mc_status*/
+            , const std::vector<int>* mc_status
             , const std::vector<int>* /*mc_barcode*/
             , const std::vector<float>* mc_pt
             , const std::vector<float>* mc_eta
@@ -35,12 +35,18 @@ namespace TruthRecordHelpers
     // loop over mc record
     size_t num_mc_records = mc_pdgId->size();
     for (size_t mc_it = 0; mc_it != num_mc_records; ++mc_it) {
+      // check that mc particle is a b quark
+      if (fabs(mc_pdgId->at(mc_it)) != 5) continue;
+
+      // check that mc particle has valid status code
+      if (  mc_status->at(mc_it) < 21
+         || mc_status->at(mc_it) > 29
+         ) continue;
+
       // check that mc particle passes pt cut
-      if (   mc_pt->at(mc_it) < pt_cut_value
-          && fabs(mc_pdgId->at(mc_it)) != 5
-         ) {
-        continue;
-      }
+      if (mc_pt->at(mc_it) < pt_cut_value) continue;
+
+
       // find dR between jet and mc particle
       delta_r = TruthNtuple::deltaR( my_jet_eta, my_jet_phi
                                    , mc_eta->at(mc_it), mc_phi->at(mc_it)
