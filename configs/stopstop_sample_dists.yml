@@ -1,6 +1,14 @@
+- label: 'w/o status code cut'
+  file:  output_hists.no_sc_cut.root
+  dir:   ""
+  color: 419 # kGreen
+  shape: 20 # kFullCircle
+  line:  1
+
 - label: 'w/ status code cut'
   file:  output_hists.sc_cut.root
-  dir:   ''
+  dir:   ""
   color: 602 # kBlue+2
   shape: 20 # kFullCircle
   line:  1
+
