@@ -1,4 +1,4 @@
-- label: 'sample MC'
+- label: 'w/ status code cut'
   file:  output_hists.sc_cut.root
   dir:   ''
   color: 602 # kBlue+2
