@@ -49,7 +49,7 @@ class FileHandle(object):
 
         keys = [lok.GetName() for lok in self.directory.GetListOfKeys()]
         print keys
-        channel_name = [lok.GetName() for lok in self.directory.GetListOfKeys() if lok.GetName().startswith('dc_all__fc_all__flavor_channel')]
+        channel_name = [lok.GetName() for lok in self.directory.GetListOfKeys() if lok.GetName().startswith('fc_all__flavor_channel')]
         print 'channel_name: %s' % channel_name
         assert len(channel_name) == 1
         channel_name = channel_name[0]

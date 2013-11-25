@@ -1,5 +1,5 @@
 - label: 'sample MC'
-  file:  sample_dists.sc_cut.root
+  file:  output_hists.sc_cut.root
   dir:   ''
   color: 602 # kBlue+2
   shape: 20 # kFullCircle

@@ -14,13 +14,13 @@ namespace TruthNtuple
                       , FLAVOR_NONE
                       , FLAVOR_N
                       };
-  const std::string FlavorChannelStrings[] = { "flavor_all"
-                                             , "flavor_ee"
-                                             , "flavor_mm"
-                                             , "flavor_em"
-                                             , "flavor_me"
-                                             , "flavor_none"
-                                             , "flavor_n"
+  const std::string FlavorChannelStrings[] = { "fc_all"
+                                             , "fc_ee"
+                                             , "fc_mm"
+                                             , "fc_em"
+                                             , "fc_me"
+                                             , "fc_none"
+                                             , "fc_n"
                                              };
 }
 
