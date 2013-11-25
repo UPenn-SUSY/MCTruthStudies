@@ -32,6 +32,56 @@ void HistogramHandlers::Handle::write(TFile*)
 }
 
 // =============================================================================
+// = Flavor channel
+// =============================================================================
+HistogramHandlers::FlavorChannel::FlavorChannel() : HistogramHandlers::Handle()
+{
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    m_h_flavor_channel.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                            + "__flavor_channel"
+                                            ).c_str()
+                                          , ( "Flavor Channel - "
+                                            + TruthNtuple::FlavorChannelStrings[fc_it]
+                                            + "; Flavor Channel ; Entries"
+                                            ).c_str()
+                                          , TruthNtuple::FLAVOR_N, -0.5, TruthNtuple::FLAVOR_N - 0.5
+                                          )
+                                );
+    for (int flavor_it = 0; flavor_it != TruthNtuple::FLAVOR_N; ++flavor_it) {
+      m_h_flavor_channel.at(fc_it)->GetXaxis()->SetBinLabel( flavor_it+1
+                                                           , TruthNtuple::FlavorChannelStrings[flavor_it].c_str()
+                                                           );
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+void HistogramHandlers::FlavorChannel::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
+         , const std::vector<TruthNtuple::Electron*>&
+         , const std::vector<TruthNtuple::Muon*>&
+         , const std::vector<TruthNtuple::Jet*>&
+         , const TruthNtuple::Met&
+         )
+{
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
+    if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
+      m_h_flavor_channel.at(fc)->Fill(flavor_channel);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+void HistogramHandlers::FlavorChannel::write(TFile* f)
+{
+  f->cd();
+
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+      m_h_flavor_channel.at(fc_it)->Write();
+  }
+}
+
+// =============================================================================
 // = Object Multiplicity
 // =============================================================================
 HistogramHandlers::ObjectMultiplicity::ObjectMultiplicity() : HistogramHandlers::Handle()

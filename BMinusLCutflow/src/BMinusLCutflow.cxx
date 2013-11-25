@@ -15,6 +15,7 @@
 BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
 {
   // construct histogram list
+  m_histograms.push_back(new HistogramHandlers::FlavorChannel());
   m_histograms.push_back(new HistogramHandlers::ObjectMultiplicity());
   m_histograms.push_back(new HistogramHandlers::LeptonPt());
   m_histograms.push_back(new HistogramHandlers::LeptonEta());

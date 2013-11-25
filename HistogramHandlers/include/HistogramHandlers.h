@@ -31,15 +31,37 @@ namespace HistogramHandlers
       Handle();
 
       virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                      , const std::vector<TruthNtuple::Electron*>&
-                      , const std::vector<TruthNtuple::Muon*>&
-                      , const std::vector<TruthNtuple::Jet*>&
-                      , const TruthNtuple::Met&
-                      );
+                       , const std::vector<TruthNtuple::Electron*>&
+                       , const std::vector<TruthNtuple::Muon*>&
+                       , const std::vector<TruthNtuple::Jet*>&
+                       , const TruthNtuple::Met&
+                       );
       virtual void write(TFile*);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
+  };
+
+  // =============================================================================
+  // = flavor channel
+  // =============================================================================
+  class FlavorChannel : public Handle
+  {
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    public:
+      FlavorChannel();
+
+      virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
+                       , const std::vector<TruthNtuple::Electron*>&
+                       , const std::vector<TruthNtuple::Muon*>&
+                       , const std::vector<TruthNtuple::Jet*>&
+                       , const TruthNtuple::Met&
+                       );
+      virtual void write(TFile*);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    private:
+      std::vector<TH1F*> m_h_flavor_channel;
   };
 
   // =============================================================================
