@@ -122,10 +122,6 @@ void BMinusL::Cutflow::writeToFile()
 // -----------------------------------------------------------------------------
 void BMinusL::Cutflow::doObjectSelection()
 {
-  std::vector<TruthNtuple::Electron*> tmp_el;
-  std::vector<TruthNtuple::Muon*>     tmp_mu;
-  std::vector<TruthNtuple::Jet*>      tmp_jet;
-
   m_selected_el.resize(m_el_list.size());
   for (size_t el_it = 0; el_it != m_el_list.size(); ++el_it) {
     m_selected_el.push_back(&m_el_list.at(el_it));
