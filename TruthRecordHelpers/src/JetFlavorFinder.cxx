@@ -36,8 +36,8 @@ namespace TruthRecordHelpers
     size_t num_mc_records = mc_pdgId->size();
     for (size_t mc_it = 0; mc_it != num_mc_records; ++mc_it) {
       // check that mc particle passes pt cut
-      if (  mc_pt->at(mc_it) < pt_cut_value
-          && abs(mc_pdgId->at(mc_it)) != 5
+      if (   mc_pt->at(mc_it) < pt_cut_value
+          && fabs(mc_pdgId->at(mc_it)) != 5
          ) {
         continue;
       }
@@ -48,14 +48,14 @@ namespace TruthRecordHelpers
 
       // if this particle is a b-quark, and it is closer than previous b quarks,
       // make this the selected b-quark
-      if (abs(mc_pdgId->at(mc_it)) == 5 && delta_r < delta_r_b) {
+      if (fabs(mc_pdgId->at(mc_it)) == 5 && delta_r < delta_r_b) {
         delta_r_b = delta_r;
         index_b = mc_it;
       }
 
       /*
       // leave this here for when we do full flavor finding
-      if (abs(mc_pdgId->at(mc_it)) == 5 && delta_r < delta_r_b) {
+      if (fabs(mc_pdgId->at(mc_it)) == 5 && delta_r < delta_r_b) {
       // delta_r_b = delta_r;
       // barcode_b = mc_barcode->at(mc_it);
       }

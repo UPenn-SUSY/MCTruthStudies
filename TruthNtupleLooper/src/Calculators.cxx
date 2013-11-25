@@ -1,5 +1,6 @@
 #include "TruthNtupleLooper/include/Calculators.h"
 #include <math.h>
+#include <stdlib.h>
 
 #include "TruthNtupleLooper/include/ObjectDefs.h"
 
