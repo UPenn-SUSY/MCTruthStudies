@@ -20,6 +20,7 @@ namespace TruthNtuple
 namespace HistogramHandlers
 {
   class Handle;
+  class Mbl;
 }
 
 // =============================================================================
@@ -43,22 +44,20 @@ namespace BMinusL
 
       TruthNtuple::FLAVOR_CHANNEL m_flavor_channel;
 
-      // // objects passing selection criteria
-      // std::vector<TruthNtuple::Electron*> m_selected_el;
-      // std::vector<TruthNtuple::Muon*>     m_selected_mu;
-      // std::vector<TruthNtuple::Jet*>      m_selected_jet;
-
+      // keep track of stops and ALL b quarks
       std::vector<TruthNtuple::Particle*> m_stops;
       std::vector<TruthNtuple::Particle*> m_b_quarks;
 
       // objects matched to SUSY mother
       std::vector<TruthNtuple::Electron*> m_daughter_el;
       std::vector<TruthNtuple::Muon*>     m_daughter_mu;
+      std::vector<TruthNtuple::Particle*> m_daughter_b_quarks;
       std::vector<TruthNtuple::Jet*>      m_daughter_jet;
 
       TruthNtuple::Met m_met;
 
       std::vector<HistogramHandlers::Handle*> m_histograms;
+      HistogramHandlers::Mbl* m_h_mbl;
   };
 }
 

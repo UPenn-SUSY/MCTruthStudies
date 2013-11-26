@@ -12,6 +12,7 @@ class TFile;
 
 namespace TruthNtuple
 {
+  class Particle;
   class Electron;
   class Muon;
   class Jet;
@@ -289,6 +290,31 @@ namespace HistogramHandlers
   };
 
   // =============================================================================
+  // = mjl
+  // =============================================================================
+  class Mjl : public Handle
+  {
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    public:
+      Mjl();
+
+      virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
+                       , const std::vector<TruthNtuple::Electron*>&
+                       , const std::vector<TruthNtuple::Muon*>&
+                       , const std::vector<TruthNtuple::Jet*>&
+                       , const TruthNtuple::Met&
+                       );
+      virtual void write(TFile*);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    private:
+      std::vector<TH1F*> m_h_mjl_truth;
+      std::vector<TH1F*> m_h_mjl_dphi_matching;
+      std::vector<TH1F*> m_h_mjl_dr_matching;
+  };
+
+  // TODO move mbl to BMinusLCutflow directory
+  // =============================================================================
   // = mbl
   // =============================================================================
   class Mbl : public Handle
@@ -297,12 +323,11 @@ namespace HistogramHandlers
     public:
       Mbl();
 
-      virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
-                       , const TruthNtuple::Met&
-                       );
+      virtual void FillSpecial( const TruthNtuple::FLAVOR_CHANNEL
+                              , const std::vector<TruthNtuple::Electron*>&
+                              , const std::vector<TruthNtuple::Muon*>&
+                              , const std::vector<TruthNtuple::Particle*>&
+                              );
       virtual void write(TFile*);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

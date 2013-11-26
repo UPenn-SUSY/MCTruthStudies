@@ -16,11 +16,11 @@ HistogramHandlers::Handle::Handle()
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::Handle::Fill( const TruthNtuple::FLAVOR_CHANNEL
-                            , const std::vector<TruthNtuple::Electron*>&
-                            , const std::vector<TruthNtuple::Muon*>&
-                            , const std::vector<TruthNtuple::Jet*>&
-                            , const TruthNtuple::Met&
-                            )
+                                    , const std::vector<TruthNtuple::Electron*>&
+                                    , const std::vector<TruthNtuple::Muon*>&
+                                    , const std::vector<TruthNtuple::Jet*>&
+                                    , const TruthNtuple::Met&
+                                    )
 {
   // do nothing
 }
@@ -1124,6 +1124,105 @@ void HistogramHandlers::Met::write(TFile* f)
 }
 
 // =============================================================================
+// = Mjl
+// =============================================================================
+HistogramHandlers::Mjl::Mjl() : HistogramHandlers::Handle()
+{
+  const int bins   = 50;
+  const double min = 0;
+  const double max = 500;
+
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    m_h_mjl_truth.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__mjl_truth"
+                                       ).c_str()
+                                     , ( "m_{jl}^{truth} - "
+                                       + TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "; m_{jl}^{truth} [GeV] ; Entries"
+                                       ).c_str()
+                                     , bins, min, max
+                                     )
+                           );
+    m_h_mjl_dphi_matching.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "__mjl_dphi_matching"
+                                               ).c_str()
+                                             , ( "m_{jl} - "
+                                               + TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "; m_{jl} [GeV] ; Entries"
+                                               ).c_str()
+                                             , bins, min, max
+                                             )
+                                   );
+    m_h_mjl_dr_matching.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                             + "__mjl_dr_matching"
+                                             ).c_str()
+                                           , ( "m_{jl} - "
+                                             + TruthNtuple::FlavorChannelStrings[fc_it]
+                                             + "; m_{jl} [GeV] ; Entries"
+                                             ).c_str()
+                                           , bins, min, max
+                                           )
+                                 );
+  }
+}
+
+// -----------------------------------------------------------------------------
+void HistogramHandlers::Mjl::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
+         , const std::vector<TruthNtuple::Electron*>& el_list
+         , const std::vector<TruthNtuple::Muon*>& mu_list
+         , const std::vector<TruthNtuple::Jet*>& jet_list
+         , const TruthNtuple::Met&
+         )
+{
+  if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
+
+  // merge el and mu lists to lepton list
+  std::vector<TruthNtuple::Lepton*> lep_list;
+  lep_list.reserve(el_list.size() + mu_list.size());
+  lep_list.insert(lep_list.end(), el_list.begin(), el_list.end());
+  lep_list.insert(lep_list.end(), mu_list.begin(), mu_list.end());
+
+  // get lists of mjl values for different matching methods
+  // std::vector<double> mjl_list_truth         = TruthNtuple::getMbl(lep_list, jet_list, 0);
+  // std::vector<double> mjl_list_dphi_matching = TruthNtuple::getMbl(lep_list, jet_list, 1);
+  // std::vector<double> mjl_list_dr_matching   = TruthNtuple::getMbl(lep_list, jet_list, 2);
+  std::vector<double> mjl_list_truth         = TruthNtuple::getInvariantMassList(lep_list, jet_list, 0);
+  std::vector<double> mjl_list_dphi_matching = TruthNtuple::getInvariantMassList(lep_list, jet_list, 1);
+  std::vector<double> mjl_list_dr_matching   = TruthNtuple::getInvariantMassList(lep_list, jet_list, 2);
+
+  // loop over flavor channels
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
+    if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
+      // fill mjl truth histogram
+      for (size_t mjl_it = 0; mjl_it != mjl_list_truth.size(); ++mjl_it) {
+        m_h_mjl_truth.at(fc)->Fill(mjl_list_truth.at(mjl_it)/1.e3);
+      }
+      // fill mjl dphi matching histogram
+      for (size_t mjl_it = 0; mjl_it != mjl_list_dphi_matching.size(); ++mjl_it) {
+        m_h_mjl_dphi_matching.at(fc)->Fill(mjl_list_dphi_matching.at(mjl_it)/1.e3);
+      }
+      // fill mjl dr matching histogram
+      for (size_t mjl_it = 0; mjl_it != mjl_list_dr_matching.size(); ++mjl_it) {
+        m_h_mjl_dr_matching.at(fc)->Fill(mjl_list_dr_matching.at(mjl_it)/1.e3);
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+void HistogramHandlers::Mjl::write(TFile* f)
+{
+  f->cd();
+
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+      m_h_mjl_truth.at(fc_it)->Write();
+      m_h_mjl_dphi_matching.at(fc_it)->Write();
+      m_h_mjl_dr_matching.at(fc_it)->Write();
+  }
+}
+
+// =============================================================================
 // = Mbl
 // =============================================================================
 HistogramHandlers::Mbl::Mbl() : HistogramHandlers::Handle()
@@ -1167,11 +1266,10 @@ HistogramHandlers::Mbl::Mbl() : HistogramHandlers::Handle()
 }
 
 // -----------------------------------------------------------------------------
-void HistogramHandlers::Mbl::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
+void HistogramHandlers::Mbl::FillSpecial( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
          , const std::vector<TruthNtuple::Electron*>& el_list
          , const std::vector<TruthNtuple::Muon*>& mu_list
-         , const std::vector<TruthNtuple::Jet*>& jet_list
-         , const TruthNtuple::Met&
+         , const std::vector<TruthNtuple::Particle*>& quark_list
          )
 {
   if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
@@ -1183,9 +1281,9 @@ void HistogramHandlers::Mbl::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_chan
   lep_list.insert(lep_list.end(), mu_list.begin(), mu_list.end());
 
   // get lists of mbl values for different matching methods
-  std::vector<double> mbl_list_truth         = TruthNtuple::getMbl(lep_list, jet_list, 0);
-  std::vector<double> mbl_list_dphi_matching = TruthNtuple::getMbl(lep_list, jet_list, 1);
-  std::vector<double> mbl_list_dr_matching   = TruthNtuple::getMbl(lep_list, jet_list, 2);
+  std::vector<double> mbl_list_truth         = TruthNtuple::getInvariantMassList(lep_list, quark_list, 0);
+  std::vector<double> mbl_list_dphi_matching = TruthNtuple::getInvariantMassList(lep_list, quark_list, 1);
+  std::vector<double> mbl_list_dr_matching   = TruthNtuple::getInvariantMassList(lep_list, quark_list, 2);
 
   // loop over flavor channels
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
