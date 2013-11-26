@@ -117,6 +117,16 @@ void BMinusL::Cutflow::writeToFile()
 // -----------------------------------------------------------------------------
 void BMinusL::Cutflow::doObjectSelection()
 {
+  for ( size_t particle_it = 0
+      ; particle_it != m_particle_list.size()
+      ; ++particle_it
+      ) {
+    if (fabs(m_particle_list.at(particle_it).getPdgid()) == 1e6+6)
+      m_stops.push_back(&m_particle_list.at(particle_it));
+    if (fabs(m_particle_list.at(particle_it).getPdgid()) == 5)
+      m_b_quarks.push_back(&m_particle_list.at(particle_it));
+  }
+
   m_daughter_el.reserve(m_el_list.size());
   for (size_t el_it = 0; el_it != m_el_list.size(); ++el_it) {
     if (fabs(m_el_list.at(el_it).getParentPdgid()) == 1e6+6)

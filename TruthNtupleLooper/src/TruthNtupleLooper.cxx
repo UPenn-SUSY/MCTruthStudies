@@ -691,6 +691,7 @@ void TruthNtuple::TruthNtupleLooper::Loop()
 // -----------------------------------------------------------------------------
 void TruthNtuple::TruthNtupleLooper::clearObjects()
 {
+  m_particle_list.clear();
   m_el_list.clear();
   m_mu_list.clear();
   m_jet_list.clear();
@@ -700,6 +701,10 @@ void TruthNtuple::TruthNtupleLooper::clearObjects()
 // -----------------------------------------------------------------------------
 void TruthNtuple::TruthNtupleLooper::constructObjects()
 {
+  for (int mc_index = 0; mc_index != mc_n; ++mc_index) {
+    Particle this_particle = Particle(this, mc_index);
+    m_particle_list.push_back(this_particle);
+  }
   for (int el_index = 0; el_index != el_n; ++el_index) {
     Electron this_el = Electron(this, el_index);
     m_el_list.push_back(this_el);

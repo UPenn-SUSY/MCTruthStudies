@@ -48,6 +48,9 @@ namespace BMinusL
       // std::vector<TruthNtuple::Muon*>     m_selected_mu;
       // std::vector<TruthNtuple::Jet*>      m_selected_jet;
 
+      std::vector<TruthNtuple::Particle*> m_stops;
+      std::vector<TruthNtuple::Particle*> m_b_quarks;
+
       // objects matched to SUSY mother
       std::vector<TruthNtuple::Electron*> m_daughter_el;
       std::vector<TruthNtuple::Muon*>     m_daughter_mu;

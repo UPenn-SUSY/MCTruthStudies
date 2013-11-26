@@ -32,6 +32,7 @@ namespace TruthNtuple
       virtual void processEvent();
 
     protected:
+      std::vector<TruthNtuple::Particle> m_particle_list;
       std::vector<TruthNtuple::Electron> m_el_list;
       std::vector<TruthNtuple::Muon>     m_mu_list;
       std::vector<TruthNtuple::Jet>      m_jet_list;
