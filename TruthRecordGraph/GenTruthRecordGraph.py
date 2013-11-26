@@ -36,6 +36,10 @@ def getStyleString(current_pdgid):
         style_string = ', style=filled, color=springgreen'
     if abs(current_pdgid) == 11 or abs(current_pdgid) == 13:
         style_string = ', style=filled, color=orange'
+    if abs(current_pdgid) == 21:
+        style_string = ', style=filled, color=gold3'
+    if abs(current_pdgid) == 1 or abs(current_pdgid) == 2:
+        style_string = ', style=filled, color=purple'
 
     return style_string
 
@@ -45,17 +49,19 @@ def constructGraph(event, current_index, current_depth, max_depth):
     labels = {}
     draw_label = {}
     for mc_index in xrange(event.mc_barcode.size()):
-        current_barcode = event.mc_barcode.at(mc_index)
-        current_pdgid   = event.mc_pdgId.at(mc_index)
+        current_barcode     = event.mc_barcode.at(mc_index)
+        current_pdgid       = event.mc_pdgId.at(mc_index)
+        current_status_code = event.mc_status.at(mc_index)
 
         style_string = getStyleString(current_pdgid)
 
         draw_label[current_barcode] = False
-        labels[current_barcode] = '  bc_%s [label="bc: %s pdg: %s"%s];\n' % ( current_barcode
-                                                                            , current_barcode
-                                                                            , current_pdgid
-                                                                            , style_string
-                                                                            )
+        labels[current_barcode] = '  bc_%s [label="pdg: %s bc: %s sc: %s"%s];\n' % ( current_barcode
+                                                                                   , current_pdgid
+                                                                                   , current_barcode
+                                                                                   , current_status_code
+                                                                                   , style_string
+                                                                                   )
 
 
     decay_block = ''
