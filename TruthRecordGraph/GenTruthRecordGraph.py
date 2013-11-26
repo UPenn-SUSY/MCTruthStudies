@@ -37,9 +37,9 @@ def getStyleString(current_pdgid):
     if abs(current_pdgid) == 11 or abs(current_pdgid) == 13:
         style_string = ', style=filled, color=orange'
     if abs(current_pdgid) == 21:
-        style_string = ', style=filled, color=gold3'
+        style_string = ', style=filled, color=snow3'
     if abs(current_pdgid) == 1 or abs(current_pdgid) == 2:
-        style_string = ', style=filled, color=purple'
+        style_string = ', style=filled, color=violet'
 
     return style_string
 
