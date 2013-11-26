@@ -43,10 +43,10 @@ namespace BMinusL
 
       TruthNtuple::FLAVOR_CHANNEL m_flavor_channel;
 
-      // objects passing selection criterial
-      std::vector<TruthNtuple::Electron*> m_selected_el;
-      std::vector<TruthNtuple::Muon*>     m_selected_mu;
-      std::vector<TruthNtuple::Jet*>      m_selected_jet;
+      // // objects passing selection criteria
+      // std::vector<TruthNtuple::Electron*> m_selected_el;
+      // std::vector<TruthNtuple::Muon*>     m_selected_mu;
+      // std::vector<TruthNtuple::Jet*>      m_selected_jet;
 
       // objects matched to SUSY mother
       std::vector<TruthNtuple::Electron*> m_daughter_el;

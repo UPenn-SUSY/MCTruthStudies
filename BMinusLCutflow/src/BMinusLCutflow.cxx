@@ -41,10 +41,6 @@ void BMinusL::Cutflow::clearObjects()
 
   m_flavor_channel = TruthNtuple::FLAVOR_NONE;
 
-  m_selected_el.clear();
-  m_selected_mu.clear();
-  m_selected_jet.clear();
-
   m_daughter_el.clear();
   m_daughter_mu.clear();
   m_daughter_jet.clear();
@@ -77,27 +73,26 @@ void BMinusL::Cutflow::processEvent()
     m_flavor_channel = TruthNtuple::FLAVOR_NONE;
   }
 
-  std::cout << "========================================"
-            << "\nevent number: " << EventNumber
-            << "\n\tnum el: " << num_el
-            << "\n\tnum mu: " << num_mu
-            << "\n\tnum jet: " << num_jet
-            << "\n----------------------------------------"
-            << "\n";
+  // std::cout << "========================================"
+  //           << "\nevent number: " << EventNumber
+  //           << "\n\tnum el: " << num_el
+  //           << "\n\tnum mu: " << num_mu
+  //           << "\n\tnum jet: " << num_jet
+  //           << "\n----------------------------------------"
+  //           << "\n";
 
-  for (size_t el_it = 0; el_it != num_el; ++el_it) {
-    m_daughter_el.at(el_it)->print(this);
-  }
-  for (size_t mu_it = 0; mu_it != num_mu; ++mu_it) {
-    m_daughter_mu.at(mu_it)->print(this);
-  }
-  for (size_t jet_it = 0; jet_it != num_jet; ++jet_it) {
-    m_daughter_jet.at(jet_it)->print(this);
-  }
+  // for (size_t el_it = 0; el_it != num_el; ++el_it) {
+  //   m_daughter_el.at(el_it)->print(this);
+  // }
+  // for (size_t mu_it = 0; mu_it != num_mu; ++mu_it) {
+  //   m_daughter_mu.at(mu_it)->print(this);
+  // }
+  // for (size_t jet_it = 0; jet_it != num_jet; ++jet_it) {
+  //   m_daughter_jet.at(jet_it)->print(this);
+  // }
 
   size_t num_hists = m_histograms.size();
   for (size_t hist_it = 0; hist_it != num_hists; ++hist_it) {
-    m_histograms.at(hist_it);
     m_histograms.at(hist_it)->Fill( m_flavor_channel
                                   , m_daughter_el
                                   , m_daughter_mu
@@ -122,30 +117,23 @@ void BMinusL::Cutflow::writeToFile()
 // -----------------------------------------------------------------------------
 void BMinusL::Cutflow::doObjectSelection()
 {
-  m_selected_el.resize(m_el_list.size());
+  m_daughter_el.reserve(m_el_list.size());
   for (size_t el_it = 0; el_it != m_el_list.size(); ++el_it) {
-    m_selected_el.push_back(&m_el_list.at(el_it));
-
-    if (fabs(m_el_list.at(el_it).getParentPdgid()) > 1e6)
+    if (fabs(m_el_list.at(el_it).getParentPdgid()) == 1e6+6)
       m_daughter_el.push_back(&m_el_list.at(el_it));
   }
 
-  m_selected_mu.resize(m_mu_list.size());
+  m_daughter_mu.reserve(m_mu_list.size());
   for (size_t mu_it = 0; mu_it != m_mu_list.size(); ++mu_it) {
-    m_selected_mu.push_back(&m_mu_list.at(mu_it));
-
-    if (fabs(m_mu_list.at(mu_it).getParentPdgid()) > 1e6)
+    if (fabs(m_mu_list.at(mu_it).getParentPdgid()) == 1e6+6)
       m_daughter_mu.push_back(&m_mu_list.at(mu_it));
   }
 
-  m_selected_jet.resize(m_jet_list.size());
+  m_daughter_jet.reserve(m_jet_list.size());
   for (size_t jet_it = 0; jet_it != m_jet_list.size(); ++jet_it) {
-    if (!m_jet_list.at(jet_it).getIsBJet())
-      continue;
+    if (!m_jet_list.at(jet_it).getIsBJet()) continue;
 
-    m_selected_jet.push_back(&m_jet_list.at(jet_it));
-
-    if (fabs(m_jet_list.at(jet_it).getParentPdgid()) > 1e6)
+    if (fabs(m_jet_list.at(jet_it).getParentPdgid()) == 1e6+6)
       m_daughter_jet.push_back(&m_jet_list.at(jet_it));
   }
 

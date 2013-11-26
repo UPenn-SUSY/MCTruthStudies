@@ -18,7 +18,8 @@ static const double PI = 3.14159265359;
 // -----------------------------------------------------------------------------
 TruthNtuple::Particle::Particle()
 {
-  m_index = 0;
+  m_mc_index = 0;
+  m_pdgid = 0;
   m_pt = 0;
   m_eta = 0;
   m_phi = 0;
@@ -29,10 +30,47 @@ TruthNtuple::Particle::Particle()
 }
 
 // -----------------------------------------------------------------------------
-void TruthNtuple::Particle::setIndex(unsigned int val)
+TruthNtuple::Particle::Particle( const TruthNtuple::TruthNtupleLooper* tnl
+                               , unsigned int mc_index
+                               )
 {
-  m_index = val;
+  setMCIndex(mc_index);
+  setPdgid(tnl->mc_pdgId->at(mc_index));
+  setPt(tnl->mc_pt->at(mc_index));
+  setEta(tnl->mc_eta->at(mc_index));
+  setPhi(tnl->mc_phi->at(mc_index));
+  setE(tnl->mc_E->at(mc_index));
+  setPx(tnl->mc_px->at(mc_index));
+  setPy(tnl->mc_py->at(mc_index));
+  setPz(tnl->mc_pz->at(mc_index));
+
+  setParentMCIndex( TruthRecordHelpers::getParentIndex( m_mc_index
+                                                      , tnl->mc_pdgId
+                                                      , tnl->mc_parent_index
+                                                      )
+                  );
+  if (m_parent_index >= 0) {
+    setParentPdgid(tnl->mc_pdgId->at(m_parent_index));
+    setParentBarcode(tnl->mc_barcode->at(m_parent_index));
+  }
+  else {
+    setParentPdgid(0);
+    setParentBarcode(0);
+  }
 }
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Particle::setMCIndex(unsigned int val)
+{
+  m_mc_index = val;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Particle::setPdgid(int val)
+{
+  m_pdgid = val;
+}
+
 
 // -----------------------------------------------------------------------------
 void TruthNtuple::Particle::setPt(double val)
@@ -83,7 +121,7 @@ void TruthNtuple::Particle::setParentPdgid(int val)
 }
 
 // -----------------------------------------------------------------------------
-void TruthNtuple::Particle::setParentIndex(int val)
+void TruthNtuple::Particle::setParentMCIndex(int val)
 {
   m_parent_index = val;
 }
@@ -96,9 +134,15 @@ void TruthNtuple::Particle::setParentBarcode(int val)
 
 
 // -----------------------------------------------------------------------------
-unsigned int TruthNtuple::Particle::getIndex() const
+unsigned int TruthNtuple::Particle::getMCIndex() const
 {
-  return m_index;
+  return m_mc_index;
+}
+
+// -----------------------------------------------------------------------------
+int TruthNtuple::Particle::getPdgid() const
+{
+  return m_pdgid;
 }
 
 // -----------------------------------------------------------------------------
@@ -150,7 +194,7 @@ int TruthNtuple::Particle::getParentPdgid() const
 }
 
 // -----------------------------------------------------------------------------
-int TruthNtuple::Particle::getParentIndex() const
+int TruthNtuple::Particle::getParentMCIndex() const
 {
   return m_parent_index;
 }
@@ -164,7 +208,7 @@ int TruthNtuple::Particle::getParentBarcode() const
 // -----------------------------------------------------------------------------
 void TruthNtuple::Particle::printGeneralInfo() const
 {
-  std::cout << "\tindex: " << m_index
+  std::cout << "\tmc index: " << m_mc_index
             << "\n"
             << "\tpt: " << m_pt
             << "\teta: " << m_eta
@@ -243,8 +287,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
                                )
 {
   setIsElectron(true);
-
-  setIndex(el_index);
+  setElIndex(el_index);
 
   setPt(    tnl->el_pt->at(el_index));
   setEta(   tnl->el_eta->at(el_index));
@@ -255,12 +298,18 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
   setPz(    tnl->el_pz->at(el_index));
   setCharge(tnl->el_charge->at(el_index));
 
-  setParentIndex(TruthRecordHelpers::getParentIndexFromBarcode( tnl->el_barcode->at(el_index)
-                                                              , tnl->mc_barcode
-                                                              , tnl->mc_pdgId
-                                                              , tnl->mc_parent_index
-                                                              )
-                );
+  setMCIndex( TruthRecordHelpers::getIndexFromBarcode( tnl->el_barcode->at(el_index)
+                                                     , tnl->mc_barcode
+                                                     // , true
+                                                     )
+            );
+  setPdgid(tnl->mc_pdgId->at(m_mc_index));
+  setParentMCIndex( TruthRecordHelpers::getParentIndex( m_mc_index
+                                                      , tnl->mc_pdgId
+                                                      , tnl->mc_parent_index
+                                                      // , true
+                                                      )
+                  );
   if (m_parent_index >= 0) {
     setParentPdgid(tnl->mc_pdgId->at(m_parent_index));
     setParentBarcode(tnl->mc_barcode->at(m_parent_index));
@@ -269,6 +318,18 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
     setParentPdgid(0);
     setParentBarcode(0);
   }
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Electron::setElIndex(unsigned int val)
+{
+  m_el_index = val;
+}
+
+// -----------------------------------------------------------------------------
+unsigned int TruthNtuple::Electron::getElIndex() const
+{
+  return m_el_index;
 }
 
 // =============================================================================
@@ -286,8 +347,7 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
                        )
 {
   setIsElectron(false);
-
-  setIndex(mu_index);
+  setMuIndex(mu_index);
 
   setPt(    tnl->mu_staco_pt->at(mu_index));
   setEta(   tnl->mu_staco_eta->at(mu_index));
@@ -298,12 +358,18 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
   setPz(    tnl->mu_staco_pz->at(mu_index));
   setCharge(tnl->mu_staco_charge->at(mu_index));
 
-  setParentIndex(TruthRecordHelpers::getParentIndexFromBarcode( tnl->mu_staco_barcode->at(mu_index)
-                                                              , tnl->mc_barcode
-                                                              , tnl->mc_pdgId
-                                                              , tnl->mc_parent_index
-                                                              )
-                );
+  setMCIndex( TruthRecordHelpers::getIndexFromBarcode( tnl->mu_staco_barcode->at(mu_index)
+                                                     , tnl->mc_barcode
+                                                     // , true
+                                                     )
+            );
+  setPdgid(tnl->mc_pdgId->at(m_mc_index));
+  setParentMCIndex(TruthRecordHelpers::getParentIndex( m_mc_index
+                                                     , tnl->mc_pdgId
+                                                     , tnl->mc_parent_index
+                                                     // , true
+                                                     )
+                  );
   if (m_parent_index >= 0) {
     setParentPdgid(tnl->mc_pdgId->at(m_parent_index));
     setParentBarcode(tnl->mc_barcode->at(m_parent_index));
@@ -312,6 +378,18 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
     setParentPdgid(0);
     setParentBarcode(0);
   }
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Muon::setMuIndex(unsigned int val)
+{
+  m_mu_index = val;
+}
+
+// -----------------------------------------------------------------------------
+unsigned int TruthNtuple::Muon::getMuIndex() const
+{
+  return m_mu_index;
 }
 
 // =============================================================================
@@ -327,7 +405,7 @@ TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
                      , unsigned int jet_index
                      )
 {
-  setIndex(jet_index);
+  setJetIndex(jet_index);
 
   setPt( tnl->jet_AntiKt4TruthJets_pt->at(jet_index));
   setEta(tnl->jet_AntiKt4TruthJets_eta->at(jet_index));
@@ -352,13 +430,14 @@ TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
                                            )
                 );
   if (m_b_quark_index >= 0) {
+    setMCIndex(m_b_quark_index);
     setIsBJet(true);
 
-    setParentIndex(TruthRecordHelpers::getParentIndex( m_b_quark_index
-                                                     , tnl->mc_pdgId
-                                                     , tnl->mc_parent_index
-                                                     )
-                  );
+    setParentMCIndex(TruthRecordHelpers::getParentIndex( m_b_quark_index
+                                                       , tnl->mc_pdgId
+                                                       , tnl->mc_parent_index
+                                                       )
+                    );
     if (m_parent_index >= 0) {
       setParentPdgid(tnl->mc_pdgId->at(m_parent_index));
       setParentBarcode(tnl->mc_barcode->at(m_parent_index));
@@ -369,9 +448,16 @@ TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
     }
   }
   else {
+    setMCIndex(0);
     setIsBJet(false);
     setParentPdgid(0);
   }
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Jet::setJetIndex(unsigned int val)
+{
+  m_jet_index = val;
 }
 
 // -----------------------------------------------------------------------------
@@ -390,6 +476,12 @@ void TruthNtuple::Jet::setIsBJet(bool val)
 void TruthNtuple::Jet::setBQuarkIndex(int val)
 {
   m_b_quark_index = val;
+}
+
+// -----------------------------------------------------------------------------
+unsigned int TruthNtuple::Jet::getJetIndex() const
+{
+  return m_jet_index;
 }
 
 // -----------------------------------------------------------------------------
