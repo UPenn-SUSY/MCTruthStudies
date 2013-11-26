@@ -10,6 +10,7 @@
 #include "TruthNtupleLooper/include/ObjectDefs.h"
 
 #include "HistogramHandlers/include/HistogramHandlers.h"
+#include "BMinusLCutflow/include/BMinusLHistogramHandlers.h"
 
 // -----------------------------------------------------------------------------
 BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
@@ -28,6 +29,7 @@ BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
   m_histograms.push_back(new HistogramHandlers::Mjl());
 
   m_h_mbl = new HistogramHandlers::Mbl();
+  m_h_stop_kinematics = new HistogramHandlers::StopKinematics();
 }
 
 // -----------------------------------------------------------------------------
@@ -111,6 +113,10 @@ void BMinusL::Cutflow::processEvent()
                       , m_daughter_mu
                       , m_daughter_b_quarks
                       );
+
+  m_h_stop_kinematics->FillSpecial( m_flavor_channel
+                                  , m_stops
+                                  );
 }
 
 // -----------------------------------------------------------------------------
@@ -125,6 +131,7 @@ void BMinusL::Cutflow::writeToFile()
   }
 
   m_h_mbl->write(f);
+  m_h_stop_kinematics->write(f);
 }
 
 // -----------------------------------------------------------------------------

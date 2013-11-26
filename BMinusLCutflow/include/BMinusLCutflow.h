@@ -21,6 +21,7 @@ namespace HistogramHandlers
 {
   class Handle;
   class Mbl;
+  class StopKinematics;
 }
 
 // =============================================================================
@@ -57,7 +58,8 @@ namespace BMinusL
       TruthNtuple::Met m_met;
 
       std::vector<HistogramHandlers::Handle*> m_histograms;
-      HistogramHandlers::Mbl* m_h_mbl;
+      HistogramHandlers::Mbl*    m_h_mbl;
+      HistogramHandlers::StopKinematics* m_h_stop_kinematics;
   };
 }
 

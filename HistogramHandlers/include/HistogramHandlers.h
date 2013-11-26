@@ -312,30 +312,6 @@ namespace HistogramHandlers
       std::vector<TH1F*> m_h_mjl_dphi_matching;
       std::vector<TH1F*> m_h_mjl_dr_matching;
   };
-
-  // TODO move mbl to BMinusLCutflow directory
-  // =============================================================================
-  // = mbl
-  // =============================================================================
-  class Mbl : public Handle
-  {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    public:
-      Mbl();
-
-      virtual void FillSpecial( const TruthNtuple::FLAVOR_CHANNEL
-                              , const std::vector<TruthNtuple::Electron*>&
-                              , const std::vector<TruthNtuple::Muon*>&
-                              , const std::vector<TruthNtuple::Particle*>&
-                              );
-      virtual void write(TFile*);
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    private:
-      std::vector<TH1F*> m_h_mbl_truth;
-      std::vector<TH1F*> m_h_mbl_dphi_matching;
-      std::vector<TH1F*> m_h_mbl_dr_matching;
-  };
 }
 
 #endif

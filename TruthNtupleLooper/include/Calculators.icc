@@ -1,0 +1,92 @@
+#ifndef CALCULATORS_ICC
+#define CALCULATORS_ICC
+
+namespace TruthNtuple
+{
+  // -----------------------------------------------------------------------------
+  template <class T1, class T2>
+  std::vector<double> getInvariantMassList( const std::vector<T1*>& t1_list
+                                          , const std::vector<T2*>& t2_list
+                                          , unsigned int method
+                                          )
+  {
+    const size_t num_t1 = t1_list.size();
+    const size_t num_t2 = t2_list.size();
+
+    std::vector<double> inv_mass_list;
+
+    // truth matching to same parent barcode
+    if (method == 0) {
+      for (size_t t1_it = 0; t1_it != num_t1; ++t1_it) {
+        int t1_parent_pdgid   = t1_list.at(t1_it)->getParentPdgid();
+        int t1_parent_barcode = t1_list.at(t1_it)->getParentBarcode();
+
+        int chosen_t2_it = -1;
+        for (size_t t2_it = 0; t2_it != num_t2; ++t2_it) {
+          int t2_parent_pdgid   = t2_list.at(t2_it)->getParentPdgid();
+          int t2_parent_barcode = t2_list.at(t2_it)->getParentBarcode();
+
+          if (t1_parent_pdgid != t2_parent_pdgid) continue;
+
+          if (t1_parent_barcode == t2_parent_barcode) {
+            chosen_t2_it = t2_it;
+            break;
+          }
+
+        }
+        if (chosen_t2_it >= 0) {
+          inv_mass_list.push_back( TruthNtuple::invariantMass( t1_list.at(t1_it)
+                                                            , t2_list.at(chosen_t2_it)
+                                                            )
+                                );
+        }
+      }
+    }
+    // max dphi method
+    else if (method == 1) {
+      for (size_t t1_it = 0; t1_it != num_t1; ++t1_it) {
+        float max_dphi = -1;
+        float dphi = -1;
+        int chosen_t2_it = -1;
+        for (size_t t2_it = 0; t2_it != num_t2; ++t2_it) {
+          dphi = TruthNtuple::deltaPhi(t1_list.at(t1_it), t2_list.at(t2_it));
+          if (dphi > max_dphi) {
+            max_dphi = dphi;
+            chosen_t2_it = t2_it;
+          }
+        }
+        if (chosen_t2_it >= 0) {
+          inv_mass_list.push_back( TruthNtuple::invariantMass( t1_list.at(t1_it)
+                                                            , t2_list.at(chosen_t2_it)
+                                                            )
+                                );
+        }
+      }
+    }
+    // min dr method
+    else if (method == 2) {
+      for (size_t t1_it = 0; t1_it != num_t1; ++t1_it) {
+        float min_dr = 999;
+        float dr = 999;
+        int chosen_t2_it = -1;
+        for (size_t t2_it = 0; t2_it != num_t2; ++t2_it) {
+          dr = TruthNtuple::deltaR(t1_list.at(t1_it), t2_list.at(t2_it));
+          if (dr < min_dr) {
+            min_dr = dr;
+            chosen_t2_it = t2_it;
+          }
+        }
+        if (chosen_t2_it >= 0) {
+          inv_mass_list.push_back( TruthNtuple::invariantMass( t1_list.at(t1_it)
+                                                            , t2_list.at(chosen_t2_it)
+                                                            )
+                                );
+        }
+      }
+    }
+
+    return inv_mass_list;
+  }
+}
+
+#endif
