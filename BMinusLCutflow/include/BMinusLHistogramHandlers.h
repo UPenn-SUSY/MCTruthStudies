@@ -14,6 +14,7 @@ class TFile;
 namespace TruthNtuple
 {
   class Particle;
+  class Lepton;
   class Electron;
   class Muon;
   class Jet;
@@ -110,15 +111,38 @@ namespace HistogramHandlers
                               );
       virtual void write(TFile*);
 
+      bool sortObjects( const std::vector<TruthNtuple::Electron*>&
+                      , const std::vector<TruthNtuple::Muon*>&
+                      , const std::vector<TruthNtuple::Particle*>&
+                      );
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
+      TruthNtuple::Lepton* m_l_from_stop;
+      TruthNtuple::Lepton* m_l_from_astp;
+
+      TruthNtuple::Particle* m_b_from_stop;
+      TruthNtuple::Particle* m_b_from_astp;
+
       std::vector<TH2F*> m_h_right_pair_pt_2d;
       std::vector<TH2F*> m_h_right_pair_eta_2d;
       std::vector<TH2F*> m_h_right_pair_phi_2d;
 
+      std::vector<TH1F*> m_h_right_pair_mbl_all;
+      std::vector<TH1F*> m_h_right_pair_mbl_stop;
+      std::vector<TH1F*> m_h_right_pair_mbl_astp;
+      std::vector<TH1F*> m_h_right_pair_mbl_diff;
+      std::vector<TH2F*> m_h_right_pair_mbl_2d;
+
       std::vector<TH2F*> m_h_wrong_pair_pt_2d;
       std::vector<TH2F*> m_h_wrong_pair_eta_2d;
       std::vector<TH2F*> m_h_wrong_pair_phi_2d;
+
+      std::vector<TH1F*> m_h_wrong_pair_mbl_all;
+      std::vector<TH1F*> m_h_wrong_pair_mbl_0;
+      std::vector<TH1F*> m_h_wrong_pair_mbl_1;
+      std::vector<TH1F*> m_h_wrong_pair_mbl_diff;
+      std::vector<TH2F*> m_h_wrong_pair_mbl_2d;
   };
 
   // =============================================================================

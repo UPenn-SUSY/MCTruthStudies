@@ -6,6 +6,7 @@
 #include "TFile.h"
 
 #include <iostream>
+#include <math.h>
 
 // =============================================================================
 // = StopKinematics
@@ -585,7 +586,215 @@ void HistogramHandlers::QuarkKinematics::write(TFile* f)
 // =============================================================================
 HistogramHandlers::BLPairKinematics::BLPairKinematics()
 {
+  const int    pt_bins = 50;
+  const double pt_min  = 0.;
+  const double pt_max  = 500.;
 
+  const int    eta_bins = 50;
+  const double eta_min  = -5.;
+  const double eta_max  = +5.;
+
+  const int    phi_bins = 64;
+  const double phi_min  = -3.2;
+  const double phi_max  = +3.2;
+
+
+  const int    mbl_bins = 50;
+  const double mbl_min  = 0.;
+  const double mbl_max  = 500.;
+
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    m_h_right_pair_pt_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "__right_pair_pt_2d"
+                                               ).c_str()
+                                             , ( "p_{T} - "
+                                               + TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "; p_{T}^{l} [GeV] ; p_{T}^{b} [GeV]"
+                                               ).c_str()
+                                             , pt_bins, pt_min, pt_max
+                                             , pt_bins, pt_min, pt_max
+                                             )
+                                   );
+
+    m_h_right_pair_eta_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "__right_pair_eta_2d"
+                                               ).c_str()
+                                             , ( "#eta - "
+                                               + TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "; #eta^{l} ; #eta^{b}"
+                                               ).c_str()
+                                             , eta_bins, eta_min, eta_max
+                                             , eta_bins, eta_min, eta_max
+                                             )
+                                   );
+
+    m_h_right_pair_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "__right_pair_phi_2d"
+                                               ).c_str()
+                                             , ( "#phi - "
+                                               + TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "; #phi^{l} ; #phi^{b}"
+                                               ).c_str()
+                                             , phi_bins, phi_min, phi_max
+                                             , phi_bins, phi_min, phi_max
+                                             )
+                                   );
+
+    m_h_right_pair_mbl_all.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                + "__right_pair_mbl_all"
+                                                ).c_str()
+                                              , ( "mbl - "
+                                                + TruthNtuple::FlavorChannelStrings[fc_it]
+                                                + "; m_{bl} [GeV] ; Entries"
+                                                ).c_str()
+                                              , mbl_bins, mbl_min, mbl_max
+                                              )
+                                    );
+
+    m_h_right_pair_mbl_stop.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + "__right_pair_mbl_stop"
+                                                 ).c_str()
+                                               , ( "mbl - "
+                                                 + TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + "; m_{bl}^{#tilde{t}} [GeV] ; Entries"
+                                                 ).c_str()
+                                               , mbl_bins, mbl_min, mbl_max
+                                               )
+                                     );
+
+    m_h_right_pair_mbl_astp.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + "__right_pair_mbl_astp"
+                                                 ).c_str()
+                                               , ( "mbl - "
+                                                 + TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + "; m_{bl}^{#tilde{t}*} [GeV] ; Entries"
+                                                 ).c_str()
+                                               , mbl_bins, mbl_min, mbl_max
+                                               )
+                                     );
+
+    m_h_right_pair_mbl_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + "__right_pair_mbl_diff"
+                                                 ).c_str()
+                                               , ( "mbl - "
+                                                 + TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + "; |m_{bl}^{#tilde{t}} - m_{bl}^{#tilde{t}*}| [GeV] ; Entries"
+                                                 ).c_str()
+                                               , mbl_bins, mbl_min, mbl_max
+                                               )
+                                     );
+
+    m_h_right_pair_mbl_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "__right_pair_mbl_2d"
+                                               ).c_str()
+                                             , ( "mbl - "
+                                               + TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "; m_{bl}^{#tilde{t}} [GeV] ; #m_{bl}^{#tilde{t}*} [GeV]"
+                                               ).c_str()
+                                             , mbl_bins, mbl_min, mbl_max
+                                             , mbl_bins, mbl_min, mbl_max
+                                             )
+                                   );
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    m_h_wrong_pair_pt_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "__wrong_pair_pt_2d"
+                                               ).c_str()
+                                             , ( "p_{T} - "
+                                               + TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "; p_{T}^{l} [GeV] ; p_{T}^{b} [GeV]"
+                                               ).c_str()
+                                             , pt_bins, pt_min, pt_max
+                                             , pt_bins, pt_min, pt_max
+                                             )
+                                   );
+
+    m_h_wrong_pair_eta_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "__wrong_pair_eta_2d"
+                                               ).c_str()
+                                             , ( "#eta - "
+                                               + TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "; #eta^{l} ; #eta^{b}"
+                                               ).c_str()
+                                             , eta_bins, eta_min, eta_max
+                                             , eta_bins, eta_min, eta_max
+                                             )
+                                   );
+
+    m_h_wrong_pair_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "__wrong_pair_phi_2d"
+                                               ).c_str()
+                                             , ( "#phi - "
+                                               + TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "; #phi^{l} ; #phi^{b}"
+                                               ).c_str()
+                                             , phi_bins, phi_min, phi_max
+                                             , phi_bins, phi_min, phi_max
+                                             )
+                                   );
+
+
+
+
+    m_h_wrong_pair_mbl_all.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                + "__wrong_pair_mbl_all"
+                                                ).c_str()
+                                              , ( "mbl - "
+                                                + TruthNtuple::FlavorChannelStrings[fc_it]
+                                                + "; m_{bl} [GeV] ; Entries"
+                                                ).c_str()
+                                              , mbl_bins, mbl_min, mbl_max
+                                              )
+                                    );
+
+    m_h_wrong_pair_mbl_0.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                              + "__wrong_pair_mbl_0"
+                                              ).c_str()
+                                            , ( "mbl - "
+                                              + TruthNtuple::FlavorChannelStrings[fc_it]
+                                              + "; m_{bl}^{0} [GeV] ; Entries"
+                                              ).c_str()
+                                            , mbl_bins, mbl_min, mbl_max
+                                            )
+                                  );
+
+    m_h_wrong_pair_mbl_1.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                              + "__wrong_pair_mbl_1"
+                                              ).c_str()
+                                            , ( "mbl - "
+                                              + TruthNtuple::FlavorChannelStrings[fc_it]
+                                              + "; m_{bl}^{1} [GeV] ; Entries"
+                                              ).c_str()
+                                            , mbl_bins, mbl_min, mbl_max
+                                            )
+                                  );
+
+    m_h_wrong_pair_mbl_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + "__wrong_pair_mbl_diff"
+                                                 ).c_str()
+                                               , ( "mbl - "
+                                                 + TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + "; |m_{bl}^{0} - m_{bl}^{1}| [GeV] ; Entries"
+                                                 ).c_str()
+                                               , mbl_bins, mbl_min, mbl_max
+                                               )
+                                     );
+
+    m_h_wrong_pair_mbl_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "__wrong_pair_mbl_2d"
+                                               ).c_str()
+                                             , ( "mbl - "
+                                               + TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "; m_{bl}^{0} [GeV] ; #m_{bl}^{1} [GeV]"
+                                               ).c_str()
+                                             , mbl_bins, mbl_min, mbl_max
+                                             , mbl_bins, mbl_min, mbl_max
+                                             )
+                                   );
+
+
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -597,12 +806,75 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
 {
   if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
 
-  // merge el and mu lists to lepton list
-  std::vector<TruthNtuple::Lepton*> lep_list;
-  lep_list.reserve(el_list.size() + mu_list.size());
-  lep_list.insert(lep_list.end(), el_list.begin(), el_list.end());
-  lep_list.insert(lep_list.end(), mu_list.begin(), mu_list.end());
+  if (sortObjects(el_list, mu_list, quark_list) == false) return;
 
+  double mbl_stop = TruthNtuple::invariantMass(m_l_from_stop, m_b_from_stop)/1.e3;
+  double mbl_astp = TruthNtuple::invariantMass(m_l_from_astp, m_b_from_astp)/1.e3;
+
+  double mbl_wrong_0 = TruthNtuple::invariantMass(m_l_from_stop, m_b_from_astp)/1.e3;
+  double mbl_wrong_1 = TruthNtuple::invariantMass(m_l_from_astp, m_b_from_stop)/1.e3;
+
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
+    if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
+      // fill histograms for right pairing
+      m_h_right_pair_pt_2d.at(fc)->Fill( m_l_from_stop->getPt()/1.e3
+                                       , m_b_from_stop->getPt()/1.e3
+                                       );
+      m_h_right_pair_eta_2d.at(fc)->Fill( m_l_from_stop->getEta()
+                                        , m_b_from_stop->getEta()
+                                        );
+      m_h_right_pair_phi_2d.at(fc)->Fill( m_l_from_stop->getPhi()
+                                        , m_b_from_stop->getPhi()
+                                        );
+
+      m_h_right_pair_pt_2d.at(fc)->Fill( m_l_from_astp->getPt()/1.e3
+                                       , m_b_from_astp->getPt()/1.e3
+                                       );
+      m_h_right_pair_eta_2d.at(fc)->Fill( m_l_from_astp->getEta()
+                                        , m_b_from_astp->getEta()
+                                        );
+      m_h_right_pair_phi_2d.at(fc)->Fill( m_l_from_astp->getPhi()
+                                        , m_b_from_astp->getPhi()
+                                        );
+
+
+      m_h_right_pair_mbl_all.at(fc)->Fill(mbl_stop);
+      m_h_right_pair_mbl_all.at(fc)->Fill(mbl_astp);
+      m_h_right_pair_mbl_stop.at(fc)->Fill(mbl_stop);
+      m_h_right_pair_mbl_astp.at(fc)->Fill(mbl_astp);
+      m_h_right_pair_mbl_diff.at(fc)->Fill(fabs(mbl_stop - mbl_astp));
+      m_h_right_pair_mbl_2d.at(fc)->Fill(mbl_stop, mbl_astp);
+
+      // fill histograms for wrong pairing
+      m_h_wrong_pair_pt_2d.at(fc)->Fill( m_l_from_stop->getPt()/1.e3
+                                       , m_b_from_astp->getPt()/1.e3
+                                       );
+      m_h_wrong_pair_eta_2d.at(fc)->Fill( m_l_from_stop->getEta()
+                                        , m_b_from_astp->getEta()
+                                        );
+      m_h_wrong_pair_phi_2d.at(fc)->Fill( m_l_from_stop->getPhi()
+                                        , m_b_from_astp->getPhi()
+                                        );
+
+      m_h_wrong_pair_pt_2d.at(fc)->Fill( m_l_from_astp->getPt()/1.e3
+                                       , m_b_from_stop->getPt()/1.e3
+                                       );
+      m_h_wrong_pair_eta_2d.at(fc)->Fill( m_l_from_astp->getEta()
+                                        , m_b_from_stop->getEta()
+                                        );
+      m_h_wrong_pair_phi_2d.at(fc)->Fill( m_l_from_astp->getPhi()
+                                        , m_b_from_stop->getPhi()
+                                        );
+
+      m_h_wrong_pair_mbl_all.at(fc)->Fill(mbl_wrong_0);
+      m_h_wrong_pair_mbl_all.at(fc)->Fill(mbl_wrong_1);
+      m_h_wrong_pair_mbl_0.at(fc)->Fill(mbl_wrong_0);
+      m_h_wrong_pair_mbl_1.at(fc)->Fill(mbl_wrong_1);
+      m_h_wrong_pair_mbl_diff.at(fc)->Fill(fabs(mbl_wrong_0 - mbl_wrong_1));
+      m_h_wrong_pair_mbl_2d.at(fc)->Fill(mbl_wrong_0, mbl_wrong_1);
+    }
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -611,7 +883,106 @@ void HistogramHandlers::BLPairKinematics::write(TFile* f)
   f->cd();
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    m_h_right_pair_pt_2d.at(fc_it)->Write();
+    m_h_right_pair_eta_2d.at(fc_it)->Write();
+    m_h_right_pair_phi_2d.at(fc_it)->Write();
+
+  m_h_right_pair_mbl_all.at(fc_it)->Write();
+  m_h_right_pair_mbl_stop.at(fc_it)->Write();
+  m_h_right_pair_mbl_astp.at(fc_it)->Write();
+  m_h_right_pair_mbl_diff.at(fc_it)->Write();
+  m_h_right_pair_mbl_2d.at(fc_it)->Write();
+
+    m_h_wrong_pair_pt_2d.at(fc_it)->Write();
+    m_h_wrong_pair_eta_2d.at(fc_it)->Write();
+    m_h_wrong_pair_phi_2d.at(fc_it)->Write();
+
+    m_h_wrong_pair_mbl_all.at(fc_it)->Write();
+    m_h_wrong_pair_mbl_0.at(fc_it)->Write();
+    m_h_wrong_pair_mbl_1.at(fc_it)->Write();
+    m_h_wrong_pair_mbl_diff.at(fc_it)->Write();
+    m_h_wrong_pair_mbl_2d.at(fc_it)->Write();
   }
+}
+
+// -----------------------------------------------------------------------------
+bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNtuple::Electron*>& el_list
+                                                     , const std::vector<TruthNtuple::Muon*>& mu_list
+                                                     , const std::vector<TruthNtuple::Particle*>& quark_list
+                                                     )
+{
+  // merge el and mu lists to lepton list
+  std::vector<TruthNtuple::Lepton*> lep_list;
+  lep_list.reserve(el_list.size() + mu_list.size());
+  lep_list.insert(lep_list.end(), el_list.begin(), el_list.end());
+  lep_list.insert(lep_list.end(), mu_list.begin(), mu_list.end());
+
+  // Find lepton from stop and anti-stop
+  m_l_from_stop = 0;
+  m_l_from_astp = 0;
+
+  // I'm probably being overly careful here
+  for (size_t lep_it = 0; lep_it != lep_list.size(); ++lep_it) {
+    // if parent is stop
+    if (lep_list.at(lep_it)->getParentPdgid() == +(1e6+6))  {
+      if (m_l_from_stop == 0) m_l_from_stop = lep_list.at(lep_it);
+      else
+        std::cout << "WARNING! Found multiple leptons paired to stop!\n";
+    }
+    // if parent is anti-stop
+    if (lep_list.at(lep_it)->getParentPdgid() == -(1e6+6)) {
+      if (m_l_from_astp == 0) m_l_from_astp = lep_list.at(lep_it);
+      else
+        std::cout << "WARNING! Found multiple leptons paired to anti-stop!\n";
+    }
+  }
+  if (m_l_from_stop == 0 || m_l_from_astp == 0) {
+    std::cout << "ERROR!"
+              << "\tLepton from stop: "      << (m_l_from_stop == 0 ? "not found" : "found")
+              << "\tLepton from anti-stop: " << (m_l_from_astp == 0 ? "not found" : "found")
+              << "\n";
+    return false;
+  }
+
+  // Find b quark from stop and anti-stop
+  m_b_from_stop = 0;
+  m_b_from_astp = 0;
+
+  // I'm probably being overly careful here
+  for (size_t quark_it = 0; quark_it != quark_list.size(); ++quark_it) {
+    // if parent is stop
+    if (quark_list.at(quark_it)->getParentPdgid() == +(1e6+6))  {
+      if (m_b_from_stop == 0) m_b_from_stop = quark_list.at(quark_it);
+      else
+        std::cout << "WARNING! Found multiple quarks paired to stop!\n";
+    }
+    // if parent is anti-stop
+    if (quark_list.at(quark_it)->getParentPdgid() == -(1e6+6)) {
+      if (m_b_from_astp == 0) m_b_from_astp = quark_list.at(quark_it);
+      else
+        std::cout << "WARNING! Found multiple quarks paired to anti-stop!\n";
+    }
+  }
+  if (m_b_from_stop == 0 || m_b_from_astp == 0) {
+    std::cout << "ERROR!"
+              << "\tB quark from stop: "      << (m_b_from_stop == 0 ? "not found" : "found")
+              << "\tB quark from anti-stop: " << (m_b_from_astp == 0 ? "not found" : "found")
+              << "\n";
+    return false;
+  }
+
+  // check that the objects from the stop have the same parent barcode
+  if (m_l_from_stop->getParentBarcode() != m_b_from_stop->getParentBarcode()) {
+    std::cout << "ERROR! Lepton and b from stop have different parent barcodes\n";
+    return false;
+  }
+  // check that the objects from the anti-stop have the same parent barcode
+  if (m_l_from_astp->getParentBarcode() != m_b_from_astp->getParentBarcode()) {
+    std::cout << "ERROR! Lepton and b from anti-stop have different parent barcodes\n";
+    return false;
+  }
+
+  return true;
 }
 
 
