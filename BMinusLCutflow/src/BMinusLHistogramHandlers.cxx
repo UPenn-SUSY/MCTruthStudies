@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <math.h>
+#include <algorithm>
 
 // =============================================================================
 // = StopKinematics
@@ -503,17 +504,21 @@ void HistogramHandlers::QuarkKinematics::FillSpecial( const TruthNtuple::FLAVOR_
 
   // check pt ordering
   if (pt_0 < pt_1) {
-    double tmp_pt = pt_1;
-    pt_1 = pt_0;
-    pt_0 = tmp_pt;
+    std::swap(pt_0, pt_1);
+    std::swap(eta_0, eta_1);
+    std::swap(phi_0, phi_1);
 
-    double tmp_eta = eta_1;
-    eta_1 = eta_0;
-    eta_0 = tmp_eta;
+    // double tmp_pt = pt_1;
+    // pt_1 = pt_0;
+    // pt_0 = tmp_pt;
 
-    double tmp_phi = phi_1;
-    phi_1 = phi_0;
-    phi_0 = tmp_phi;
+    // double tmp_eta = eta_1;
+    // eta_1 = eta_0;
+    // eta_0 = tmp_eta;
+
+    // double tmp_phi = phi_1;
+    // phi_1 = phi_0;
+    // phi_0 = tmp_phi;
   }
 
   // fill histograms
@@ -584,7 +589,10 @@ void HistogramHandlers::QuarkKinematics::write(TFile* f)
 // =============================================================================
 // = BLPairKinematics
 // =============================================================================
-HistogramHandlers::BLPairKinematics::BLPairKinematics()
+HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
+                                                        , m_l_from_astp(0)
+                                                        , m_b_from_stop(0)
+                                                        , m_b_from_astp(0)
 {
   const int    pt_bins = 50;
   const double pt_min  = 0.;
@@ -598,195 +606,358 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics()
   const double phi_min  = -3.2;
   const double phi_max  = +3.2;
 
-
   const int    mbl_bins = 50;
   const double mbl_min  = 0.;
   const double mbl_max  = 500.;
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    m_h_right_pair_pt_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "__right_pair_pt_2d"
-                                               ).c_str()
-                                             , ( "p_{T} - "
-                                               + TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "; p_{T}^{l} [GeV] ; p_{T}^{b} [GeV]"
-                                               ).c_str()
-                                             , pt_bins, pt_min, pt_max
-                                             , pt_bins, pt_min, pt_max
-                                             )
-                                   );
+    m_h_l_pt_stop.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__l_pt_stop" // name suffix
+                                       ).c_str()
+                                     , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + " - p_{T}" // title suffix
+                                       + " ; p_{T} [GeV]" // x-axis label
+                                       + " ; Entries" // y-axis label
+                                       ).c_str()
+                                     , pt_bins, pt_min, pt_max
+                                     )
+                           );
 
-    m_h_right_pair_eta_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "__right_pair_eta_2d"
-                                               ).c_str()
-                                             , ( "#eta - "
-                                               + TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "; #eta^{l} ; #eta^{b}"
-                                               ).c_str()
-                                             , eta_bins, eta_min, eta_max
-                                             , eta_bins, eta_min, eta_max
-                                             )
-                                   );
+    m_h_l_pt_astp.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__l_pt_astp" // name suffix
+                                       ).c_str()
+                                     , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + " - p_{T}" // title suffix
+                                       + " ; p_{T} [GeV]" // x-axis label
+                                       + " ; Entries" // y-axis label
+                                       ).c_str()
+                                     , pt_bins, pt_min, pt_max
+                                     )
+                           );
 
-    m_h_right_pair_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "__right_pair_phi_2d"
-                                               ).c_str()
-                                             , ( "#phi - "
-                                               + TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "; #phi^{l} ; #phi^{b}"
-                                               ).c_str()
-                                             , phi_bins, phi_min, phi_max
-                                             , phi_bins, phi_min, phi_max
-                                             )
-                                   );
+    m_h_l_eta_stop.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__l_eta_stop" // name suffix
+                                       ).c_str()
+                                     , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + " - #eta" // title suffix
+                                       + " ; #eta" // x-axis label
+                                       + " ; Entries" // y-axis label
+                                       ).c_str()
+                                     , eta_bins, eta_min, eta_max
+                                     )
+                           );
 
+    m_h_l_eta_astp.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__l_eta_astp" // name suffix
+                                       ).c_str()
+                                     , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + " - #eta" // title suffix
+                                       + " ; #eta" // x-axis label
+                                       + " ; Entries" // y-axis label
+                                       ).c_str()
+                                     , eta_bins, eta_min, eta_max
+                                     )
+                           );
+
+    m_h_l_phi_stop.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__l_phi_stop" // name suffix
+                                       ).c_str()
+                                     , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + " - #phi" // title suffix
+                                       + " ; #phi" // x-axis label
+                                       + " ; Entries" // y-axis label
+                                       ).c_str()
+                                     , phi_bins, phi_min, phi_max
+                                     )
+                           );
+
+    m_h_l_phi_astp.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__l_phi_astp" // name suffix
+                                       ).c_str()
+                                     , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + " - #phi" // title suffix
+                                       + " ; #phi" // x-axis label
+                                       + " ; Entries" // y-axis label
+                                       ).c_str()
+                                     , phi_bins, phi_min, phi_max
+                                     )
+                           );
+
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    m_h_b_pt_stop.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__b_pt_stop" // name suffix
+                                       ).c_str()
+                                     , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + " - p_{T}" // title suffix
+                                       + " ; p_{T} [GeV]" // x-axis label
+                                       + " ; Entries" // y-axis label
+                                       ).c_str()
+                                     , pt_bins, pt_min, pt_max
+                                     )
+                           );
+
+    m_h_b_pt_astp.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__b_pt_astp" // name suffix
+                                       ).c_str()
+                                     , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + " - p_{T}" // title suffix
+                                       + " ; p_{T} [GeV]" // x-axis label
+                                       + " ; Entries" // y-axis label
+                                       ).c_str()
+                                     , pt_bins, pt_min, pt_max
+                                     )
+                           );
+
+    m_h_b_eta_stop.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__b_eta_stop" // name suffix
+                                       ).c_str()
+                                     , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + " - #eta" // title suffix
+                                       + " ; #eta" // x-axis label
+                                       + " ; Entries" // y-axis label
+                                       ).c_str()
+                                     , eta_bins, eta_min, eta_max
+                                     )
+                           );
+
+    m_h_b_eta_astp.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__b_eta_astp" // name suffix
+                                       ).c_str()
+                                     , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + " - #eta" // title suffix
+                                       + " ; #eta" // x-axis label
+                                       + " ; Entries" // y-axis label
+                                       ).c_str()
+                                     , eta_bins, eta_min, eta_max
+                                     )
+                           );
+
+    m_h_b_phi_stop.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__b_phi_stop" // name suffix
+                                       ).c_str()
+                                     , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + " - #phi" // title suffix
+                                       + " ; #phi" // x-axis label
+                                       + " ; Entries" // y-axis label
+                                       ).c_str()
+                                     , phi_bins, phi_min, phi_max
+                                     )
+                           );
+
+    m_h_b_phi_astp.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + "__b_phi_astp" // name suffix
+                                       ).c_str()
+                                     , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                       + " - #phi" // title suffix
+                                       + " ; #phi" // x-axis label
+                                       + " ; Entries" // y-axis label
+                                       ).c_str()
+                                     , phi_bins, phi_min, phi_max
+                                     )
+                           );
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    m_h_right_pair_bl_pt_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + "__right_pair_bl_pt_2d" // name suffix
+                                                 ).c_str()
+                                               , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + " - p_{T}" // title suffix
+                                                 + " ; p_{T}^{l} [GeV]" // x-axis label
+                                                 + " ; p_{T}^{b} [GeV]" // y-axis label
+                                                 ).c_str()
+                                               , pt_bins, pt_min, pt_max
+                                               , pt_bins, pt_min, pt_max
+                                               )
+                                     );
+
+    m_h_right_pair_bl_eta_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                  + "__right_pair_bl_eta_2d" // name suffix
+                                                  ).c_str()
+                                                , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                  + " - #eta" // title suffix
+                                                  + " ; #eta^{l}" // x-axis label
+                                                  + " ; #eta^{b}" // y-axis label
+                                                  ).c_str()
+                                                , eta_bins, eta_min, eta_max
+                                                , eta_bins, eta_min, eta_max
+                                                )
+                                      );
+
+    m_h_right_pair_bl_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                  + "__right_pair_bl_phi_2d" // name suffix
+                                                  ).c_str()
+                                                , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                  + " - #phi" // title suffix
+                                                  + "; #phi^{l}" // x-axis label
+                                                  + "; #phi^{b}" // y-axis label
+                                                  ).c_str()
+                                                , phi_bins, phi_min, phi_max
+                                                , phi_bins, phi_min, phi_max
+                                                )
+                                      );
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    m_h_wrong_pair_bl_pt_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + "__wrong_pair_bl_pt_2d" // name suffix
+                                                 ).c_str()
+                                               , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + " - p_{T}" // title suffix
+                                                 + " ; p_{T}^{l} [GeV]" // x-axis label
+                                                 + " ; p_{T}^{b} [GeV]" // y-axis label
+                                                 ).c_str()
+                                               , pt_bins, pt_min, pt_max
+                                               , pt_bins, pt_min, pt_max
+                                               )
+                                     );
+
+    m_h_wrong_pair_bl_eta_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                  + "__wrong_pair_bl_eta_2d" // name suffix
+                                                  ).c_str()
+                                                , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                  + " - #eta" // title suffix
+                                                  + " ; #eta^{l}" // x-axis label
+                                                  + " ; #eta^{b}" // y-axis label
+                                                  ).c_str()
+                                                , eta_bins, eta_min, eta_max
+                                                , eta_bins, eta_min, eta_max
+                                                )
+                                      );
+
+    m_h_wrong_pair_bl_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                  + "__wrong_pair_bl_phi_2d" // name suffix
+                                                  ).c_str()
+                                                , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                  + " - #phi" // title suffix
+                                                  + " ; #phi^{l}" // x-axis label
+                                                  + " ; #phi^{b}" // y-axis label
+                                                  ).c_str()
+                                                , phi_bins, phi_min, phi_max
+                                                , phi_bins, phi_min, phi_max
+                                                )
+                                      );
+
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_right_pair_mbl_all.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                                + "__right_pair_mbl_all"
+                                                + "__right_pair_mbl_all" // name suffix
                                                 ).c_str()
-                                              , ( "mbl - "
-                                                + TruthNtuple::FlavorChannelStrings[fc_it]
-                                                + "; m_{bl} [GeV] ; Entries"
+                                              , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                + " - mbl" // title suffix
+                                                + "; m_{bl} [GeV]" // x-axis label
+                                                + "; Entries" // y-axis label
                                                 ).c_str()
                                               , mbl_bins, mbl_min, mbl_max
                                               )
                                     );
 
     m_h_right_pair_mbl_stop.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                                 + "__right_pair_mbl_stop"
+                                                 + "__right_pair_mbl_stop" // name suffix
                                                  ).c_str()
-                                               , ( "mbl - "
-                                                 + TruthNtuple::FlavorChannelStrings[fc_it]
-                                                 + "; m_{bl}^{#tilde{t}} [GeV] ; Entries"
+                                               , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + " - mbl" // title suffix
+                                                 + "; m_{bl}^{#tilde{t}} [GeV]" // x-axis label
+                                                 + "; Entries" // y-axis label
                                                  ).c_str()
                                                , mbl_bins, mbl_min, mbl_max
                                                )
                                      );
 
     m_h_right_pair_mbl_astp.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                                 + "__right_pair_mbl_astp"
+                                                 + "__right_pair_mbl_astp" // name suffix
                                                  ).c_str()
-                                               , ( "mbl - "
-                                                 + TruthNtuple::FlavorChannelStrings[fc_it]
-                                                 + "; m_{bl}^{#tilde{t}*} [GeV] ; Entries"
+                                               , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + " - mbl" // title suffix
+                                                 + "; m_{bl}^{#tilde{t}*} [GeV]" // x-axis label
+                                                 + "; Entries" // y-axis label
                                                  ).c_str()
                                                , mbl_bins, mbl_min, mbl_max
                                                )
                                      );
 
     m_h_right_pair_mbl_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                                 + "__right_pair_mbl_diff"
+                                                 + "__right_pair_mbl_diff" // name suffix
                                                  ).c_str()
-                                               , ( "mbl - "
-                                                 + TruthNtuple::FlavorChannelStrings[fc_it]
-                                                 + "; |m_{bl}^{#tilde{t}} - m_{bl}^{#tilde{t}*}| [GeV] ; Entries"
+                                               , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + " - mbl" // title suffix
+                                                 + "; |m_{bl}^{#tilde{t}} - m_{bl}^{#tilde{t}*}| [GeV]" // x-axis label
+                                                 + "; Entries" // y-axis label
                                                  ).c_str()
                                                , mbl_bins, mbl_min, mbl_max
                                                )
                                      );
 
     m_h_right_pair_mbl_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "__right_pair_mbl_2d"
+                                               + "__right_pair_mbl_2d" // name suffix
                                                ).c_str()
-                                             , ( "mbl - "
-                                               + TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "; m_{bl}^{#tilde{t}} [GeV] ; #m_{bl}^{#tilde{t}*} [GeV]"
+                                             , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + " - mbl" // title suffix
+                                               + "; m_{bl}^{#tilde{t}} [GeV]" // x-axis label
+                                               + "; #m_{bl}^{#tilde{t}*} [GeV]" // y-axis label
                                                ).c_str()
                                              , mbl_bins, mbl_min, mbl_max
                                              , mbl_bins, mbl_min, mbl_max
                                              )
                                    );
+
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    m_h_wrong_pair_pt_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "__wrong_pair_pt_2d"
-                                               ).c_str()
-                                             , ( "p_{T} - "
-                                               + TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "; p_{T}^{l} [GeV] ; p_{T}^{b} [GeV]"
-                                               ).c_str()
-                                             , pt_bins, pt_min, pt_max
-                                             , pt_bins, pt_min, pt_max
-                                             )
-                                   );
-
-    m_h_wrong_pair_eta_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "__wrong_pair_eta_2d"
-                                               ).c_str()
-                                             , ( "#eta - "
-                                               + TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "; #eta^{l} ; #eta^{b}"
-                                               ).c_str()
-                                             , eta_bins, eta_min, eta_max
-                                             , eta_bins, eta_min, eta_max
-                                             )
-                                   );
-
-    m_h_wrong_pair_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "__wrong_pair_phi_2d"
-                                               ).c_str()
-                                             , ( "#phi - "
-                                               + TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "; #phi^{l} ; #phi^{b}"
-                                               ).c_str()
-                                             , phi_bins, phi_min, phi_max
-                                             , phi_bins, phi_min, phi_max
-                                             )
-                                   );
-
-
-
-
     m_h_wrong_pair_mbl_all.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                                + "__wrong_pair_mbl_all"
+                                                + "__wrong_pair_mbl_all" // name suffix
                                                 ).c_str()
-                                              , ( "mbl - "
-                                                + TruthNtuple::FlavorChannelStrings[fc_it]
-                                                + "; m_{bl} [GeV] ; Entries"
+                                              , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                + " - mbl" // title suffix
+                                                + "; m_{bl} [GeV]" // x-axis label
+                                                + "; Entries" // y-axis label
                                                 ).c_str()
                                               , mbl_bins, mbl_min, mbl_max
                                               )
                                     );
 
     m_h_wrong_pair_mbl_0.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                              + "__wrong_pair_mbl_0"
+                                              + "__wrong_pair_mbl_0" // name suffix
                                               ).c_str()
-                                            , ( "mbl - "
-                                              + TruthNtuple::FlavorChannelStrings[fc_it]
-                                              + "; m_{bl}^{0} [GeV] ; Entries"
+                                            , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                              + " - mbl" // title suffix
+                                              + "; m_{bl}^{0} [GeV]" // x-axis label
+                                              + "; Entries" // y-axis label
                                               ).c_str()
                                             , mbl_bins, mbl_min, mbl_max
                                             )
                                   );
 
     m_h_wrong_pair_mbl_1.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                              + "__wrong_pair_mbl_1"
+                                              + "__wrong_pair_mbl_1" // name suffix
                                               ).c_str()
-                                            , ( "mbl - "
-                                              + TruthNtuple::FlavorChannelStrings[fc_it]
-                                              + "; m_{bl}^{1} [GeV] ; Entries"
+                                            , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                              + " - mbl" // title suffix
+                                              + "; m_{bl}^{1} [GeV]" // x-axis label
+                                              + "; Entries" // y-axis label
                                               ).c_str()
                                             , mbl_bins, mbl_min, mbl_max
                                             )
                                   );
 
     m_h_wrong_pair_mbl_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                                 + "__wrong_pair_mbl_diff"
+                                                 + "__wrong_pair_mbl_diff" // name suffix
                                                  ).c_str()
-                                               , ( "mbl - "
-                                                 + TruthNtuple::FlavorChannelStrings[fc_it]
-                                                 + "; |m_{bl}^{0} - m_{bl}^{1}| [GeV] ; Entries"
+                                               , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + " - mbl" // title suffix
+                                                 + "; |m_{bl}^{0} - m_{bl}^{1}| [GeV]" // x-axis label
+                                                 + "; Entries" // y-axis label
                                                  ).c_str()
                                                , mbl_bins, mbl_min, mbl_max
                                                )
                                      );
 
     m_h_wrong_pair_mbl_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "__wrong_pair_mbl_2d"
+                                               + "__wrong_pair_mbl_2d" // name suffix
                                                ).c_str()
-                                             , ( "mbl - "
-                                               + TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "; m_{bl}^{0} [GeV] ; #m_{bl}^{1} [GeV]"
+                                             , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + " - mbl" // title suffix
+                                               + "; m_{bl}^{0} [GeV]" // x-axis label
+                                               + "; #m_{bl}^{1} [GeV]" // y-axis label
                                                ).c_str()
                                              , mbl_bins, mbl_min, mbl_max
                                              , mbl_bins, mbl_min, mbl_max
@@ -806,39 +977,91 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
 {
   if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
 
+  // sort objects based on parent particle - if sorting fails, exis the function
   if (sortObjects(el_list, mu_list, quark_list) == false) return;
 
+  // get and store the mbl for all combinations
   double mbl_stop = TruthNtuple::invariantMass(m_l_from_stop, m_b_from_stop)/1.e3;
   double mbl_astp = TruthNtuple::invariantMass(m_l_from_astp, m_b_from_astp)/1.e3;
 
   double mbl_wrong_0 = TruthNtuple::invariantMass(m_l_from_stop, m_b_from_astp)/1.e3;
   double mbl_wrong_1 = TruthNtuple::invariantMass(m_l_from_astp, m_b_from_stop)/1.e3;
+  if (mbl_wrong_0 < mbl_wrong_1) std::swap(mbl_wrong_0, mbl_wrong_1);
 
+
+  // loop through flavor channels
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
-      // fill histograms for right pairing
-      m_h_right_pair_pt_2d.at(fc)->Fill( m_l_from_stop->getPt()/1.e3
-                                       , m_b_from_stop->getPt()/1.e3
-                                       );
-      m_h_right_pair_eta_2d.at(fc)->Fill( m_l_from_stop->getEta()
-                                        , m_b_from_stop->getEta()
-                                        );
-      m_h_right_pair_phi_2d.at(fc)->Fill( m_l_from_stop->getPhi()
-                                        , m_b_from_stop->getPhi()
-                                        );
 
-      m_h_right_pair_pt_2d.at(fc)->Fill( m_l_from_astp->getPt()/1.e3
-                                       , m_b_from_astp->getPt()/1.e3
-                                       );
-      m_h_right_pair_eta_2d.at(fc)->Fill( m_l_from_astp->getEta()
-                                        , m_b_from_astp->getEta()
-                                        );
-      m_h_right_pair_phi_2d.at(fc)->Fill( m_l_from_astp->getPhi()
-                                        , m_b_from_astp->getPhi()
-                                        );
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      // fill lepton kinematic plots
+      m_h_l_pt_stop.at(fc)->Fill(m_l_from_stop->getPt()/1.e3);
+      m_h_l_pt_astp.at(fc)->Fill(m_l_from_astp->getPt()/1.e3);
 
+      m_h_l_eta_stop.at(fc)->Fill(m_l_from_stop->getEta());
+      m_h_l_eta_astp.at(fc)->Fill(m_l_from_astp->getEta());
 
+      m_h_l_phi_stop.at(fc)->Fill(m_l_from_stop->getPhi());
+      m_h_l_phi_astp.at(fc)->Fill(m_l_from_astp->getPhi());
+
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      // fill b quark kinematic plots
+      m_h_b_pt_stop.at(fc)->Fill(m_b_from_stop->getPt()/1.e3);
+      m_h_b_pt_astp.at(fc)->Fill(m_b_from_astp->getPt()/1.e3);
+
+      m_h_b_eta_stop.at(fc)->Fill(m_b_from_stop->getEta());
+      m_h_b_eta_astp.at(fc)->Fill(m_b_from_astp->getEta());
+
+      m_h_b_phi_stop.at(fc)->Fill(m_b_from_stop->getPhi());
+      m_h_b_phi_astp.at(fc)->Fill(m_b_from_astp->getPhi());
+
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      // fill b-vs-l histograms for right pairing
+      m_h_right_pair_bl_pt_2d.at(fc)->Fill( m_l_from_stop->getPt()/1.e3
+                                          , m_b_from_stop->getPt()/1.e3
+                                          );
+      m_h_right_pair_bl_eta_2d.at(fc)->Fill( m_l_from_stop->getEta()
+                                           , m_b_from_stop->getEta()
+                                           );
+      m_h_right_pair_bl_phi_2d.at(fc)->Fill( m_l_from_stop->getPhi()
+                                           , m_b_from_stop->getPhi()
+                                           );
+
+      m_h_right_pair_bl_pt_2d.at(fc)->Fill( m_l_from_astp->getPt()/1.e3
+                                          , m_b_from_astp->getPt()/1.e3
+                                          );
+      m_h_right_pair_bl_eta_2d.at(fc)->Fill( m_l_from_astp->getEta()
+                                           , m_b_from_astp->getEta()
+                                           );
+      m_h_right_pair_bl_phi_2d.at(fc)->Fill( m_l_from_astp->getPhi()
+                                           , m_b_from_astp->getPhi()
+                                           );
+
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      // fill b-vs-l histograms for wrong pairing
+      m_h_wrong_pair_bl_pt_2d.at(fc)->Fill( m_l_from_stop->getPt()/1.e3
+                                          , m_b_from_astp->getPt()/1.e3
+                                          );
+      m_h_wrong_pair_bl_eta_2d.at(fc)->Fill( m_l_from_stop->getEta()
+                                           , m_b_from_astp->getEta()
+                                           );
+      m_h_wrong_pair_bl_phi_2d.at(fc)->Fill( m_l_from_stop->getPhi()
+                                           , m_b_from_astp->getPhi()
+                                           );
+
+      m_h_wrong_pair_bl_pt_2d.at(fc)->Fill( m_l_from_astp->getPt()/1.e3
+                                          , m_b_from_stop->getPt()/1.e3
+                                          );
+      m_h_wrong_pair_bl_eta_2d.at(fc)->Fill( m_l_from_astp->getEta()
+                                           , m_b_from_stop->getEta()
+                                           );
+      m_h_wrong_pair_bl_phi_2d.at(fc)->Fill( m_l_from_astp->getPhi()
+                                           , m_b_from_stop->getPhi()
+                                           );
+
+      // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      // fill mbl histograms for right pairing
       m_h_right_pair_mbl_all.at(fc)->Fill(mbl_stop);
       m_h_right_pair_mbl_all.at(fc)->Fill(mbl_astp);
       m_h_right_pair_mbl_stop.at(fc)->Fill(mbl_stop);
@@ -846,27 +1069,7 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
       m_h_right_pair_mbl_diff.at(fc)->Fill(fabs(mbl_stop - mbl_astp));
       m_h_right_pair_mbl_2d.at(fc)->Fill(mbl_stop, mbl_astp);
 
-      // fill histograms for wrong pairing
-      m_h_wrong_pair_pt_2d.at(fc)->Fill( m_l_from_stop->getPt()/1.e3
-                                       , m_b_from_astp->getPt()/1.e3
-                                       );
-      m_h_wrong_pair_eta_2d.at(fc)->Fill( m_l_from_stop->getEta()
-                                        , m_b_from_astp->getEta()
-                                        );
-      m_h_wrong_pair_phi_2d.at(fc)->Fill( m_l_from_stop->getPhi()
-                                        , m_b_from_astp->getPhi()
-                                        );
-
-      m_h_wrong_pair_pt_2d.at(fc)->Fill( m_l_from_astp->getPt()/1.e3
-                                       , m_b_from_stop->getPt()/1.e3
-                                       );
-      m_h_wrong_pair_eta_2d.at(fc)->Fill( m_l_from_astp->getEta()
-                                        , m_b_from_stop->getEta()
-                                        );
-      m_h_wrong_pair_phi_2d.at(fc)->Fill( m_l_from_astp->getPhi()
-                                        , m_b_from_stop->getPhi()
-                                        );
-
+      // fill mbl histograms for wrong pairing
       m_h_wrong_pair_mbl_all.at(fc)->Fill(mbl_wrong_0);
       m_h_wrong_pair_mbl_all.at(fc)->Fill(mbl_wrong_1);
       m_h_wrong_pair_mbl_0.at(fc)->Fill(mbl_wrong_0);
@@ -883,20 +1086,39 @@ void HistogramHandlers::BLPairKinematics::write(TFile* f)
   f->cd();
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-    m_h_right_pair_pt_2d.at(fc_it)->Write();
-    m_h_right_pair_eta_2d.at(fc_it)->Write();
-    m_h_right_pair_phi_2d.at(fc_it)->Write();
+    m_h_l_pt_stop.at(fc_it)->Write();
+    m_h_l_pt_astp.at(fc_it)->Write();
+    m_h_l_eta_stop.at(fc_it)->Write();
+    m_h_l_eta_astp.at(fc_it)->Write();
+    m_h_l_phi_stop.at(fc_it)->Write();
+    m_h_l_phi_astp.at(fc_it)->Write();
 
-  m_h_right_pair_mbl_all.at(fc_it)->Write();
-  m_h_right_pair_mbl_stop.at(fc_it)->Write();
-  m_h_right_pair_mbl_astp.at(fc_it)->Write();
-  m_h_right_pair_mbl_diff.at(fc_it)->Write();
-  m_h_right_pair_mbl_2d.at(fc_it)->Write();
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    m_h_b_pt_stop.at(fc_it)->Write();
+    m_h_b_pt_astp.at(fc_it)->Write();
+    m_h_b_eta_stop.at(fc_it)->Write();
+    m_h_b_eta_astp.at(fc_it)->Write();
+    m_h_b_phi_stop.at(fc_it)->Write();
+    m_h_b_phi_astp.at(fc_it)->Write();
 
-    m_h_wrong_pair_pt_2d.at(fc_it)->Write();
-    m_h_wrong_pair_eta_2d.at(fc_it)->Write();
-    m_h_wrong_pair_phi_2d.at(fc_it)->Write();
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    m_h_right_pair_bl_pt_2d.at(fc_it)->Write();
+    m_h_right_pair_bl_eta_2d.at(fc_it)->Write();
+    m_h_right_pair_bl_phi_2d.at(fc_it)->Write();
 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    m_h_wrong_pair_bl_pt_2d.at(fc_it)->Write();
+    m_h_wrong_pair_bl_eta_2d.at(fc_it)->Write();
+    m_h_wrong_pair_bl_phi_2d.at(fc_it)->Write();
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    m_h_right_pair_mbl_all.at(fc_it)->Write();
+    m_h_right_pair_mbl_stop.at(fc_it)->Write();
+    m_h_right_pair_mbl_astp.at(fc_it)->Write();
+    m_h_right_pair_mbl_diff.at(fc_it)->Write();
+    m_h_right_pair_mbl_2d.at(fc_it)->Write();
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_wrong_pair_mbl_all.at(fc_it)->Write();
     m_h_wrong_pair_mbl_0.at(fc_it)->Write();
     m_h_wrong_pair_mbl_1.at(fc_it)->Write();

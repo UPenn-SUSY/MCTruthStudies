@@ -19,11 +19,7 @@ BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
   m_histograms.push_back(new HistogramHandlers::FlavorChannel());
   m_histograms.push_back(new HistogramHandlers::ObjectMultiplicity());
   m_histograms.push_back(new HistogramHandlers::LeptonKinematics());
-  // m_histograms.push_back(new HistogramHandlers::LeptonEta());
-  // m_histograms.push_back(new HistogramHandlers::LeptonPhi());
   m_histograms.push_back(new HistogramHandlers::JetKinematics());
-  // m_histograms.push_back(new HistogramHandlers::JetEta());
-  // m_histograms.push_back(new HistogramHandlers::JetPhi());
   m_histograms.push_back(new HistogramHandlers::Met());
   m_histograms.push_back(new HistogramHandlers::Mll());
   m_histograms.push_back(new HistogramHandlers::Mjl());
