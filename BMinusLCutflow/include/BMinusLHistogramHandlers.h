@@ -160,11 +160,21 @@ namespace HistogramHandlers
       std::vector<TH1F*> m_h_b_phi_diff;
       std::vector<TH2F*> m_h_b_phi_2d;
 
-      // 2d plots of b quark kinematics vs lepton kinematics
+      // differrence and 2d plots of b quark kinematics vs lepton kinematics
       // do for right and wrong pairing
+      std::vector<TH1F*> m_h_right_pair_bl_dpt;
+      std::vector<TH1F*> m_h_right_pair_bl_deta;
+      std::vector<TH1F*> m_h_right_pair_bl_dphi;
+      std::vector<TH1F*> m_h_right_pair_bl_dr;
+
       std::vector<TH2F*> m_h_right_pair_bl_pt_2d;
       std::vector<TH2F*> m_h_right_pair_bl_eta_2d;
       std::vector<TH2F*> m_h_right_pair_bl_phi_2d;
+
+      std::vector<TH1F*> m_h_wrong_pair_bl_dpt;
+      std::vector<TH1F*> m_h_wrong_pair_bl_deta;
+      std::vector<TH1F*> m_h_wrong_pair_bl_dphi;
+      std::vector<TH1F*> m_h_wrong_pair_bl_dr;
 
       std::vector<TH2F*> m_h_wrong_pair_bl_pt_2d;
       std::vector<TH2F*> m_h_wrong_pair_bl_eta_2d;

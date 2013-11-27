@@ -5,6 +5,7 @@
 #include "TFile.h"
 
 #include <iostream>
+#include <algorithm>
 
 // =============================================================================
 // = Handle
@@ -382,17 +383,9 @@ void HistogramHandlers::LeptonKinematics::Fill( const TruthNtuple::FLAVOR_CHANNE
 
   // check pt ordering
   if (pt_0 < pt_1) {
-    double tmp_pt = pt_1;
-    pt_1 = pt_0;
-    pt_0 = tmp_pt;
-
-    double tmp_eta = eta_1;
-    eta_1 = eta_0;
-    eta_0 = tmp_eta;
-
-    double tmp_phi = phi_1;
-    phi_1 = phi_0;
-    phi_0 = tmp_phi;
+    std::swap(pt_0 , pt_1 );
+    std::swap(eta_0, eta_1);
+    std::swap(phi_0, phi_1);
   }
 
   // fill histograms
@@ -675,17 +668,9 @@ void HistogramHandlers::JetKinematics::Fill( const TruthNtuple::FLAVOR_CHANNEL f
 
   // check pt ordering
   if (pt_0 < pt_1) {
-    double tmp_pt = pt_1;
-    pt_1 = pt_0;
-    pt_0 = tmp_pt;
-
-    double tmp_eta = eta_1;
-    eta_1 = eta_0;
-    eta_0 = tmp_eta;
-
-    double tmp_phi = phi_1;
-    phi_1 = phi_0;
-    phi_0 = tmp_phi;
+    std::swap(pt_0 , pt_1 );
+    std::swap(eta_0, eta_1);
+    std::swap(phi_0, phi_1);
   }
 
   // fill histograms
