@@ -77,7 +77,6 @@ class HistMerger(object):
             self.canvas.SetLogz()
 
         if len(self.hists) == 1:
-            print 'printing 2D as colz!'
             self.hists[0].Draw('COLZ')
 
             this_label = self.getLabel(0)
@@ -95,7 +94,7 @@ class HistMerger(object):
             else:
                 self.canvas.Divide(3,3)
                 print 'Uh Oh! HistMerger cannot handle histogram lists of > 9 entries'
-            
+
             for i, h in enumerate(self.hists):
                 if i > 9: break
                 self.canvas.cd(i+1)

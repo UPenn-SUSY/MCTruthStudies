@@ -18,8 +18,10 @@ namespace TruthNtuple
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
       Particle();
+      Particle(const TruthNtuple::TruthNtupleLooper*, unsigned int mc_index);
 
-      void setIndex(unsigned int);
+      void setMCIndex(unsigned int);
+      void setPdgid(int);
       void setPt(double);
       void setEta(double);
       void setPhi(double);
@@ -28,10 +30,11 @@ namespace TruthNtuple
       void setPy(double);
       void setPz(double);
       void setParentPdgid(int);
-      void setParentIndex(int);
+      void setParentMCIndex(int);
       void setParentBarcode(int);
 
-      unsigned int getIndex() const;
+      unsigned int getMCIndex() const;
+      int getPdgid() const;
       double getPt() const;
       double getEta() const;
       double getPhi() const;
@@ -40,14 +43,15 @@ namespace TruthNtuple
       double getPy() const;
       double getPz() const;
       int getParentPdgid() const;
-      int getParentIndex() const;
+      int getParentMCIndex() const;
       int getParentBarcode() const;
 
       virtual void printGeneralInfo() const;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
-      unsigned int m_index;
+      unsigned int m_mc_index;
+      double       m_pdgid;
       double       m_pt;
       double       m_eta;
       double       m_phi;
@@ -90,8 +94,13 @@ namespace TruthNtuple
       Electron();
       Electron(const TruthNtuple::TruthNtupleLooper*, unsigned int el_index);
 
+      void setElIndex(unsigned int);
+
+      unsigned int getElIndex() const;
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
+      unsigned int m_el_index;
   };
 
   // =============================================================================
@@ -102,8 +111,13 @@ namespace TruthNtuple
       Muon();
       Muon(const TruthNtuple::TruthNtupleLooper*, unsigned int mu_index);
 
+      void setMuIndex(unsigned int);
+
+      unsigned int getMuIndex() const;
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
+      unsigned int m_mu_index;
   };
 
   // =============================================================================
@@ -114,10 +128,12 @@ namespace TruthNtuple
       Jet();
       Jet(const TruthNtuple::TruthNtupleLooper*, unsigned int jet_index);
 
+      void setJetIndex(unsigned int);
       void setTheta(double);
       void setIsBJet(bool);
       void setBQuarkIndex(int);
 
+      unsigned int getJetIndex() const;
       double getTheta() const;
       bool getIsBJet() const;
       int getBQuarkIndex() const;
@@ -126,6 +142,7 @@ namespace TruthNtuple
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
+      unsigned int m_jet_index;
       double m_theta;
       bool m_is_b_jet;
       int m_b_quark_index;

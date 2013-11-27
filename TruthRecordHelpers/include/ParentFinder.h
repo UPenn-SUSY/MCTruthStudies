@@ -8,7 +8,7 @@ namespace TruthRecordHelpers
   // given a barcode, find the corresponding index within the mc truth block
   int getIndexFromBarcode( int barcode
                          , const std::vector<int>* mc_barcode
-                         , bool verbose
+                         , bool verbose = false
                          );
 
   // given the particle barcode, get the parent index within the mc truth block

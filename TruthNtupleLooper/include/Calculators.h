@@ -2,16 +2,17 @@
 #define CALCULATORS_H
 
 #include <vector>
+#include "TruthNtupleLooper/include/ObjectDefs.h"
 
 // =============================================================================
-namespace TruthNtuple
-{
-  class Particle;
-  class Lepton;
-  class Electron;
-  class Muon;
-  class Jet;
-}
+// namespace TruthNtuple
+// {
+//   class Particle;
+//   class Lepton;
+//   class Electron;
+//   class Muon;
+//   class Jet;
+// }
 
 // =============================================================================
 namespace TruthNtuple
@@ -45,15 +46,18 @@ namespace TruthNtuple
                , double eta2
                , double phi2
                );
-  // get mbl using one of our methods:
+  // get list of invariant masses by combining two lists of particles.
+  // The method is defined as follows
   //    0: truth matching to parent barcode
-  //    1: dphi matching
-  //    1: dphi matching
-  //    2: dr matching
-  std::vector<double> getMbl( const std::vector<Lepton*>&
-                            , const std::vector<Jet*>&
-                            , unsigned int mbl_method = 0
-                            );
+  //    1: max dphi matching
+  //    2: min dr matching
+  template <class T1, class T2>
+    std::vector<double> getInvariantMassList( const std::vector<T1*>&
+                                            , const std::vector<T2*>&
+                                            , unsigned int method = 0
+                                            );
 }
+
+#include "TruthNtupleLooper/include/Calculators.icc"
 
 #endif
