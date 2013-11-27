@@ -130,23 +130,35 @@ namespace HistogramHandlers
       // and anti-stop
       std::vector<TH1F*> m_h_l_pt_stop;
       std::vector<TH1F*> m_h_l_pt_astp;
+      std::vector<TH1F*> m_h_l_pt_diff;
+      std::vector<TH2F*> m_h_l_pt_2d;
 
       std::vector<TH1F*> m_h_l_eta_stop;
       std::vector<TH1F*> m_h_l_eta_astp;
+      std::vector<TH1F*> m_h_l_eta_diff;
+      std::vector<TH2F*> m_h_l_eta_2d;
 
       std::vector<TH1F*> m_h_l_phi_stop;
       std::vector<TH1F*> m_h_l_phi_astp;
+      std::vector<TH1F*> m_h_l_phi_diff;
+      std::vector<TH2F*> m_h_l_phi_2d;
 
       // 1d plots of b quark kinematics. separate plots for leptons from stop
       // and anti-stop
       std::vector<TH1F*> m_h_b_pt_stop;
       std::vector<TH1F*> m_h_b_pt_astp;
+      std::vector<TH1F*> m_h_b_pt_diff;
+      std::vector<TH2F*> m_h_b_pt_2d;
 
       std::vector<TH1F*> m_h_b_eta_stop;
       std::vector<TH1F*> m_h_b_eta_astp;
+      std::vector<TH1F*> m_h_b_eta_diff;
+      std::vector<TH2F*> m_h_b_eta_2d;
 
       std::vector<TH1F*> m_h_b_phi_stop;
       std::vector<TH1F*> m_h_b_phi_astp;
+      std::vector<TH1F*> m_h_b_phi_diff;
+      std::vector<TH2F*> m_h_b_phi_2d;
 
       // 2d plots of b quark kinematics vs lepton kinematics
       // do for right and wrong pairing
