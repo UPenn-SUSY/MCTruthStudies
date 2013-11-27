@@ -18,17 +18,19 @@ BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
   // construct histogram list
   m_histograms.push_back(new HistogramHandlers::FlavorChannel());
   m_histograms.push_back(new HistogramHandlers::ObjectMultiplicity());
-  m_histograms.push_back(new HistogramHandlers::LeptonPt());
-  m_histograms.push_back(new HistogramHandlers::LeptonEta());
-  m_histograms.push_back(new HistogramHandlers::LeptonPhi());
-  m_histograms.push_back(new HistogramHandlers::JetPt());
-  m_histograms.push_back(new HistogramHandlers::JetEta());
-  m_histograms.push_back(new HistogramHandlers::JetPhi());
+  m_histograms.push_back(new HistogramHandlers::LeptonKinematics());
+  // m_histograms.push_back(new HistogramHandlers::LeptonEta());
+  // m_histograms.push_back(new HistogramHandlers::LeptonPhi());
+  m_histograms.push_back(new HistogramHandlers::JetKinematics());
+  // m_histograms.push_back(new HistogramHandlers::JetEta());
+  // m_histograms.push_back(new HistogramHandlers::JetPhi());
   m_histograms.push_back(new HistogramHandlers::Met());
   m_histograms.push_back(new HistogramHandlers::Mll());
   m_histograms.push_back(new HistogramHandlers::Mjl());
 
   m_h_mbl = new HistogramHandlers::Mbl();
+  m_h_bl_pair_kinematics = new HistogramHandlers::BLPairKinematics();
+  m_h_quark_kinematics = new HistogramHandlers::QuarkKinematics();
   m_h_stop_kinematics = new HistogramHandlers::StopKinematics();
 }
 
@@ -50,6 +52,7 @@ void BMinusL::Cutflow::clearObjects()
 
   m_daughter_el.clear();
   m_daughter_mu.clear();
+  m_daughter_b_quarks.clear();
   m_daughter_jet.clear();
 
   m_met.clear();
@@ -63,6 +66,7 @@ void BMinusL::Cutflow::processEvent()
   size_t num_el  = m_daughter_el.size();
   size_t num_mu  = m_daughter_mu.size();
   // size_t num_jet = m_daughter_jet.size();
+  size_t num_b_quarks = m_daughter_b_quarks.size();
 
   if (num_el == 2 && num_mu == 0) {
     m_flavor_channel = TruthNtuple::FLAVOR_EE;
@@ -79,6 +83,17 @@ void BMinusL::Cutflow::processEvent()
   else {
     m_flavor_channel = TruthNtuple::FLAVOR_NONE;
   }
+
+  if (  m_flavor_channel == TruthNtuple::FLAVOR_NONE
+     || num_b_quarks != 2
+     )
+  {
+    // std::cout << "\nskipping event -- flavor: " << m_flavor_channel
+    //           << " - num b quarks: " << num_b_quarks
+    //           << "\n";
+    return;
+  }
+
 
   // std::cout << "========================================"
   //           << "\nevent number: " << EventNumber
@@ -113,7 +128,14 @@ void BMinusL::Cutflow::processEvent()
                       , m_daughter_mu
                       , m_daughter_b_quarks
                       );
-
+  m_h_bl_pair_kinematics->FillSpecial( m_flavor_channel
+                                     , m_daughter_el
+                                     , m_daughter_mu
+                                     , m_daughter_b_quarks
+                                     );
+  m_h_quark_kinematics->FillSpecial( m_flavor_channel
+                                   , m_daughter_b_quarks
+                                   );
   m_h_stop_kinematics->FillSpecial( m_flavor_channel
                                   , m_stops
                                   );
@@ -131,6 +153,8 @@ void BMinusL::Cutflow::writeToFile()
   }
 
   m_h_mbl->write(f);
+  m_h_bl_pair_kinematics->write(f);
+  m_h_quark_kinematics->write(f);
   m_h_stop_kinematics->write(f);
 }
 

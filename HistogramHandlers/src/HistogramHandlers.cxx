@@ -143,15 +143,25 @@ void HistogramHandlers::ObjectMultiplicity::write(TFile* f)
 }
 
 // =============================================================================
-// = LeptonPt
+// = LeptonKinematics
 // =============================================================================
-HistogramHandlers::LeptonPt::LeptonPt() : HistogramHandlers::Handle()
+HistogramHandlers::LeptonKinematics::LeptonKinematics() : HistogramHandlers::Handle()
 {
-  const int bins   = 50;
-  const double min = 0.;
-  const double max = 500.;
+  const int    pt_bins = 50;
+  const double pt_min  = 0.;
+  const double pt_max  = 500.;
+
+  const int    eta_bins = 50;
+  const double eta_min  = -5.;
+  const double eta_max  = +5.;
+
+  const int    phi_bins = 64;
+  const double phi_min  = -3.2;
+  const double phi_max  = +3.2;
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // initialize pt histograms
     m_h_pt_all.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
                                     + "__lep_pt_all"
                                     ).c_str()
@@ -159,7 +169,7 @@ HistogramHandlers::LeptonPt::LeptonPt() : HistogramHandlers::Handle()
                                     + TruthNtuple::FlavorChannelStrings[fc_it]
                                     + "; p_{T} [GeV] ; Entries"
                                     ).c_str()
-                                  , bins, min, max
+                                  , pt_bins, pt_min, pt_max
                                   )
                         );
     m_h_pt_0.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -169,7 +179,7 @@ HistogramHandlers::LeptonPt::LeptonPt() : HistogramHandlers::Handle()
                                   + TruthNtuple::FlavorChannelStrings[fc_it]
                                   + "; p_{T}^{0} [GeV] ; Entries"
                                   ).c_str()
-                                , bins, min, max
+                                , pt_bins, pt_min, pt_max
                                 )
                       );
     m_h_pt_1.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -179,7 +189,7 @@ HistogramHandlers::LeptonPt::LeptonPt() : HistogramHandlers::Handle()
                                   + TruthNtuple::FlavorChannelStrings[fc_it]
                                   + "; p_{T}^{1} [GeV] ; Entries"
                                   ).c_str()
-                                , bins, min, max
+                                , pt_bins, pt_min, pt_max
                                 )
                       );
     m_h_pt_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -189,7 +199,7 @@ HistogramHandlers::LeptonPt::LeptonPt() : HistogramHandlers::Handle()
                                      + TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "; p_{T}^{0} - p_{T}^{1} [GeV] ; Entries"
                                      ).c_str()
-                                   , bins, min, max
+                                   , pt_bins, pt_min, pt_max
                                    )
                          );
     m_h_pt_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -199,92 +209,14 @@ HistogramHandlers::LeptonPt::LeptonPt() : HistogramHandlers::Handle()
                                    + TruthNtuple::FlavorChannelStrings[fc_it]
                                    + "; p_{T}^{0} [GeV] ; p_{T}^{1} [GeV]"
                                    ).c_str()
-                                 , bins, min, max
-                                 , bins, min, max
+                                 , pt_bins, pt_min, pt_max
+                                 , pt_bins, pt_min, pt_max
                                  )
                        );
-  }
-}
-
-// -----------------------------------------------------------------------------
-void HistogramHandlers::LeptonPt::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>& el_list
-         , const std::vector<TruthNtuple::Muon*>& mu_list
-         , const std::vector<TruthNtuple::Jet*>& /*jet_list*/
-         , const TruthNtuple::Met&
-         )
-{
-  double pt_0 = 0;
-  double pt_1 = 0;
-
-  // get lepton pt values delending on the channel
-  if (flavor_channel == TruthNtuple::FLAVOR_EE) {
-    pt_0 = el_list.at(0)->getPt()/1.e3;
-    pt_1 = el_list.at(1)->getPt()/1.e3;
-  }
-  else if (flavor_channel == TruthNtuple::FLAVOR_MM) {
-    pt_0 = mu_list.at(0)->getPt()/1.e3;
-    pt_1 = mu_list.at(1)->getPt()/1.e3;
-  }
-  else if (  flavor_channel == TruthNtuple::FLAVOR_EM
-          || flavor_channel == TruthNtuple::FLAVOR_ME
-          ) {
-    pt_0 = el_list.at(0)->getPt()/1.e3;
-    pt_1 = mu_list.at(0)->getPt()/1.e3;
-  }
-  else {
-    return;
-  }
-
-  // check pt ordering
-  if (pt_0 < pt_1) {
-    double tmp = pt_1;
-    pt_1 = pt_0;
-    pt_0 = tmp;
-  }
-
-  // fill histograms
-  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-    TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
-    if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
-
-      m_h_pt_all.at(fc)->Fill(pt_0);
-      m_h_pt_all.at(fc)->Fill(pt_1);
-
-      m_h_pt_0.at(fc)->Fill(pt_0);
-      m_h_pt_1.at(fc)->Fill(pt_1);
-
-      m_h_pt_diff.at(fc)->Fill(pt_0 - pt_1);
-      m_h_pt_2d.at(fc)->Fill(pt_0, pt_1);
-    }
-  }
-}
-
-// -----------------------------------------------------------------------------
-void HistogramHandlers::LeptonPt::write(TFile* f)
-{
-  f->cd();
-
-  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-      m_h_pt_all.at(fc_it)->Write();
-      m_h_pt_0.at(fc_it)->Write();
-      m_h_pt_1.at(fc_it)->Write();
-      m_h_pt_diff.at(fc_it)->Write();
-      m_h_pt_2d.at(fc_it)->Write();
-  }
-}
 
 
-// =============================================================================
-// = LeptonEta
-// =============================================================================
-HistogramHandlers::LeptonEta::LeptonEta() : HistogramHandlers::Handle()
-{
-  const int bins   = 50;
-  const double min = -5.;
-  const double max = +5.;
-
-  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // initialize eta histograms
     m_h_eta_all.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "__lep_eta_all"
                                      ).c_str()
@@ -292,7 +224,7 @@ HistogramHandlers::LeptonEta::LeptonEta() : HistogramHandlers::Handle()
                                      + TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "; #eta ; Entries"
                                      ).c_str()
-                                   , bins, min, max
+                                   , eta_bins, eta_min, eta_max
                                    )
                          );
     m_h_eta_0.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -302,7 +234,7 @@ HistogramHandlers::LeptonEta::LeptonEta() : HistogramHandlers::Handle()
                                    + TruthNtuple::FlavorChannelStrings[fc_it]
                                    + "; #eta^{0} ; Entries"
                                    ).c_str()
-                                 , bins, min, max
+                                 , eta_bins, eta_min, eta_max
                                  )
                        );
     m_h_eta_1.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -312,7 +244,7 @@ HistogramHandlers::LeptonEta::LeptonEta() : HistogramHandlers::Handle()
                                    + TruthNtuple::FlavorChannelStrings[fc_it]
                                    + "; #eta^{1} ; Entries"
                                    ).c_str()
-                                 , bins, min, max
+                                 , eta_bins, eta_min, eta_max
                                  )
                        );
     m_h_eta_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -322,7 +254,7 @@ HistogramHandlers::LeptonEta::LeptonEta() : HistogramHandlers::Handle()
                                       + TruthNtuple::FlavorChannelStrings[fc_it]
                                       + "; #eta^{0} - #eta^{1} ; Entries"
                                       ).c_str()
-                                    , bins/2, 0, max
+                                    , eta_bins/2, 0, eta_max
                                     )
                           );
     m_h_eta_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -332,15 +264,70 @@ HistogramHandlers::LeptonEta::LeptonEta() : HistogramHandlers::Handle()
                                     + TruthNtuple::FlavorChannelStrings[fc_it]
                                     + "; #eta^{0} ; #eta^{1}"
                                     ).c_str()
-                                  , bins, min, max
-                                  , bins, min, max
+                                  , eta_bins, eta_min, eta_max
+                                  , eta_bins, eta_min, eta_max
                                   )
                         );
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // initialize phi histograms
+    m_h_phi_all.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                     + "__lep_phi_all"
+                                     ).c_str()
+                                   , ( "#phi - "
+                                     + TruthNtuple::FlavorChannelStrings[fc_it]
+                                     + "; #phi ; Entries"
+                                     ).c_str()
+                                   , phi_bins, phi_min, phi_max
+                                   )
+                         );
+    m_h_phi_0.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                   + "__lep_phi_0"
+                                   ).c_str()
+                                 , ( "#phi - "
+                                   + TruthNtuple::FlavorChannelStrings[fc_it]
+                                   + "; #phi^{0} ; Entries"
+                                   ).c_str()
+                                 , phi_bins, phi_min, phi_max
+                                 )
+                       );
+    m_h_phi_1.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                   + "__lep_phi_1"
+                                   ).c_str()
+                                 , ( "#phi - "
+                                   + TruthNtuple::FlavorChannelStrings[fc_it]
+                                   + "; #phi^{1} ; Entries"
+                                   ).c_str()
+                                 , phi_bins, phi_min, phi_max
+                                 )
+                       );
+    m_h_phi_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                      + "__lep_phi_diff"
+                                      ).c_str()
+                                    , ( "#phi diff - "
+                                      + TruthNtuple::FlavorChannelStrings[fc_it]
+                                      + "; #phi^{0} - #phi^{1} ; Entries"
+                                      ).c_str()
+                                    , phi_bins/2, 0, phi_max
+                                    )
+                          );
+    m_h_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                    + "__lep_phi_2d"
+                                    ).c_str()
+                                  , ( "#phi map - "
+                                    + TruthNtuple::FlavorChannelStrings[fc_it]
+                                    + "; #phi^{0} ; #phi^{1}"
+                                    ).c_str()
+                                  , phi_bins, phi_min, phi_max
+                                  , phi_bins, phi_min, phi_max
+                                  )
+                        );
+    
   }
 }
 
 // -----------------------------------------------------------------------------
-void HistogramHandlers::LeptonEta::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
+void HistogramHandlers::LeptonKinematics::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
          , const std::vector<TruthNtuple::Electron*>& el_list
          , const std::vector<TruthNtuple::Muon*>& mu_list
          , const std::vector<TruthNtuple::Jet*>& /*jet_list*/
@@ -353,151 +340,6 @@ void HistogramHandlers::LeptonEta::Fill( const TruthNtuple::FLAVOR_CHANNEL flavo
   double eta_0 = 0;
   double eta_1 = 0;
 
-  // get lepton pt values delending on the channel
-  if (flavor_channel == TruthNtuple::FLAVOR_EE) {
-    pt_0 = el_list.at(0)->getPt()/1.e3;
-    pt_1 = el_list.at(1)->getPt()/1.e3;
-
-    eta_0 = el_list.at(0)->getEta();
-    eta_1 = el_list.at(1)->getEta();
-  }
-  else if (flavor_channel == TruthNtuple::FLAVOR_MM) {
-    pt_0 = mu_list.at(0)->getPt()/1.e3;
-    pt_1 = mu_list.at(1)->getPt()/1.e3;
-
-    eta_0 = mu_list.at(0)->getEta();
-    eta_1 = mu_list.at(1)->getEta();
-  }
-  else if (  flavor_channel == TruthNtuple::FLAVOR_EM
-          || flavor_channel == TruthNtuple::FLAVOR_ME
-          ) {
-    pt_0 = el_list.at(0)->getPt()/1.e3;
-    pt_1 = mu_list.at(0)->getPt()/1.e3;
-
-    eta_0 = el_list.at(0)->getEta();
-    eta_1 = mu_list.at(0)->getEta();
-  }
-  else {
-    return;
-  }
-
-  // check pt ordering
-  if (pt_0 < pt_1) {
-    double tmp_pt = pt_1;
-    pt_1 = pt_0;
-    pt_0 = tmp_pt;
-
-    double tmp_eta = eta_1;
-    eta_1 = eta_0;
-    eta_0 = tmp_eta;
-  }
-
-  // fill histograms
-  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-    TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
-    if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
-
-      m_h_eta_all.at(fc)->Fill(eta_0);
-      m_h_eta_all.at(fc)->Fill(eta_1);
-
-      m_h_eta_0.at(fc)->Fill(eta_0);
-      m_h_eta_1.at(fc)->Fill(eta_1);
-
-      m_h_eta_diff.at(fc)->Fill(TruthNtuple::deltaEta(eta_0, eta_1));
-      m_h_eta_2d.at(fc)->Fill(eta_0, eta_1);
-    }
-  }
-}
-
-// -----------------------------------------------------------------------------
-void HistogramHandlers::LeptonEta::write(TFile* f)
-{
-  f->cd();
-
-  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-      m_h_eta_all.at(fc_it)->Write();
-      m_h_eta_0.at(fc_it)->Write();
-      m_h_eta_1.at(fc_it)->Write();
-      m_h_eta_diff.at(fc_it)->Write();
-      m_h_eta_2d.at(fc_it)->Write();
-  }
-}
-
-
-// =============================================================================
-// = LeptonPhi
-// =============================================================================
-HistogramHandlers::LeptonPhi::LeptonPhi() : HistogramHandlers::Handle()
-{
-  const int bins   = 64;
-  const double min = -3.2;
-  const double max = +3.2;
-
-  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-    m_h_phi_all.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                     + "__lep_phi_all"
-                                     ).c_str()
-                                   , ( "#phi - "
-                                     + TruthNtuple::FlavorChannelStrings[fc_it]
-                                     + "; #phi ; Entries"
-                                     ).c_str()
-                                   , bins, min, max
-                                   )
-                         );
-    m_h_phi_0.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                   + "__lep_phi_0"
-                                   ).c_str()
-                                 , ( "#phi - "
-                                   + TruthNtuple::FlavorChannelStrings[fc_it]
-                                   + "; #phi^{0} ; Entries"
-                                   ).c_str()
-                                 , bins, min, max
-                                 )
-                       );
-    m_h_phi_1.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                   + "__lep_phi_1"
-                                   ).c_str()
-                                 , ( "#phi - "
-                                   + TruthNtuple::FlavorChannelStrings[fc_it]
-                                   + "; #phi^{1} ; Entries"
-                                   ).c_str()
-                                 , bins, min, max
-                                 )
-                       );
-    m_h_phi_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                      + "__lep_phi_diff"
-                                      ).c_str()
-                                    , ( "#phi diff - "
-                                      + TruthNtuple::FlavorChannelStrings[fc_it]
-                                      + "; #phi^{0} - #phi^{1} ; Entries"
-                                      ).c_str()
-                                    , bins/2, 0, max
-                                    )
-                          );
-    m_h_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                    + "__lep_phi_2d"
-                                    ).c_str()
-                                  , ( "#phi map - "
-                                    + TruthNtuple::FlavorChannelStrings[fc_it]
-                                    + "; #phi^{0} ; #phi^{1}"
-                                    ).c_str()
-                                  , bins, min, max
-                                  , bins, min, max
-                                  )
-                        );
-  }
-}
-
-void HistogramHandlers::LeptonPhi::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>& el_list
-         , const std::vector<TruthNtuple::Muon*>& mu_list
-         , const std::vector<TruthNtuple::Jet*>& /*jet_list*/
-         , const TruthNtuple::Met&
-         )
-{
-  double pt_0 = 0;
-  double pt_1 = 0;
-
   double phi_0 = 0;
   double phi_1 = 0;
 
@@ -506,12 +348,18 @@ void HistogramHandlers::LeptonPhi::Fill( const TruthNtuple::FLAVOR_CHANNEL flavo
     pt_0 = el_list.at(0)->getPt()/1.e3;
     pt_1 = el_list.at(1)->getPt()/1.e3;
 
+    eta_0 = el_list.at(0)->getEta();
+    eta_1 = el_list.at(1)->getEta();
+
     phi_0 = el_list.at(0)->getPhi();
     phi_1 = el_list.at(1)->getPhi();
   }
   else if (flavor_channel == TruthNtuple::FLAVOR_MM) {
     pt_0 = mu_list.at(0)->getPt()/1.e3;
     pt_1 = mu_list.at(1)->getPt()/1.e3;
+
+    eta_0 = mu_list.at(0)->getEta();
+    eta_1 = mu_list.at(1)->getEta();
 
     phi_0 = mu_list.at(0)->getPhi();
     phi_1 = mu_list.at(1)->getPhi();
@@ -521,6 +369,9 @@ void HistogramHandlers::LeptonPhi::Fill( const TruthNtuple::FLAVOR_CHANNEL flavo
           ) {
     pt_0 = el_list.at(0)->getPt()/1.e3;
     pt_1 = mu_list.at(0)->getPt()/1.e3;
+
+    eta_0 = el_list.at(0)->getEta();
+    eta_1 = mu_list.at(0)->getEta();
 
     phi_0 = el_list.at(0)->getPhi();
     phi_1 = mu_list.at(0)->getPhi();
@@ -535,6 +386,10 @@ void HistogramHandlers::LeptonPhi::Fill( const TruthNtuple::FLAVOR_CHANNEL flavo
     pt_1 = pt_0;
     pt_0 = tmp_pt;
 
+    double tmp_eta = eta_1;
+    eta_1 = eta_0;
+    eta_0 = tmp_eta;
+
     double tmp_phi = phi_1;
     phi_1 = phi_0;
     phi_0 = tmp_phi;
@@ -544,7 +399,27 @@ void HistogramHandlers::LeptonPhi::Fill( const TruthNtuple::FLAVOR_CHANNEL flavo
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
+      // fill pt histograms
+      m_h_pt_all.at(fc)->Fill(pt_0);
+      m_h_pt_all.at(fc)->Fill(pt_1);
 
+      m_h_pt_0.at(fc)->Fill(pt_0);
+      m_h_pt_1.at(fc)->Fill(pt_1);
+
+      m_h_pt_diff.at(fc)->Fill(pt_0 - pt_1);
+      m_h_pt_2d.at(fc)->Fill(pt_0, pt_1);
+
+      // fill eta histograms
+      m_h_eta_all.at(fc)->Fill(eta_0);
+      m_h_eta_all.at(fc)->Fill(eta_1);
+
+      m_h_eta_0.at(fc)->Fill(eta_0);
+      m_h_eta_1.at(fc)->Fill(eta_1);
+
+      m_h_eta_diff.at(fc)->Fill(TruthNtuple::deltaEta(eta_0, eta_1));
+      m_h_eta_2d.at(fc)->Fill(eta_0, eta_1);
+
+      // fill phi histograms
       m_h_phi_all.at(fc)->Fill(phi_0);
       m_h_phi_all.at(fc)->Fill(phi_1);
 
@@ -558,11 +433,23 @@ void HistogramHandlers::LeptonPhi::Fill( const TruthNtuple::FLAVOR_CHANNEL flavo
 }
 
 // -----------------------------------------------------------------------------
-void HistogramHandlers::LeptonPhi::write(TFile* f)
+void HistogramHandlers::LeptonKinematics::write(TFile* f)
 {
   f->cd();
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+      m_h_pt_all.at(fc_it)->Write();
+      m_h_pt_0.at(fc_it)->Write();
+      m_h_pt_1.at(fc_it)->Write();
+      m_h_pt_diff.at(fc_it)->Write();
+      m_h_pt_2d.at(fc_it)->Write();
+
+      m_h_eta_all.at(fc_it)->Write();
+      m_h_eta_0.at(fc_it)->Write();
+      m_h_eta_1.at(fc_it)->Write();
+      m_h_eta_diff.at(fc_it)->Write();
+      m_h_eta_2d.at(fc_it)->Write();
+
       m_h_phi_all.at(fc_it)->Write();
       m_h_phi_0.at(fc_it)->Write();
       m_h_phi_1.at(fc_it)->Write();
@@ -573,15 +460,25 @@ void HistogramHandlers::LeptonPhi::write(TFile* f)
 
 
 // =============================================================================
-// = JetPt
+// = JetKinematics
 // =============================================================================
-HistogramHandlers::JetPt::JetPt() : HistogramHandlers::Handle()
+HistogramHandlers::JetKinematics::JetKinematics() : HistogramHandlers::Handle()
 {
-  const int bins   = 50;
-  const double min = 0.;
-  const double max = 500.;
+  const int    pt_bins = 50;
+  const double pt_min  = 0.;
+  const double pt_max  = 500.;
+
+  const int    eta_bins = 50;
+  const double eta_min  = -5.;
+  const double eta_max  = +5.;
+
+  const int    phi_bins   = 64;
+  const double phi_min = -3.2;
+  const double phi_max = +3.2;
+
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    // initialize pt histograms
     m_h_pt_all.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
                                     + "__jet_pt_all"
                                     ).c_str()
@@ -589,7 +486,7 @@ HistogramHandlers::JetPt::JetPt() : HistogramHandlers::Handle()
                                     + TruthNtuple::FlavorChannelStrings[fc_it]
                                     + "; p_{T} [GeV] ; Entries"
                                     ).c_str()
-                                  , bins, min, max
+                                  , pt_bins, pt_min, pt_max
                                   )
                         );
     m_h_pt_0.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -599,7 +496,7 @@ HistogramHandlers::JetPt::JetPt() : HistogramHandlers::Handle()
                                   + TruthNtuple::FlavorChannelStrings[fc_it]
                                   + "; p_{T}^{0} [GeV] ; Entries"
                                   ).c_str()
-                                , bins, min, max
+                                , pt_bins, pt_min, pt_max
                                 )
                       );
     m_h_pt_1.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -609,29 +506,9 @@ HistogramHandlers::JetPt::JetPt() : HistogramHandlers::Handle()
                                   + TruthNtuple::FlavorChannelStrings[fc_it]
                                   + "; p_{T}^{1} [GeV] ; Entries"
                                   ).c_str()
-                                , bins, min, max
+                                , pt_bins, pt_min, pt_max
                                 )
                       );
-    // m_h_pt_2.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-    //                               + "__jet_pt_2"
-    //                               ).c_str()
-    //                             , ( "p_{T} - "
-    //                               + TruthNtuple::FlavorChannelStrings[fc_it]
-    //                               + "; p_{T}^{2} [GeV] ; Entries"
-    //                               ).c_str()
-    //                             , bins, min, max
-    //                             )
-    //                   );
-    // m_h_pt_3.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-    //                               + "__jet_pt_3"
-    //                               ).c_str()
-    //                             , ( "p_{T} - "
-    //                               + TruthNtuple::FlavorChannelStrings[fc_it]
-    //                               + "; p_{T}^{3} [GeV] ; Entries"
-    //                               ).c_str()
-    //                             , bins, min, max
-    //                             )
-    //                   );
     m_h_pt_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "__jet_pt_diff"
                                      ).c_str()
@@ -639,7 +516,7 @@ HistogramHandlers::JetPt::JetPt() : HistogramHandlers::Handle()
                                      + TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "; p_{T}^{0} - p_{T}^{1} [GeV] ; Entries"
                                      ).c_str()
-                                   , bins, min, max
+                                   , pt_bins, pt_min, pt_max
                                    )
                          );
     m_h_pt_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -649,87 +526,12 @@ HistogramHandlers::JetPt::JetPt() : HistogramHandlers::Handle()
                                    + TruthNtuple::FlavorChannelStrings[fc_it]
                                    + "; p_{T}^{0} [GeV] ; p_{T}^{1} [GeV]"
                                    ).c_str()
-                                 , bins, min, max
-                                 , bins, min, max
+                                 , pt_bins, pt_min, pt_max
+                                 , pt_bins, pt_min, pt_max
                                  )
                        );
-  }
-}
 
-
-// -----------------------------------------------------------------------------
-void HistogramHandlers::JetPt::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>& /*el_list*/
-         , const std::vector<TruthNtuple::Muon*>& /*mu_list*/
-         , const std::vector<TruthNtuple::Jet*>& jet_list
-         , const TruthNtuple::Met&
-         )
-{
-  size_t num_jet = jet_list.size();
-
-  double pt_0 = -1;
-  double pt_1 = -1;
-
-  if (num_jet > 0) {
-    pt_0 = jet_list.at(0)->getPt()/1.e3;
-  }
-  else {
-    return;
-  }
-  if (num_jet > 1) {
-    pt_1 = jet_list.at(1)->getPt()/1.e3;
-  }
-
-  // check pt ordering
-  if (pt_0 < pt_1) {
-    double tmp = pt_1;
-    pt_1 = pt_0;
-    pt_0 = tmp;
-  }
-
-  // fill histograms
-  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-    TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
-    if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
-      // always fill entries for leading jet
-      m_h_pt_all.at(fc)->Fill(pt_0);
-      m_h_pt_0.at(fc)->Fill(pt_0);
-
-      // only fill entries for subleading jet if there are more than one
-      if (num_jet > 1) {
-        m_h_pt_all.at(fc)->Fill(pt_1);
-        m_h_pt_1.at(fc)->Fill(pt_1);
-        m_h_pt_diff.at(fc)->Fill(pt_0 - pt_1);
-        m_h_pt_2d.at(fc)->Fill(pt_0, pt_1);
-      }
-    }
-  }
-}
-
-// -----------------------------------------------------------------------------
-void HistogramHandlers::JetPt::write(TFile* f)
-{
-  f->cd();
-
-  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-      m_h_pt_all.at(fc_it)->Write();
-      m_h_pt_0.at(fc_it)->Write();
-      m_h_pt_1.at(fc_it)->Write();
-      m_h_pt_diff.at(fc_it)->Write();
-      m_h_pt_2d.at(fc_it)->Write();
-  }
-}
-
-// =============================================================================
-// = JetEta
-// =============================================================================
-HistogramHandlers::JetEta::JetEta() : HistogramHandlers::Handle()
-{
-  const int bins   = 50;
-  const double min = -5.;
-  const double max = +5.;
-
-  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    // initialize eta histograms
     m_h_eta_all.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "__jet_eta_all"
                                      ).c_str()
@@ -737,7 +539,7 @@ HistogramHandlers::JetEta::JetEta() : HistogramHandlers::Handle()
                                      + TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "; #eta ; Entries"
                                      ).c_str()
-                                   , bins, min, max
+                                   , eta_bins, eta_min, eta_max
                                    )
                          );
     m_h_eta_0.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -747,7 +549,7 @@ HistogramHandlers::JetEta::JetEta() : HistogramHandlers::Handle()
                                    + TruthNtuple::FlavorChannelStrings[fc_it]
                                    + "; #eta^{0} ; Entries"
                                    ).c_str()
-                                 , bins, min, max
+                                 , eta_bins, eta_min, eta_max
                                  )
                        );
     m_h_eta_1.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -757,7 +559,7 @@ HistogramHandlers::JetEta::JetEta() : HistogramHandlers::Handle()
                                    + TruthNtuple::FlavorChannelStrings[fc_it]
                                    + "; #eta^{1} ; Entries"
                                    ).c_str()
-                                 , bins, min, max
+                                 , eta_bins, eta_min, eta_max
                                  )
                        );
     m_h_eta_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -767,7 +569,7 @@ HistogramHandlers::JetEta::JetEta() : HistogramHandlers::Handle()
                                       + TruthNtuple::FlavorChannelStrings[fc_it]
                                       + "; #eta^{0} - #eta^{1} ; Entries"
                                       ).c_str()
-                                    , bins/2, 0, max
+                                    , eta_bins/2, 0, eta_max
                                     )
                           );
     m_h_eta_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -777,15 +579,69 @@ HistogramHandlers::JetEta::JetEta() : HistogramHandlers::Handle()
                                     + TruthNtuple::FlavorChannelStrings[fc_it]
                                     + "; #eta^{0} ; #eta^{1}"
                                     ).c_str()
-                                  , bins, min, max
-                                  , bins, min, max
+                                  , eta_bins, eta_min, eta_max
+                                  , eta_bins, eta_min, eta_max
+                                  )
+                        );
+
+    // initialize phi hisogramas
+    m_h_phi_all.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                     + "__jet_phi_all"
+                                     ).c_str()
+                                   , ( "#phi - "
+                                     + TruthNtuple::FlavorChannelStrings[fc_it]
+                                     + "; #phi ; Entries"
+                                     ).c_str()
+                                   , phi_bins, phi_min, phi_max
+                                   )
+                         );
+    m_h_phi_0.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                   + "__jet_phi_0"
+                                   ).c_str()
+                                 , ( "#phi - "
+                                   + TruthNtuple::FlavorChannelStrings[fc_it]
+                                   + "; #phi^{0} ; Entries"
+                                   ).c_str()
+                                 , phi_bins, phi_min, phi_max
+                                 )
+                       );
+    m_h_phi_1.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                   + "__jet_phi_1"
+                                   ).c_str()
+                                 , ( "#phi - "
+                                   + TruthNtuple::FlavorChannelStrings[fc_it]
+                                   + "; #phi^{1} ; Entries"
+                                   ).c_str()
+                                 , phi_bins, phi_min, phi_max
+                                 )
+                       );
+    m_h_phi_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                      + "__jet_phi_diff"
+                                      ).c_str()
+                                    , ( "#phi diff - "
+                                      + TruthNtuple::FlavorChannelStrings[fc_it]
+                                      + "; #phi^{0} - #phi^{1} ; Entries"
+                                      ).c_str()
+                                    , phi_bins/2, 0, phi_max
+                                    )
+                          );
+    m_h_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                    + "__jet_phi_2d"
+                                    ).c_str()
+                                  , ( "#phi map - "
+                                    + TruthNtuple::FlavorChannelStrings[fc_it]
+                                    + "; #phi^{0} ; #phi^{1}"
+                                    ).c_str()
+                                  , phi_bins, phi_min, phi_max
+                                  , phi_bins, phi_min, phi_max
                                   )
                         );
   }
 }
 
+
 // -----------------------------------------------------------------------------
-void HistogramHandlers::JetEta::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
+void HistogramHandlers::JetKinematics::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
          , const std::vector<TruthNtuple::Electron*>& /*el_list*/
          , const std::vector<TruthNtuple::Muon*>& /*mu_list*/
          , const std::vector<TruthNtuple::Jet*>& jet_list
@@ -800,17 +656,21 @@ void HistogramHandlers::JetEta::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_c
   double eta_0 = 0;
   double eta_1 = 0;
 
-  // get jet pt and eta values delending on the channel
+  double phi_0 = 0;
+  double phi_1 = 0;
+
   if (num_jet > 0) {
-    pt_0  = jet_list.at(0)->getPt()/1.e3;
+    pt_0 = jet_list.at(0)->getPt()/1.e3;
     eta_0 = jet_list.at(0)->getEta();
+    phi_0 = jet_list.at(0)->getPhi();
   }
   else {
     return;
   }
   if (num_jet > 1) {
-    pt_1  = jet_list.at(1)->getPt()/1.e3;
+    pt_1 = jet_list.at(1)->getPt()/1.e3;
     eta_1 = jet_list.at(1)->getEta();
+    phi_1 = jet_list.at(1)->getPhi();
   }
 
   // check pt ordering
@@ -822,139 +682,6 @@ void HistogramHandlers::JetEta::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_c
     double tmp_eta = eta_1;
     eta_1 = eta_0;
     eta_0 = tmp_eta;
-  }
-
-  // fill histograms
-  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-    TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
-    if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
-      // always fill entries for leading jet
-      m_h_eta_all.at(fc)->Fill(eta_0);
-      m_h_eta_0.at(fc)->Fill(eta_0);
-
-      // only fill entries for subleading jet if there are more than one
-      if (num_jet > 1) {
-        m_h_eta_all.at(fc)->Fill(eta_1);
-        m_h_eta_1.at(fc)->Fill(eta_1);
-        m_h_eta_diff.at(fc)->Fill(TruthNtuple::deltaEta(eta_0, eta_1));
-        m_h_eta_2d.at(fc)->Fill(eta_0, eta_1);
-      }
-    }
-  }
-}
-
-// -----------------------------------------------------------------------------
-void HistogramHandlers::JetEta::write(TFile* f)
-{
-  f->cd();
-
-  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-      m_h_eta_all.at(fc_it)->Write();
-      m_h_eta_0.at(fc_it)->Write();
-      m_h_eta_1.at(fc_it)->Write();
-      m_h_eta_diff.at(fc_it)->Write();
-      m_h_eta_2d.at(fc_it)->Write();
-  }
-}
-
-// =============================================================================
-// = JetPhi
-// =============================================================================
-HistogramHandlers::JetPhi::JetPhi() : HistogramHandlers::Handle()
-{
-  const int bins   = 64;
-  const double min = -3.2;
-  const double max = +3.2;
-
-  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-    m_h_phi_all.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                     + "__jet_phi_all"
-                                     ).c_str()
-                                   , ( "#phi - "
-                                     + TruthNtuple::FlavorChannelStrings[fc_it]
-                                     + "; #phi ; Entries"
-                                     ).c_str()
-                                   , bins, min, max
-                                   )
-                         );
-    m_h_phi_0.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                   + "__jet_phi_0"
-                                   ).c_str()
-                                 , ( "#phi - "
-                                   + TruthNtuple::FlavorChannelStrings[fc_it]
-                                   + "; #phi^{0} ; Entries"
-                                   ).c_str()
-                                 , bins, min, max
-                                 )
-                       );
-    m_h_phi_1.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                   + "__jet_phi_1"
-                                   ).c_str()
-                                 , ( "#phi - "
-                                   + TruthNtuple::FlavorChannelStrings[fc_it]
-                                   + "; #phi^{1} ; Entries"
-                                   ).c_str()
-                                 , bins, min, max
-                                 )
-                       );
-    m_h_phi_diff.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                      + "__jet_phi_diff"
-                                      ).c_str()
-                                    , ( "#phi diff - "
-                                      + TruthNtuple::FlavorChannelStrings[fc_it]
-                                      + "; #phi^{0} - #phi^{1} ; Entries"
-                                      ).c_str()
-                                    , bins/2, 0, max
-                                    )
-                          );
-    m_h_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                    + "__jet_phi_2d"
-                                    ).c_str()
-                                  , ( "#phi map - "
-                                    + TruthNtuple::FlavorChannelStrings[fc_it]
-                                    + "; #phi^{0} ; #phi^{1}"
-                                    ).c_str()
-                                  , bins, min, max
-                                  , bins, min, max
-                                  )
-                        );
-  }
-}
-
-// -----------------------------------------------------------------------------
-void HistogramHandlers::JetPhi::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>& /*el_list*/
-         , const std::vector<TruthNtuple::Muon*>& /*mu_list*/
-         , const std::vector<TruthNtuple::Jet*>& jet_list
-         , const TruthNtuple::Met&
-         )
-{
-  size_t num_jet = jet_list.size();
-
-  double pt_0 = 0;
-  double pt_1 = 0;
-
-  double phi_0 = 0;
-  double phi_1 = 0;
-
-  // get jet pt and phi values delending on the channel
-  if (num_jet > 0) {
-    pt_0  = jet_list.at(0)->getPt()/1.e3;
-    phi_0 = jet_list.at(0)->getPhi();
-  }
-  else {
-    return;
-  }
-  if (num_jet > 1) {
-    pt_1  = jet_list.at(1)->getPt()/1.e3;
-    phi_1 = jet_list.at(1)->getPhi();
-  }
-
-  // check pt ordering
-  if (pt_0 < pt_1) {
-    double tmp_pt = pt_1;
-    pt_1 = pt_0;
-    pt_0 = tmp_pt;
 
     double tmp_phi = phi_1;
     phi_1 = phi_0;
@@ -966,14 +693,29 @@ void HistogramHandlers::JetPhi::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_c
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
       // always fill entries for leading jet
+      m_h_pt_all.at(fc)->Fill(pt_0);
+      m_h_pt_0.at(fc)->Fill(pt_0);
+
+      m_h_eta_all.at(fc)->Fill(eta_0);
+      m_h_eta_0.at(fc)->Fill(eta_0);
+
       m_h_phi_all.at(fc)->Fill(phi_0);
       m_h_phi_0.at(fc)->Fill(phi_0);
 
       // only fill entries for subleading jet if there are more than one
       if (num_jet > 1) {
+        m_h_pt_all.at(fc)->Fill(pt_1);
+        m_h_pt_1.at(fc)->Fill(pt_1);
+        m_h_pt_diff.at(fc)->Fill(pt_0 - pt_1);
+        m_h_pt_2d.at(fc)->Fill(pt_0, pt_1);
+
+        m_h_eta_all.at(fc)->Fill(eta_1);
+        m_h_eta_1.at(fc)->Fill(eta_1);
+        m_h_eta_diff.at(fc)->Fill(TruthNtuple::deltaEta(eta_0, eta_1));
+        m_h_eta_2d.at(fc)->Fill(eta_0, eta_1);
+
         m_h_phi_all.at(fc)->Fill(phi_1);
         m_h_phi_1.at(fc)->Fill(phi_1);
-
         m_h_phi_diff.at(fc)->Fill(TruthNtuple::deltaPhi(phi_0, phi_1));
         m_h_phi_2d.at(fc)->Fill(phi_0, phi_1);
       }
@@ -982,11 +724,23 @@ void HistogramHandlers::JetPhi::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_c
 }
 
 // -----------------------------------------------------------------------------
-void HistogramHandlers::JetPhi::write(TFile* f)
+void HistogramHandlers::JetKinematics::write(TFile* f)
 {
   f->cd();
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+      m_h_pt_all.at(fc_it)->Write();
+      m_h_pt_0.at(fc_it)->Write();
+      m_h_pt_1.at(fc_it)->Write();
+      m_h_pt_diff.at(fc_it)->Write();
+      m_h_pt_2d.at(fc_it)->Write();
+
+      m_h_eta_all.at(fc_it)->Write();
+      m_h_eta_0.at(fc_it)->Write();
+      m_h_eta_1.at(fc_it)->Write();
+      m_h_eta_diff.at(fc_it)->Write();
+      m_h_eta_2d.at(fc_it)->Write();
+
       m_h_phi_all.at(fc_it)->Write();
       m_h_phi_0.at(fc_it)->Write();
       m_h_phi_1.at(fc_it)->Write();
@@ -1183,9 +937,6 @@ void HistogramHandlers::Mjl::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_chan
   lep_list.insert(lep_list.end(), mu_list.begin(), mu_list.end());
 
   // get lists of mjl values for different matching methods
-  // std::vector<double> mjl_list_truth         = TruthNtuple::getMbl(lep_list, jet_list, 0);
-  // std::vector<double> mjl_list_dphi_matching = TruthNtuple::getMbl(lep_list, jet_list, 1);
-  // std::vector<double> mjl_list_dr_matching   = TruthNtuple::getMbl(lep_list, jet_list, 2);
   std::vector<double> mjl_list_truth         = TruthNtuple::getInvariantMassList(lep_list, jet_list, 0);
   std::vector<double> mjl_list_dphi_matching = TruthNtuple::getInvariantMassList(lep_list, jet_list, 1);
   std::vector<double> mjl_list_dr_matching   = TruthNtuple::getInvariantMassList(lep_list, jet_list, 2);

@@ -59,6 +59,69 @@ namespace HistogramHandlers
   };
 
   // =============================================================================
+  // = QuarkKinematics
+  // =============================================================================
+  class QuarkKinematics : public Handle
+  {
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    public:
+      QuarkKinematics();
+
+      virtual void FillSpecial( const TruthNtuple::FLAVOR_CHANNEL
+                              , const std::vector<TruthNtuple::Particle*>&
+                              );
+      virtual void write(TFile*);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    private:
+      std::vector<TH1F*> m_h_pt_all;
+      std::vector<TH1F*> m_h_pt_0;
+      std::vector<TH1F*> m_h_pt_1;
+      std::vector<TH1F*> m_h_pt_diff;
+      std::vector<TH2F*> m_h_pt_2d;
+
+      std::vector<TH1F*> m_h_eta_all;
+      std::vector<TH1F*> m_h_eta_0;
+      std::vector<TH1F*> m_h_eta_1;
+      std::vector<TH1F*> m_h_eta_diff;
+      std::vector<TH2F*> m_h_eta_2d;
+
+      std::vector<TH1F*> m_h_phi_all;
+      std::vector<TH1F*> m_h_phi_0;
+      std::vector<TH1F*> m_h_phi_1;
+      std::vector<TH1F*> m_h_phi_diff;
+      std::vector<TH2F*> m_h_phi_2d;
+
+  };
+
+  // =============================================================================
+  // = B-l pair kinematics
+  // =============================================================================
+  class BLPairKinematics : public Handle
+  {
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    public:
+      BLPairKinematics();
+
+      virtual void FillSpecial( const TruthNtuple::FLAVOR_CHANNEL
+                              , const std::vector<TruthNtuple::Electron*>&
+                              , const std::vector<TruthNtuple::Muon*>&
+                              , const std::vector<TruthNtuple::Particle*>&
+                              );
+      virtual void write(TFile*);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    private:
+      std::vector<TH2F*> m_h_right_pair_pt_2d;
+      std::vector<TH2F*> m_h_right_pair_eta_2d;
+      std::vector<TH2F*> m_h_right_pair_phi_2d;
+
+      std::vector<TH2F*> m_h_wrong_pair_pt_2d;
+      std::vector<TH2F*> m_h_wrong_pair_eta_2d;
+      std::vector<TH2F*> m_h_wrong_pair_phi_2d;
+  };
+
+  // =============================================================================
   // = mbl
   // =============================================================================
   class Mbl : public Handle

@@ -89,13 +89,13 @@ namespace HistogramHandlers
   };
 
   // =============================================================================
-  // = Lepton pT
+  // = Lepton kinematics
   // =============================================================================
-  class LeptonPt : public Handle
+  class LeptonKinematics : public Handle
   {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
-      LeptonPt();
+      LeptonKinematics();
 
       virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
                        , const std::vector<TruthNtuple::Electron*>&
@@ -112,53 +112,13 @@ namespace HistogramHandlers
       std::vector<TH1F*> m_h_pt_1;
       std::vector<TH1F*> m_h_pt_diff;
       std::vector<TH2F*> m_h_pt_2d;
-  };
 
-  // =============================================================================
-  // = Lepton eta
-  // =============================================================================
-  class LeptonEta : public Handle
-  {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    public:
-      LeptonEta();
-
-      virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
-                       , const TruthNtuple::Met&
-                       );
-      virtual void write(TFile*);
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    private:
       std::vector<TH1F*> m_h_eta_all;
       std::vector<TH1F*> m_h_eta_0;
       std::vector<TH1F*> m_h_eta_1;
       std::vector<TH1F*> m_h_eta_diff;
       std::vector<TH2F*> m_h_eta_2d;
-  };
 
-  // =============================================================================
-  // = Lepton Phi
-  // =============================================================================
-  class LeptonPhi : public Handle
-  {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    public:
-      LeptonPhi();
-
-      virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
-                       , const TruthNtuple::Met&
-                       );
-      virtual void write(TFile*);
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    private:
       std::vector<TH1F*> m_h_phi_all;
       std::vector<TH1F*> m_h_phi_0;
       std::vector<TH1F*> m_h_phi_1;
@@ -166,14 +126,15 @@ namespace HistogramHandlers
       std::vector<TH2F*> m_h_phi_2d;
   };
 
+
   // =============================================================================
-  // = Jet pT
+  // = JetKinematics
   // =============================================================================
-  class JetPt : public Handle
+  class JetKinematics : public Handle
   {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
-      JetPt();
+      JetKinematics();
 
       virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
                        , const std::vector<TruthNtuple::Electron*>&
@@ -190,53 +151,13 @@ namespace HistogramHandlers
       std::vector<TH1F*> m_h_pt_1;
       std::vector<TH1F*> m_h_pt_diff;
       std::vector<TH2F*> m_h_pt_2d;
-  };
 
-  // =============================================================================
-  // = Jet eta
-  // =============================================================================
-  class JetEta : public Handle
-  {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    public:
-      JetEta();
-
-      virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
-                       , const TruthNtuple::Met&
-                       );
-      virtual void write(TFile*);
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    private:
       std::vector<TH1F*> m_h_eta_all;
       std::vector<TH1F*> m_h_eta_0;
       std::vector<TH1F*> m_h_eta_1;
       std::vector<TH1F*> m_h_eta_diff;
       std::vector<TH2F*> m_h_eta_2d;
-  };
 
-  // =============================================================================
-  // = Jet phi
-  // =============================================================================
-  class JetPhi : public Handle
-  {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    public:
-      JetPhi();
-
-      virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
-                       , const TruthNtuple::Met&
-                       );
-      virtual void write(TFile*);
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    private:
       std::vector<TH1F*> m_h_phi_all;
       std::vector<TH1F*> m_h_phi_0;
       std::vector<TH1F*> m_h_phi_1;

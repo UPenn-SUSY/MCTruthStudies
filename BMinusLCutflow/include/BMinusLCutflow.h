@@ -21,6 +21,8 @@ namespace HistogramHandlers
 {
   class Handle;
   class Mbl;
+  class BLPairKinematics;
+  class QuarkKinematics;
   class StopKinematics;
 }
 
@@ -59,6 +61,8 @@ namespace BMinusL
 
       std::vector<HistogramHandlers::Handle*> m_histograms;
       HistogramHandlers::Mbl*    m_h_mbl;
+      HistogramHandlers::BLPairKinematics* m_h_bl_pair_kinematics;
+      HistogramHandlers::QuarkKinematics* m_h_quark_kinematics;
       HistogramHandlers::StopKinematics* m_h_stop_kinematics;
   };
 }
