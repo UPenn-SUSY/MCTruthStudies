@@ -4,9 +4,13 @@ import sys
 import os.path
 import optparse
 import time
+import math
 
 import ROOT
 import rootlogon
+
+# ==============================================================================
+BUFFER = 1.15
 
 # ==============================================================================
 class HistMerger(object):
@@ -31,9 +35,13 @@ class HistMerger(object):
     def prep1DHistStack(self):
         self.stack = ROOT.THStack('s_%s' % self.name, self.title)
 
-        leg_x1 = 0.80
-        leg_x2 = 0.98
-        leg_y1 = 0.98
+        # leg_x1 = 0.80
+        # leg_x2 = 0.98
+        # leg_y1 = 0.98
+        # leg_y2 = leg_y1-(0.06*len(self.hists))
+        leg_x1 = 0.20
+        leg_x2 = 0.43
+        leg_y1 = 0.93
         leg_y2 = leg_y1-(0.06*len(self.hists))
 
         big_leg_x1 = 0.05
@@ -41,8 +49,19 @@ class HistMerger(object):
         big_leg_y1 = 0.98
         big_leg_y2 = leg_y1-(0.08*len(self.hists))
 
+        # make legend
         self.legend = ROOT.TLegend(leg_x1, leg_y1, leg_x2, leg_y2)
         self.big_legend = ROOT.TLegend(big_leg_x1, big_leg_y1, big_leg_x2, big_leg_y2)
+
+        # set background color of legend
+        self.legend.SetFillColor(0)
+        self.big_legend.SetFillColor(0)
+        # self.legend.SetFillStyle(0)
+        # self.big_legend.SetFillStyle(0)
+
+        self.legend.SetBorderSize(0)
+        self.big_legend.SetBorderSize(0)
+
         for i, h in enumerate(self.hists):
             self.stack.Add(h, 'HIST')
             self.legend.AddEntry(h, self.file_names[i], 'L')
@@ -56,6 +75,23 @@ class HistMerger(object):
         self.canvas = ROOT.TCanvas(canvas_name)
         if self.log:
             self.canvas.SetLogy()
+
+        # add padding to top of plots
+        self.stack.Draw('nostack')
+        old_min = self.stack.GetHistogram().GetMinimum()
+        old_max = self.stack.GetHistogram().GetMaximum()
+        if self.log:
+            new_max = math.pow( 10
+                              , ( math.log(old_max, 10)
+                                + (math.log(old_max, 10)-math.log(old_min, 10))*BUFFER/(1+BUFFER)
+                                )
+                              )
+            self.stack.SetMaximum(new_max)
+        else:
+            new_max = (old_max + (old_max-old_min)*BUFFER/(1+BUFFER))
+            self.stack.SetMaximum(new_max)
+
+        # Draw plots and legend
         self.stack.Draw('nostack')
         self.legend.Draw()
 
@@ -77,8 +113,14 @@ class HistMerger(object):
             self.canvas.SetLogz()
 
         if len(self.hists) == 1:
+            # add padding to top of plots
             self.hists[0].Draw('COLZ')
+            old_min = self.hists[0].GetYaxis().GetXmin()
+            old_max = self.hists[0].GetYaxis().GetXmax()
+            new_max = (old_max + (old_max-old_min)*BUFFER/(1+BUFFER))
+            self.hists[0].GetYaxis().SetRangeUser(old_min, new_max)
 
+            self.hists[0].Draw('COLZ')
             this_label = self.getLabel(0)
             this_label.Draw()
             self.labels.append(this_label)
@@ -98,6 +140,14 @@ class HistMerger(object):
             for i, h in enumerate(self.hists):
                 if i > 9: break
                 self.canvas.cd(i+1)
+
+                # add padding to top of plots
+                self.hists[i].Draw('COLZ')
+                old_min = self.hists[i].GetYaxis().GetXmin()
+                old_max = self.hists[i].GetYaxis().GetXmax()
+                new_max = (old_max + (old_max-old_min)*BUFFER/(1+BUFFER))
+                self.hists[i].SetAxisRange(old_min, new_max, "Y")
+
                 self.hists[i].Draw('COLZ')
 
                 this_label = self.getLabel(i)
@@ -118,6 +168,6 @@ class HistMerger(object):
         this_label = ROOT.TLatex(1,1, self.file_names[index])
         this_label.SetNDC()
         this_label.SetX(0.45)
-        this_label.SetY(0.80)
+        this_label.SetY(0.96)
         this_label.SetTextSize(0.05)
         return this_label

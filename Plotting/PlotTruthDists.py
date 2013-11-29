@@ -25,6 +25,7 @@ def main():
     list_of_hists = files[0].getListOfHists()
     num_hists = len(list_of_hists)
     for i, loh in enumerate(list_of_hists):
+        if 'fc_all__' not in loh: continue
         for is_log in [True, False]:
             print 'hist (%d of %d): %s' % (i, num_hists, loh)
 
