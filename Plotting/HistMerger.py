@@ -167,7 +167,9 @@ class HistMerger(object):
     def getLabel(self, index):
         this_label = ROOT.TLatex(1,1, self.file_names[index])
         this_label.SetNDC()
-        this_label.SetX(0.45)
+        # this_label.SetX(0.45)
+        this_label.SetX(0.17)
         this_label.SetY(0.96)
-        this_label.SetTextSize(0.05)
+        # this_label.SetTextSize(0.05)
+        this_label.SetTextSize(0.045)
         return this_label
