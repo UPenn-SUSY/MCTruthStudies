@@ -595,7 +595,7 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
   const double phi_max  = +3.2;
 
   const int    dr_bins = 50;
-  const double dr_min  = -5.;
+  const double dr_min  = 0.;
   const double dr_max  = +5.;
 
   const int    mbl_bins = 150;
