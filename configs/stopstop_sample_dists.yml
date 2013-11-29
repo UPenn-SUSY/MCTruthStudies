@@ -5,3 +5,17 @@
   shape: 20 # kFullCircle
   line:  1
 
+- label: 'm(#tilde{t}) = 500 GeV'
+  file:  output_hists.m_st_500.root
+  dir:   ""
+  color: 633 # kRed+1
+  shape: 20 # kFullCircle
+  line:  1
+
+- label: 'm(#tilde{t}) = 1000 GeV'
+  file:  output_hists.m_st_1000.root
+  dir:   ""
+  color: 419 # kGreen+3
+  shape: 20 # kFullCircle
+  line:  1
+
