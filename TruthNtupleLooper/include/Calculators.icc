@@ -1,6 +1,8 @@
 #ifndef CALCULATORS_ICC
 #define CALCULATORS_ICC
 
+#include <stdlib.h>
+
 namespace TruthNtuple
 {
   // -----------------------------------------------------------------------------

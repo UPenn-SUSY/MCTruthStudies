@@ -14,9 +14,9 @@
 // =============================================================================
 HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle()
 {
-  const int pt_bins   = 50;
+  const int pt_bins   = 150;
   const double pt_min = 0.;
-  const double pt_max = 500.;
+  const double pt_max = 1500.;
 
   const int eta_bins   = 50;
   const double eta_min = -5.;
@@ -116,7 +116,7 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                      + TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "; #eta^{#tilde{t}} - #eta^{#tilde{t}*} ; Entries"
                                      ).c_str()
-                                   , 2*eta_bins, -eta_max, eta_max
+                                   , eta_bins/2, 0, eta_max
                                    )
                          );
     m_h_eta_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -168,7 +168,7 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                      + TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "; #phi^{#tilde{t}} - #phi^{#tilde{t}*} ; Entries"
                                      ).c_str()
-                                   , 2*phi_bins, -phi_max, phi_max
+                                   , phi_bins/2, 0, phi_max
                                    )
                          );
     m_h_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -257,7 +257,7 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
       m_h_eta_stop.at(fc)->Fill(eta_stop);
       m_h_eta_astp.at(fc)->Fill(eta_astp);
 
-      m_h_eta_diff.at(fc)->Fill(eta_stop - eta_astp);
+      m_h_eta_diff.at(fc)->Fill(TruthNtuple::deltaEta(eta_stop, eta_astp));
       m_h_eta_2d.at(fc)->Fill(eta_stop, eta_astp);
 
       // Fill phi
@@ -267,7 +267,7 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
       m_h_phi_stop.at(fc)->Fill(phi_stop);
       m_h_phi_astp.at(fc)->Fill(phi_astp);
 
-      m_h_phi_diff.at(fc)->Fill(phi_stop - phi_astp);
+      m_h_phi_diff.at(fc)->Fill(TruthNtuple::deltaPhi(phi_stop, phi_astp));
       m_h_phi_2d.at(fc)->Fill(phi_stop, phi_astp);
     }
   }
@@ -304,9 +304,9 @@ void HistogramHandlers::StopKinematics::write(TFile* f)
 // =============================================================================
 HistogramHandlers::QuarkKinematics::QuarkKinematics() : HistogramHandlers::Handle()
 {
-  const int    pt_bins = 50;
+  const int    pt_bins = 150;
   const double pt_min  = 0.;
-  const double pt_max  = 500.;
+  const double pt_max  = 1500.;
 
   const int    eta_bins = 50;
   const double eta_min  = -5.;
@@ -479,7 +479,7 @@ HistogramHandlers::QuarkKinematics::QuarkKinematics() : HistogramHandlers::Handl
                                   , phi_bins, phi_min, phi_max
                                   )
                         );
-    
+
   }
 }
 
@@ -582,9 +582,9 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
                                                         , m_b_from_stop(0)
                                                         , m_b_from_astp(0)
 {
-  const int    pt_bins = 50;
+  const int    pt_bins = 150;
   const double pt_min  = 0.;
-  const double pt_max  = 500.;
+  const double pt_max  = 1500.;
 
   const int    eta_bins = 50;
   const double eta_min  = -5.;
@@ -598,9 +598,9 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
   const double dr_min  = -5.;
   const double dr_max  = +5.;
 
-  const int    mbl_bins = 50;
+  const int    mbl_bins = 150;
   const double mbl_min  = 0.;
-  const double mbl_max  = 500.;
+  const double mbl_max  = 1500.;
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -726,7 +726,7 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
                                        + " ; |#phi^{#tilde{t}} - #phi^{#tilde{t}*}|" // x-axis label
                                        + " ; Entries" // y-axis label
                                        ).c_str()
-                                     , phi_bins, phi_min, phi_max
+                                     , phi_bins/2, 0, phi_max
                                      )
                            );
     m_h_l_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -866,7 +866,7 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
                                        + " ; |#phi^{#tilde{t}} - #phi^{#tilde{t}*}|" // x-axis label
                                        + " ; Entries" // y-axis label
                                        ).c_str()
-                                     , phi_bins, phi_min, phi_max
+                                     , phi_bins/2, 0, phi_max
                                      )
                            );
     m_h_b_phi_2d.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -902,7 +902,7 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
                                                 + " ; |#eta^{l} - #eta^{b}|" // x-axis label
                                                 + " ; Entries" // y-axis label
                                                 ).c_str()
-                                              , eta_bins, eta_min, eta_max
+                                              , eta_bins/2, 0, eta_max
                                               )
                                     );
     m_h_right_pair_bl_dphi.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -913,7 +913,7 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
                                                 + " ; |#phi^{l} - #phi^{b}|" // x-axis label
                                                 + " ; Entries" // y-axis label
                                                 ).c_str()
-                                              , phi_bins, phi_min, phi_max
+                                              , phi_bins/2, 0, phi_max
                                               )
                                     );
     m_h_right_pair_bl_dr.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -985,7 +985,7 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
                                                 + " ; |#eta^{l} - #eta^{b}|" // x-axis label
                                                 + " ; Entries" // y-axis label
                                                 ).c_str()
-                                              , eta_bins, eta_min, eta_max
+                                              , eta_bins/2, 0, eta_max
                                               )
                                     );
     m_h_wrong_pair_bl_dphi.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -996,7 +996,7 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
                                                 + " ; |#phi^{l} - #phi^{b}|" // x-axis label
                                                 + " ; Entries" // y-axis label
                                                 ).c_str()
-                                              , phi_bins, phi_min, phi_max
+                                              , phi_bins/2, 0, phi_max
                                               )
                                     );
     m_h_wrong_pair_bl_dr.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -1557,9 +1557,9 @@ bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNt
 // =============================================================================
 HistogramHandlers::Mbl::Mbl() : HistogramHandlers::Handle()
 {
-  const int bins   = 50;
+  const int bins   = 150;
   const double min = 0;
-  const double max = 500;
+  const double max = 1500;
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     m_h_mbl_truth.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]

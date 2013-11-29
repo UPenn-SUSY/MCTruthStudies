@@ -148,9 +148,9 @@ void HistogramHandlers::ObjectMultiplicity::write(TFile* f)
 // =============================================================================
 HistogramHandlers::LeptonKinematics::LeptonKinematics() : HistogramHandlers::Handle()
 {
-  const int    pt_bins = 50;
+  const int    pt_bins = 150;
   const double pt_min  = 0.;
-  const double pt_max  = 500.;
+  const double pt_max  = 1500.;
 
   const int    eta_bins = 50;
   const double eta_min  = -5.;
@@ -457,9 +457,9 @@ void HistogramHandlers::LeptonKinematics::write(TFile* f)
 // =============================================================================
 HistogramHandlers::JetKinematics::JetKinematics() : HistogramHandlers::Handle()
 {
-  const int    pt_bins = 50;
+  const int    pt_bins = 150;
   const double pt_min  = 0.;
-  const double pt_max  = 500.;
+  const double pt_max  = 1500.;
 
   const int    eta_bins = 50;
   const double eta_min  = -5.;
@@ -739,9 +739,9 @@ void HistogramHandlers::JetKinematics::write(TFile* f)
 // =============================================================================
 HistogramHandlers::Mll::Mll() : HistogramHandlers::Handle()
 {
-  const int bins   = 50;
+  const int bins   = 150;
   const double min = 0;
-  const double max = 500;
+  const double max = 1500;
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     m_h_mll.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -867,9 +867,9 @@ void HistogramHandlers::Met::write(TFile* f)
 // =============================================================================
 HistogramHandlers::Mjl::Mjl() : HistogramHandlers::Handle()
 {
-  const int bins   = 50;
+  const int bins   = 150;
   const double min = 0;
-  const double max = 500;
+  const double max = 1500;
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     m_h_mjl_truth.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
