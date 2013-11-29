@@ -173,3 +173,4 @@ class HistMerger(object):
         # this_label.SetTextSize(0.05)
         this_label.SetTextSize(0.045)
         return this_label
+
