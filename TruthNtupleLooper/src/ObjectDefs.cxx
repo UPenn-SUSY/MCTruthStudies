@@ -31,7 +31,7 @@ TruthNtuple::Particle::Particle()
 
 // -----------------------------------------------------------------------------
 TruthNtuple::Particle::Particle( const TruthNtuple::TruthNtupleLooper* tnl
-                               , unsigned int mc_index
+                               , int mc_index
                                )
 {
   setMCIndex(mc_index);
@@ -60,7 +60,7 @@ TruthNtuple::Particle::Particle( const TruthNtuple::TruthNtupleLooper* tnl
 }
 
 // -----------------------------------------------------------------------------
-void TruthNtuple::Particle::setMCIndex(unsigned int val)
+void TruthNtuple::Particle::setMCIndex(int val)
 {
   m_mc_index = val;
 }
@@ -134,7 +134,7 @@ void TruthNtuple::Particle::setParentBarcode(int val)
 
 
 // -----------------------------------------------------------------------------
-unsigned int TruthNtuple::Particle::getMCIndex() const
+int TruthNtuple::Particle::getMCIndex() const
 {
   return m_mc_index;
 }
@@ -283,20 +283,12 @@ TruthNtuple::Electron::Electron()
 
 // -----------------------------------------------------------------------------
 TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
-                               , unsigned int el_index
+                               , int el_index
+                               , bool get_final_state
                                )
 {
   setIsElectron(true);
   setElIndex(el_index);
-
-  setPt(    tnl->el_pt->at(el_index));
-  setEta(   tnl->el_eta->at(el_index));
-  setPhi(   tnl->el_phi->at(el_index));
-  setE(     tnl->el_E->at(el_index));
-  setPx(    tnl->el_px->at(el_index));
-  setPy(    tnl->el_py->at(el_index));
-  setPz(    tnl->el_pz->at(el_index));
-  setCharge(tnl->el_charge->at(el_index));
 
   setMCIndex( TruthRecordHelpers::getIndexFromBarcode( tnl->el_barcode->at(el_index)
                                                      , tnl->mc_barcode
@@ -304,6 +296,46 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
                                                      )
             );
   setPdgid(tnl->mc_pdgId->at(m_mc_index));
+
+  if (get_final_state) {
+    setPt(    tnl->el_pt->at(el_index));
+    setEta(   tnl->el_eta->at(el_index));
+    setPhi(   tnl->el_phi->at(el_index));
+    setE(     tnl->el_E->at(el_index));
+    setPx(    tnl->el_px->at(el_index));
+    setPy(    tnl->el_py->at(el_index));
+    setPz(    tnl->el_pz->at(el_index));
+    setCharge(tnl->el_charge->at(el_index));
+  }
+  else {
+    setMCIndex( TruthRecordHelpers::getInitialIndex( m_mc_index
+                                                   , tnl->mc_pdgId
+                                                   , tnl->mc_parent_index
+                                                   // , true
+                                                   )
+              );
+    if (m_mc_index >= 0) {
+      setPt(    tnl->mc_pt->at(m_mc_index));
+      setEta(   tnl->mc_eta->at(m_mc_index));
+      setPhi(   tnl->mc_phi->at(m_mc_index));
+      setE(     tnl->mc_E->at(m_mc_index));
+      setPx(    tnl->mc_px->at(m_mc_index));
+      setPy(    tnl->mc_py->at(m_mc_index));
+      setPz(    tnl->mc_pz->at(m_mc_index));
+      setCharge(tnl->el_charge->at(el_index));
+    }
+    else {
+      setPt(    tnl->el_pt->at(el_index));
+      setEta(   tnl->el_eta->at(el_index));
+      setPhi(   tnl->el_phi->at(el_index));
+      setE(     tnl->el_E->at(el_index));
+      setPx(    tnl->el_px->at(el_index));
+      setPy(    tnl->el_py->at(el_index));
+      setPz(    tnl->el_pz->at(el_index));
+      setCharge(tnl->el_charge->at(el_index));
+    }
+  }
+
   setParentMCIndex( TruthRecordHelpers::getParentIndex( m_mc_index
                                                       , tnl->mc_pdgId
                                                       , tnl->mc_parent_index
@@ -321,13 +353,13 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
 }
 
 // -----------------------------------------------------------------------------
-void TruthNtuple::Electron::setElIndex(unsigned int val)
+void TruthNtuple::Electron::setElIndex(int val)
 {
   m_el_index = val;
 }
 
 // -----------------------------------------------------------------------------
-unsigned int TruthNtuple::Electron::getElIndex() const
+int TruthNtuple::Electron::getElIndex() const
 {
   return m_el_index;
 }
@@ -343,20 +375,12 @@ TruthNtuple::Muon::Muon()
 
 // -----------------------------------------------------------------------------
 TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
-                       , unsigned int mu_index
+                       , int mu_index
+                       , bool get_final_state
                        )
 {
   setIsElectron(false);
   setMuIndex(mu_index);
-
-  setPt(    tnl->mu_staco_pt->at(mu_index));
-  setEta(   tnl->mu_staco_eta->at(mu_index));
-  setPhi(   tnl->mu_staco_phi->at(mu_index));
-  setE(     tnl->mu_staco_E->at(mu_index));
-  setPx(    tnl->mu_staco_px->at(mu_index));
-  setPy(    tnl->mu_staco_py->at(mu_index));
-  setPz(    tnl->mu_staco_pz->at(mu_index));
-  setCharge(tnl->mu_staco_charge->at(mu_index));
 
   setMCIndex( TruthRecordHelpers::getIndexFromBarcode( tnl->mu_staco_barcode->at(mu_index)
                                                      , tnl->mc_barcode
@@ -364,6 +388,46 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
                                                      )
             );
   setPdgid(tnl->mc_pdgId->at(m_mc_index));
+
+  if (get_final_state) {
+    setPt(    tnl->mu_staco_pt->at(mu_index));
+    setEta(   tnl->mu_staco_eta->at(mu_index));
+    setPhi(   tnl->mu_staco_phi->at(mu_index));
+    setE(     tnl->mu_staco_E->at(mu_index));
+    setPx(    tnl->mu_staco_px->at(mu_index));
+    setPy(    tnl->mu_staco_py->at(mu_index));
+    setPz(    tnl->mu_staco_pz->at(mu_index));
+    setCharge(tnl->mu_staco_charge->at(mu_index));
+  }
+  else {
+    setMCIndex( TruthRecordHelpers::getInitialIndex( m_mc_index
+                                                   , tnl->mc_pdgId
+                                                   , tnl->mc_parent_index
+                                                   // , true
+                                                   )
+              );
+    if (m_mc_index >= 0) {
+      setPt(    tnl->mc_pt->at(m_mc_index));
+      setEta(   tnl->mc_eta->at(m_mc_index));
+      setPhi(   tnl->mc_phi->at(m_mc_index));
+      setE(     tnl->mc_E->at(m_mc_index));
+      setPx(    tnl->mc_px->at(m_mc_index));
+      setPy(    tnl->mc_py->at(m_mc_index));
+      setPz(    tnl->mc_pz->at(m_mc_index));
+      setCharge(tnl->mu_staco_charge->at(mu_index));
+    }
+    else {
+      setPt(    tnl->mu_staco_pt->at(mu_index));
+      setEta(   tnl->mu_staco_eta->at(mu_index));
+      setPhi(   tnl->mu_staco_phi->at(mu_index));
+      setE(     tnl->mu_staco_E->at(mu_index));
+      setPx(    tnl->mu_staco_px->at(mu_index));
+      setPy(    tnl->mu_staco_py->at(mu_index));
+      setPz(    tnl->mu_staco_pz->at(mu_index));
+      setCharge(tnl->mu_staco_charge->at(mu_index));
+    }
+  }
+
   setParentMCIndex(TruthRecordHelpers::getParentIndex( m_mc_index
                                                      , tnl->mc_pdgId
                                                      , tnl->mc_parent_index
@@ -381,13 +445,13 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
 }
 
 // -----------------------------------------------------------------------------
-void TruthNtuple::Muon::setMuIndex(unsigned int val)
+void TruthNtuple::Muon::setMuIndex(int val)
 {
   m_mu_index = val;
 }
 
 // -----------------------------------------------------------------------------
-unsigned int TruthNtuple::Muon::getMuIndex() const
+int TruthNtuple::Muon::getMuIndex() const
 {
   return m_mu_index;
 }
@@ -402,7 +466,7 @@ TruthNtuple::Jet::Jet()
 
 // -----------------------------------------------------------------------------
 TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
-                     , unsigned int jet_index
+                     , int jet_index
                      )
 {
   setJetIndex(jet_index);
@@ -455,7 +519,7 @@ TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
 }
 
 // -----------------------------------------------------------------------------
-void TruthNtuple::Jet::setJetIndex(unsigned int val)
+void TruthNtuple::Jet::setJetIndex(int val)
 {
   m_jet_index = val;
 }
@@ -479,7 +543,7 @@ void TruthNtuple::Jet::setBQuarkIndex(int val)
 }
 
 // -----------------------------------------------------------------------------
-unsigned int TruthNtuple::Jet::getJetIndex() const
+int TruthNtuple::Jet::getJetIndex() const
 {
   return m_jet_index;
 }

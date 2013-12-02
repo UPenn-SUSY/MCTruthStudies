@@ -88,12 +88,64 @@ namespace TruthRecordHelpers
   }
 
   // -----------------------------------------------------------------------------
+  int getInitialIndex( int mc_index
+                     , const std::vector<int>* mc_pdg_id
+                     , const std::vector<std::vector<int> >* mc_parent_index
+                     , bool verbose
+                     )
+  {
+    int original_pdgid = mc_pdg_id->at(mc_index);
+    int current_index = mc_index;
+    int mother = 0;
+
+    if (verbose) {
+      std::cout << "looking for initial index: "
+                << "\n\tfinal index: " << mc_index
+                << "\n\toriginal pdgid: " << original_pdgid
+                << "\n";
+    }
+
+    // this counter is just to prevent infinite loops. mother == 0 check should
+    // get us out of this loop!
+    for (unsigned int itr = 0; itr != 100 && mother == 0; ++itr) {
+      size_t num_parents = mc_parent_index->at(current_index).size();
+
+      for (size_t it_parent = 0; it_parent != num_parents; ++it_parent) {
+        int parent_index = mc_parent_index->at(current_index).at(it_parent);
+        int parent_pdgid = mc_pdg_id->at(parent_index);
+
+        if (parent_pdgid == original_pdgid) {
+          current_index = parent_index;
+          break;
+        }
+        else {
+          if (verbose) {
+            std::cout << "found initial index! -- original_pdgid" << original_pdgid
+                      << " -- mother pdg id: " << parent_pdgid
+                      << " -- initial index: " << current_index
+                      << " -- mother index: " << parent_index
+                      << "\n";
+          }
+          return current_index;
+        }
+      }
+    }
+    if (verbose) {
+      std::cout << "did not find initial index -- original_pdgid: "
+                << original_pdgid << "\n";
+    }
+    return -1;
+  }
+
+  // -----------------------------------------------------------------------------
   int getParentIndex( int mc_index
                     , const std::vector<int>* mc_pdg_id
                     , const std::vector<std::vector<int> >* mc_parent_index
                     , bool verbose
                     )
   {
+    if (mc_index < 0) return -1;
+
     int original_pdgid = mc_pdg_id->at(mc_index);
     int current_index = mc_index;
     int mother = 0;

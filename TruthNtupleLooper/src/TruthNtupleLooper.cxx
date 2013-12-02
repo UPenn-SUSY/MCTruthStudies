@@ -706,11 +706,13 @@ void TruthNtuple::TruthNtupleLooper::constructObjects()
     m_particle_list.push_back(this_particle);
   }
   for (int el_index = 0; el_index != el_n; ++el_index) {
-    Electron this_el = Electron(this, el_index);
+    // Electron this_el = Electron(this, el_index);
+    Electron this_el = Electron(this, el_index, false);
     m_el_list.push_back(this_el);
   }
   for (int mu_index = 0; mu_index != mu_staco_n; ++mu_index) {
-    Muon this_mu = Muon(this, mu_index);
+    // Muon this_mu = Muon(this, mu_index);
+    Muon this_mu = Muon(this, mu_index, false);
     m_mu_list.push_back(this_mu);
   }
   for (int jet_index = 0; jet_index != jet_AntiKt4TruthJets_n; ++jet_index) {
