@@ -22,9 +22,9 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
   const double pt_min = 0.;
   const double pt_max = 1500.;
 
-  const int pt_ratio_bins   = 300;
+  const int pt_ratio_bins   = 100;
   const double pt_ratio_min = 0.;
-  const double pt_ratio_max = 3.;
+  const double pt_ratio_max = 5.;
 
   const int eta_bins   = 50;
   const double eta_min = -5.;
@@ -591,7 +591,7 @@ void HistogramHandlers::StopKinematics::write(TFile* f)
       m_h_e_stop.at(fc_it)->Write();
       m_h_e_astp.at(fc_it)->Write();
       m_h_e_diff.at(fc_it)->Write();
-      m_h_e_diff.at(fc_it)->Write();
+      m_h_e_2d.at(fc_it)->Write();
 
       m_h_p_all.at(fc_it)->Write();
       m_h_p_stop.at(fc_it)->Write();
