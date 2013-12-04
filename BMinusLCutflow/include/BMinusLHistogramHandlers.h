@@ -40,11 +40,37 @@ namespace HistogramHandlers
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
+      std::vector<TH1F*> m_h_e_com;
+
+      std::vector<TH1F*> m_h_e_all;
+      std::vector<TH1F*> m_h_e_stop;
+      std::vector<TH1F*> m_h_e_astp;
+      std::vector<TH1F*> m_h_e_diff;
+      std::vector<TH2F*> m_h_e_2d;
+
+      std::vector<TH1F*> m_h_p_all;
+      std::vector<TH1F*> m_h_p_stop;
+      std::vector<TH1F*> m_h_p_astp;
+      std::vector<TH1F*> m_h_p_diff;
+      std::vector<TH2F*> m_h_p_2d;
+
       std::vector<TH1F*> m_h_pt_all;
       std::vector<TH1F*> m_h_pt_stop; // stop
       std::vector<TH1F*> m_h_pt_astp; // anti-stop
       std::vector<TH1F*> m_h_pt_diff;
       std::vector<TH2F*> m_h_pt_2d;
+
+      std::vector<TH1F*> m_h_p_over_m_all;
+      std::vector<TH1F*> m_h_p_over_m_stop;
+      std::vector<TH1F*> m_h_p_over_m_astp;
+      std::vector<TH1F*> m_h_p_over_m_diff;
+      std::vector<TH2F*> m_h_p_over_m_2d;
+
+      std::vector<TH1F*> m_h_pt_over_m_all;
+      std::vector<TH1F*> m_h_pt_over_m_stop; // stop
+      std::vector<TH1F*> m_h_pt_over_m_astp; // anti-stop
+      std::vector<TH1F*> m_h_pt_over_m_diff;
+      std::vector<TH2F*> m_h_pt_over_m_2d;
 
       std::vector<TH1F*> m_h_eta_all;
       std::vector<TH1F*> m_h_eta_stop; // stop

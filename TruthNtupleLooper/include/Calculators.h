@@ -17,6 +17,9 @@
 // =============================================================================
 namespace TruthNtuple
 {
+  double comEnergy( const TruthNtuple::Particle*
+                  , const TruthNtuple::Particle*
+                  );
   double invariantMass( const TruthNtuple::Particle*
                       , const TruthNtuple::Particle*
                       );

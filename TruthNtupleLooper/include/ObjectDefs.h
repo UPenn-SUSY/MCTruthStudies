@@ -26,6 +26,7 @@ namespace TruthNtuple
       void setEta(double);
       void setPhi(double);
       void setE(double);
+      void setM(double);
       void setPx(double);
       void setPy(double);
       void setPz(double);
@@ -36,9 +37,11 @@ namespace TruthNtuple
       int getMCIndex() const;
       int getPdgid() const;
       double getPt() const;
+      double getP() const;
       double getEta() const;
       double getPhi() const;
       double getE() const;
+      double getM() const;
       double getPx() const;
       double getPy() const;
       double getPz() const;
@@ -56,6 +59,7 @@ namespace TruthNtuple
       double       m_eta;
       double       m_phi;
       double       m_e;
+      double       m_m;
       double       m_px;
       double       m_py;
       double       m_pz;

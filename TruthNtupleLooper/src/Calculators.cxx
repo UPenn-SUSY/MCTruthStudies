@@ -8,6 +8,20 @@
 static const double PI = 3.14159265359;
 
 // -----------------------------------------------------------------------------
+double TruthNtuple::comEnergy( const TruthNtuple::Particle* p1
+                             , const TruthNtuple::Particle* p2
+                             )
+{
+  double px = p1->getPx() + p2->getPx();
+  double py = p1->getPy() + p2->getPy();
+  double pz = p1->getPz() + p2->getPz();
+  double m  = p1->getM()  + p2->getM();
+
+  double e2 = m*m + px*px + py*py + pz*pz;
+  return e2/sqrt(fabs(e2));
+}
+
+// -----------------------------------------------------------------------------
 double TruthNtuple::invariantMass( const TruthNtuple::Particle* p1
                                  , const TruthNtuple::Particle* p2
                                  )

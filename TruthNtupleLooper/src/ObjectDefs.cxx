@@ -24,6 +24,7 @@ TruthNtuple::Particle::Particle()
   m_eta = 0;
   m_phi = 0;
   m_e = 0;
+  m_m = 0;
   m_px = 0;
   m_py = 0;
   m_pz = 0;
@@ -40,6 +41,7 @@ TruthNtuple::Particle::Particle( const TruthNtuple::TruthNtupleLooper* tnl
   setEta(tnl->mc_eta->at(mc_index));
   setPhi(tnl->mc_phi->at(mc_index));
   setE(tnl->mc_E->at(mc_index));
+  setM(tnl->mc_m->at(mc_index));
   setPx(tnl->mc_px->at(mc_index));
   setPy(tnl->mc_py->at(mc_index));
   setPz(tnl->mc_pz->at(mc_index));
@@ -94,6 +96,12 @@ void TruthNtuple::Particle::setPhi(double val)
 void TruthNtuple::Particle::setE(double val)
 {
   m_e = val;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Particle::setM(double val)
+{
+  m_m = val;
 }
 
 // -----------------------------------------------------------------------------
@@ -152,6 +160,12 @@ double TruthNtuple::Particle::getPt() const
 }
 
 // -----------------------------------------------------------------------------
+double TruthNtuple::Particle::getP() const
+{
+  return sqrt(m_px*m_px + m_py*m_py + m_pz*m_pz);
+}
+
+// -----------------------------------------------------------------------------
 double TruthNtuple::Particle::getEta() const
 {
   return m_eta;
@@ -167,6 +181,12 @@ double TruthNtuple::Particle::getPhi() const
 double TruthNtuple::Particle::getE() const
 {
   return m_e;
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::Particle::getM() const
+{
+  return m_m;
 }
 
 // -----------------------------------------------------------------------------
@@ -214,6 +234,7 @@ void TruthNtuple::Particle::printGeneralInfo() const
             << "\teta: " << m_eta
             << "\tphi: " << m_phi
             << "\tE: " << m_e
+            << "\tm: " << m_m
             << "\n"
             << "\tpx: " << m_px
             << "\tpy: " << m_py
@@ -302,6 +323,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
     setEta(   tnl->el_eta->at(el_index));
     setPhi(   tnl->el_phi->at(el_index));
     setE(     tnl->el_E->at(el_index));
+    setM(     tnl->el_m->at(el_index));
     setPx(    tnl->el_px->at(el_index));
     setPy(    tnl->el_py->at(el_index));
     setPz(    tnl->el_pz->at(el_index));
@@ -319,6 +341,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
       setEta(   tnl->mc_eta->at(m_mc_index));
       setPhi(   tnl->mc_phi->at(m_mc_index));
       setE(     tnl->mc_E->at(m_mc_index));
+      setM(     tnl->mc_m->at(m_mc_index));
       setPx(    tnl->mc_px->at(m_mc_index));
       setPy(    tnl->mc_py->at(m_mc_index));
       setPz(    tnl->mc_pz->at(m_mc_index));
@@ -329,6 +352,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
       setEta(   tnl->el_eta->at(el_index));
       setPhi(   tnl->el_phi->at(el_index));
       setE(     tnl->el_E->at(el_index));
+      setM(     tnl->el_m->at(el_index));
       setPx(    tnl->el_px->at(el_index));
       setPy(    tnl->el_py->at(el_index));
       setPz(    tnl->el_pz->at(el_index));
@@ -394,6 +418,7 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
     setEta(   tnl->mu_staco_eta->at(mu_index));
     setPhi(   tnl->mu_staco_phi->at(mu_index));
     setE(     tnl->mu_staco_E->at(mu_index));
+    setM(     tnl->mu_staco_m->at(mu_index));
     setPx(    tnl->mu_staco_px->at(mu_index));
     setPy(    tnl->mu_staco_py->at(mu_index));
     setPz(    tnl->mu_staco_pz->at(mu_index));
@@ -411,6 +436,7 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
       setEta(   tnl->mc_eta->at(m_mc_index));
       setPhi(   tnl->mc_phi->at(m_mc_index));
       setE(     tnl->mc_E->at(m_mc_index));
+      setM(     tnl->mc_m->at(m_mc_index));
       setPx(    tnl->mc_px->at(m_mc_index));
       setPy(    tnl->mc_py->at(m_mc_index));
       setPz(    tnl->mc_pz->at(m_mc_index));
@@ -421,6 +447,7 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
       setEta(   tnl->mu_staco_eta->at(mu_index));
       setPhi(   tnl->mu_staco_phi->at(mu_index));
       setE(     tnl->mu_staco_E->at(mu_index));
+      setM(     tnl->mu_staco_m->at(mu_index));
       setPx(    tnl->mu_staco_px->at(mu_index));
       setPy(    tnl->mu_staco_py->at(mu_index));
       setPz(    tnl->mu_staco_pz->at(mu_index));
@@ -475,6 +502,7 @@ TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
   setEta(tnl->jet_AntiKt4TruthJets_eta->at(jet_index));
   setPhi(tnl->jet_AntiKt4TruthJets_phi->at(jet_index));
   setE(  tnl->jet_AntiKt4TruthJets_E->at(jet_index));
+  setM(  tnl->jet_AntiKt4TruthJets_m->at(jet_index));
 
   setTheta( 2*atan( exp( -fabs(m_eta))) * m_eta/fabs(m_eta));
 
