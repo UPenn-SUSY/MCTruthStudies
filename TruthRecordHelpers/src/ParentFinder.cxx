@@ -94,6 +94,8 @@ namespace TruthRecordHelpers
                      , bool verbose
                      )
   {
+    if (mc_index < 0) return -1;
+
     int original_pdgid = mc_pdg_id->at(mc_index);
     int current_index = mc_index;
     int mother = 0;

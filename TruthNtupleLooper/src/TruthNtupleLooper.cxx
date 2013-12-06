@@ -327,27 +327,31 @@ void TruthNtuple::TruthNtupleLooper::clearObjects()
 // -----------------------------------------------------------------------------
 void TruthNtuple::TruthNtupleLooper::constructObjects()
 {
+  std::cout << "total number particles: " << el_n << "\n";
   for (int mc_index = 0; mc_index != mc_n; ++mc_index) {
+    std::cout << "\tmc index: " << mc_index << "\n";
     Particle this_particle = Particle(this, mc_index);
     m_particle_list.push_back(this_particle);
   }
+  std::cout << "total number electrons: " << el_n << "\n";
   for (int el_index = 0; el_index != el_n; ++el_index) {
-    // Electron this_el = Electron(this, el_index);
-    Electron this_el = Electron(this, el_index, false);
+    std::cout << "\tel index: " << el_index << "\n";
+    Electron this_el = Electron(this, el_index, true);
     m_el_list.push_back(this_el);
   }
-  for (int mu_index = 0; mu_index != mu_staco_n; ++mu_index) {
-    // Muon this_mu = Muon(this, mu_index);
-    Muon this_mu = Muon(this, mu_index, false);
+  std::cout << "total number muons: " << el_n << "\n";
+  for (int mu_index = 0; mu_index != mu_n; ++mu_index) {
+    std::cout << "\tmu index: " << mu_index << "\n";
+    Muon this_mu = Muon(this, mu_index, true);
     m_mu_list.push_back(this_mu);
   }
-  for (int jet_index = 0; jet_index != jet_AntiKt4TruthJets_n; ++jet_index) {
+  std::cout << "total number jets: " << el_n << "\n";
+  for (int jet_index = 0; jet_index != jet_AntiKt4TruthJets_WZ_n; ++jet_index) {
+    std::cout << "\tjets index: " << jet_index << "\n";
     Jet this_jet = Jet(this, jet_index);
     m_jet_list.push_back(this_jet);
   }
   m_met.setMetNoint(MET_Truth_NonInt_etx, MET_Truth_NonInt_ety);
-
-
 }
 
 // -----------------------------------------------------------------------------

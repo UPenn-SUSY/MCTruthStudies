@@ -49,6 +49,14 @@ namespace TruthNtuple
                , double eta2
                , double phi2
                );
+
+  double thetaFromEta(double eta);
+  double pxFromPtPhi(double pt, double phi);
+  double pyFromPtPhi(double pt, double phi);
+  double pzFromPtTheta(double pt, double theta);
+  double pzFromPtEta(double pt, double eta);
+  double eFromPxPyPzM(double px, double py, double pz, double m);
+
   // get list of invariant masses by combining two lists of particles.
   // The method is defined as follows
   //    0: truth matching to parent barcode

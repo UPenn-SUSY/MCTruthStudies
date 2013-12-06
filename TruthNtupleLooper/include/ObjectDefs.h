@@ -18,7 +18,10 @@ namespace TruthNtuple
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
       Particle();
-      Particle(const TruthNtuple::TruthNtupleLooper*, int mc_index);
+      Particle( const TruthNtuple::TruthNtupleLooper*
+              , int mc_index
+              , bool verbose = false
+              );
 
       void setMCIndex(int);
       void setPdgid(int);
@@ -102,6 +105,7 @@ namespace TruthNtuple
       Electron( const TruthNtuple::TruthNtupleLooper*
               , int el_index
               , bool get_final_state = true
+              , bool verbose = false
               );
 
       void setElIndex(int);
@@ -122,6 +126,7 @@ namespace TruthNtuple
       Muon( const TruthNtuple::TruthNtupleLooper*
           , int mu_index
           , bool get_final_state = true
+          , bool verbose = false
           );
 
       void setMuIndex(int);
@@ -139,7 +144,10 @@ namespace TruthNtuple
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
       Jet();
-      Jet(const TruthNtuple::TruthNtupleLooper*, int jet_index);
+      Jet( const TruthNtuple::TruthNtupleLooper*
+         , int jet_index
+         , bool verbose = false
+         );
 
       void setJetIndex(int);
       void setIsBJet(bool);
@@ -164,7 +172,10 @@ namespace TruthNtuple
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
       Met();
-      Met(double met_etx_noint, double met_ety_noint);
+      Met( double met_etx_noint
+         , double met_ety_noint
+         , bool verbose = false
+         );
       void clear();
 
       void setMetNoint(double met_etx, double met_ety);

@@ -119,3 +119,38 @@ double TruthNtuple::deltaR( double eta1
   return sqrt( delta_phi*delta_phi + delta_eta*delta_eta );
 }
 
+// -----------------------------------------------------------------------------
+double TruthNtuple::thetaFromEta(double eta)
+{
+  return 2*atan( exp( -fabs(eta))) * eta/fabs(eta);
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::pxFromPtPhi(double pt, double phi)
+{
+  return pt*cos(phi);
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::pyFromPtPhi(double pt, double phi)
+{
+  return pt*sin(phi);
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::pzFromPtTheta(double pt, double theta)
+{
+  return pt*cos(theta);
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::pzFromPtEta(double pt, double eta)
+{
+  return pt*cos(thetaFromEta(eta));
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::eFromPxPyPzM(double px, double py, double pz, double m)
+{
+  return sqrt(px*px + py*py + pz*pz + m*m);
+}
