@@ -24,6 +24,7 @@ namespace TruthNtuple
       void setPdgid(int);
       void setPt(double);
       void setEta(double);
+      void setTheta(double);
       void setPhi(double);
       void setE(double);
       void setM(double);
@@ -39,6 +40,7 @@ namespace TruthNtuple
       double getPt() const;
       double getP() const;
       double getEta() const;
+      double getTheta() const;
       double getPhi() const;
       double getE() const;
       double getM() const;
@@ -57,6 +59,7 @@ namespace TruthNtuple
       double       m_pdgid;
       double       m_pt;
       double       m_eta;
+      double       m_theta;
       double       m_phi;
       double       m_e;
       double       m_m;
@@ -139,12 +142,10 @@ namespace TruthNtuple
       Jet(const TruthNtuple::TruthNtupleLooper*, int jet_index);
 
       void setJetIndex(int);
-      void setTheta(double);
       void setIsBJet(bool);
       void setBQuarkIndex(int);
 
       int getJetIndex() const;
-      double getTheta() const;
       bool getIsBJet() const;
       int getBQuarkIndex() const;
 
@@ -153,7 +154,6 @@ namespace TruthNtuple
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
       int m_jet_index;
-      double m_theta;
       bool m_is_b_jet;
       int m_b_quark_index;
   };

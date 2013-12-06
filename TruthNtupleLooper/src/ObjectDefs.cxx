@@ -42,6 +42,9 @@ TruthNtuple::Particle::Particle( const TruthNtuple::TruthNtupleLooper* tnl
   setPhi(tnl->mc_phi->at(mc_index));
   setE(tnl->mc_E->at(mc_index));
   setM(tnl->mc_m->at(mc_index));
+
+  setTheta( 2*atan( exp( -fabs(m_eta))) * m_eta/fabs(m_eta));
+
   setPx(tnl->mc_px->at(mc_index));
   setPy(tnl->mc_py->at(mc_index));
   setPz(tnl->mc_pz->at(mc_index));
@@ -85,6 +88,13 @@ void TruthNtuple::Particle::setEta(double val)
 {
   m_eta = val;
 }
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Particle::setTheta(double val)
+{
+  m_theta = val;
+}
+
 
 // -----------------------------------------------------------------------------
 void TruthNtuple::Particle::setPhi(double val)
@@ -169,6 +179,12 @@ double TruthNtuple::Particle::getP() const
 double TruthNtuple::Particle::getEta() const
 {
   return m_eta;
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::Particle::getTheta() const
+{
+  return m_theta;
 }
 
 // -----------------------------------------------------------------------------
@@ -406,7 +422,7 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
   setIsElectron(false);
   setMuIndex(mu_index);
 
-  setMCIndex( TruthRecordHelpers::getIndexFromBarcode( tnl->mu_staco_barcode->at(mu_index)
+  setMCIndex( TruthRecordHelpers::getIndexFromBarcode( tnl->mu_barcode->at(mu_index)
                                                      , tnl->mc_barcode
                                                      // , true
                                                      )
@@ -414,15 +430,15 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
   setPdgid(tnl->mc_pdgId->at(m_mc_index));
 
   if (get_final_state) {
-    setPt(    tnl->mu_staco_pt->at(mu_index));
-    setEta(   tnl->mu_staco_eta->at(mu_index));
-    setPhi(   tnl->mu_staco_phi->at(mu_index));
-    setE(     tnl->mu_staco_E->at(mu_index));
-    setM(     tnl->mu_staco_m->at(mu_index));
-    setPx(    tnl->mu_staco_px->at(mu_index));
-    setPy(    tnl->mu_staco_py->at(mu_index));
-    setPz(    tnl->mu_staco_pz->at(mu_index));
-    setCharge(tnl->mu_staco_charge->at(mu_index));
+    setPt(    tnl->mu_pt->at(mu_index));
+    setEta(   tnl->mu_eta->at(mu_index));
+    setPhi(   tnl->mu_phi->at(mu_index));
+    setE(     tnl->mu_E->at(mu_index));
+    setM(     tnl->mu_m->at(mu_index));
+    setPx(    tnl->mu_px->at(mu_index));
+    setPy(    tnl->mu_py->at(mu_index));
+    setPz(    tnl->mu_pz->at(mu_index));
+    setCharge(tnl->mu_charge->at(mu_index));
   }
   else {
     setMCIndex( TruthRecordHelpers::getInitialIndex( m_mc_index
@@ -440,18 +456,18 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
       setPx(    tnl->mc_px->at(m_mc_index));
       setPy(    tnl->mc_py->at(m_mc_index));
       setPz(    tnl->mc_pz->at(m_mc_index));
-      setCharge(tnl->mu_staco_charge->at(mu_index));
+      setCharge(tnl->mu_charge->at(mu_index));
     }
     else {
-      setPt(    tnl->mu_staco_pt->at(mu_index));
-      setEta(   tnl->mu_staco_eta->at(mu_index));
-      setPhi(   tnl->mu_staco_phi->at(mu_index));
-      setE(     tnl->mu_staco_E->at(mu_index));
-      setM(     tnl->mu_staco_m->at(mu_index));
-      setPx(    tnl->mu_staco_px->at(mu_index));
-      setPy(    tnl->mu_staco_py->at(mu_index));
-      setPz(    tnl->mu_staco_pz->at(mu_index));
-      setCharge(tnl->mu_staco_charge->at(mu_index));
+      setPt(    tnl->mu_pt->at(mu_index));
+      setEta(   tnl->mu_eta->at(mu_index));
+      setPhi(   tnl->mu_phi->at(mu_index));
+      setE(     tnl->mu_E->at(mu_index));
+      setM(     tnl->mu_m->at(mu_index));
+      setPx(    tnl->mu_px->at(mu_index));
+      setPy(    tnl->mu_py->at(mu_index));
+      setPz(    tnl->mu_pz->at(mu_index));
+      setCharge(tnl->mu_charge->at(mu_index));
     }
   }
 
@@ -504,8 +520,6 @@ TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
   setE(  tnl->jet_AntiKt4TruthJets_E->at(jet_index));
   setM(  tnl->jet_AntiKt4TruthJets_m->at(jet_index));
 
-  setTheta( 2*atan( exp( -fabs(m_eta))) * m_eta/fabs(m_eta));
-
   setPx( m_pt*cos(m_phi));
   setPy( m_pt*sin(m_phi));
   setPz( m_pt*sin(m_theta));
@@ -553,12 +567,6 @@ void TruthNtuple::Jet::setJetIndex(int val)
 }
 
 // -----------------------------------------------------------------------------
-void TruthNtuple::Jet::setTheta(double val)
-{
-  m_theta = val;
-}
-
-// -----------------------------------------------------------------------------
 void TruthNtuple::Jet::setIsBJet(bool val)
 {
   m_is_b_jet = val;
@@ -574,12 +582,6 @@ void TruthNtuple::Jet::setBQuarkIndex(int val)
 int TruthNtuple::Jet::getJetIndex() const
 {
   return m_jet_index;
-}
-
-// -----------------------------------------------------------------------------
-double TruthNtuple::Jet::getTheta() const
-{
-  return m_theta;
 }
 
 // -----------------------------------------------------------------------------
