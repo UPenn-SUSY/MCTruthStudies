@@ -1514,8 +1514,8 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>& el_list
-         , const std::vector<TruthNtuple::Muon*>& mu_list
+         , const std::vector<TruthNtuple::Particle*>& el_list
+         , const std::vector<TruthNtuple::Particle*>& mu_list
          , const std::vector<TruthNtuple::Particle*>& quark_list
          )
 {
@@ -1804,13 +1804,13 @@ void HistogramHandlers::BLPairKinematics::write(TFile* f)
 }
 
 // -----------------------------------------------------------------------------
-bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNtuple::Electron*>& el_list
-                                                     , const std::vector<TruthNtuple::Muon*>& mu_list
+bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNtuple::Particle*>& el_list
+                                                     , const std::vector<TruthNtuple::Particle*>& mu_list
                                                      , const std::vector<TruthNtuple::Particle*>& quark_list
                                                      )
 {
   // merge el and mu lists to lepton list
-  std::vector<TruthNtuple::Lepton*> lep_list;
+  std::vector<TruthNtuple::Particle*> lep_list;
   lep_list.reserve(el_list.size() + mu_list.size());
   lep_list.insert(lep_list.end(), el_list.begin(), el_list.end());
   lep_list.insert(lep_list.end(), mu_list.begin(), mu_list.end());
@@ -1929,15 +1929,15 @@ HistogramHandlers::Mbl::Mbl() : HistogramHandlers::Handle()
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::Mbl::FillSpecial( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>& el_list
-         , const std::vector<TruthNtuple::Muon*>& mu_list
+         , const std::vector<TruthNtuple::Particle*>& el_list
+         , const std::vector<TruthNtuple::Particle*>& mu_list
          , const std::vector<TruthNtuple::Particle*>& quark_list
          )
 {
   if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
 
   // merge el and mu lists to lepton list
-  std::vector<TruthNtuple::Lepton*> lep_list;
+  std::vector<TruthNtuple::Particle*> lep_list;
   lep_list.reserve(el_list.size() + mu_list.size());
   lep_list.insert(lep_list.end(), el_list.begin(), el_list.end());
   lep_list.insert(lep_list.end(), mu_list.begin(), mu_list.end());

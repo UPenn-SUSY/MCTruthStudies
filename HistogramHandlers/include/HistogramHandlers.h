@@ -13,9 +13,9 @@ class TFile;
 namespace TruthNtuple
 {
   class Particle;
-  class Electron;
-  class Muon;
-  class Jet;
+  // class Electron;
+  // class Muon;
+  // class Jet;
   class Met;
 }
 
@@ -32,9 +32,9 @@ namespace HistogramHandlers
       Handle();
 
       virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
+                       , const std::vector<TruthNtuple::Particle*>& el
+                       , const std::vector<TruthNtuple::Particle*>& mu
+                       , const std::vector<TruthNtuple::Particle*>& jet
                        , const TruthNtuple::Met&
                        );
       virtual void write(TFile*);
@@ -53,9 +53,9 @@ namespace HistogramHandlers
       FlavorChannel();
 
       virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
+                       , const std::vector<TruthNtuple::Particle*>& el
+                       , const std::vector<TruthNtuple::Particle*>& mu
+                       , const std::vector<TruthNtuple::Particle*>& jet
                        , const TruthNtuple::Met&
                        );
       virtual void write(TFile*);
@@ -75,9 +75,9 @@ namespace HistogramHandlers
       ObjectMultiplicity();
 
       virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
+                       , const std::vector<TruthNtuple::Particle*>& el
+                       , const std::vector<TruthNtuple::Particle*>& mu
+                       , const std::vector<TruthNtuple::Particle*>& jet
                        , const TruthNtuple::Met&
                        );
       virtual void write(TFile*);
@@ -98,9 +98,9 @@ namespace HistogramHandlers
       LeptonKinematics();
 
       virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
+                       , const std::vector<TruthNtuple::Particle*>& el
+                       , const std::vector<TruthNtuple::Particle*>& mu
+                       , const std::vector<TruthNtuple::Particle*>& jet
                        , const TruthNtuple::Met&
                        );
       virtual void write(TFile*);
@@ -137,9 +137,9 @@ namespace HistogramHandlers
       JetKinematics();
 
       virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
+                       , const std::vector<TruthNtuple::Particle*>& el
+                       , const std::vector<TruthNtuple::Particle*>& mu
+                       , const std::vector<TruthNtuple::Particle*>& jet
                        , const TruthNtuple::Met&
                        );
       virtual void write(TFile*);
@@ -175,9 +175,9 @@ namespace HistogramHandlers
       Met();
 
       virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
+                       , const std::vector<TruthNtuple::Particle*>& el
+                       , const std::vector<TruthNtuple::Particle*>& mu
+                       , const std::vector<TruthNtuple::Particle*>& jet
                        , const TruthNtuple::Met&
                        );
       virtual void write(TFile*);
@@ -198,9 +198,9 @@ namespace HistogramHandlers
       Mll();
 
       virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
+                       , const std::vector<TruthNtuple::Particle*>& el
+                       , const std::vector<TruthNtuple::Particle*>& mu
+                       , const std::vector<TruthNtuple::Particle*>& jet
                        , const TruthNtuple::Met&
                        );
       virtual void write(TFile*);
@@ -220,9 +220,9 @@ namespace HistogramHandlers
       Mjl();
 
       virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
-                       , const std::vector<TruthNtuple::Electron*>&
-                       , const std::vector<TruthNtuple::Muon*>&
-                       , const std::vector<TruthNtuple::Jet*>&
+                       , const std::vector<TruthNtuple::Particle*>& el
+                       , const std::vector<TruthNtuple::Particle*>& mu
+                       , const std::vector<TruthNtuple::Particle*>& jet
                        , const TruthNtuple::Met&
                        );
       virtual void write(TFile*);

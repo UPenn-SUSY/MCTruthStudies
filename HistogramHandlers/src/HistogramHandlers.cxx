@@ -17,9 +17,9 @@ HistogramHandlers::Handle::Handle()
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::Handle::Fill( const TruthNtuple::FLAVOR_CHANNEL
-                                    , const std::vector<TruthNtuple::Electron*>&
-                                    , const std::vector<TruthNtuple::Muon*>&
-                                    , const std::vector<TruthNtuple::Jet*>&
+                                    , const std::vector<TruthNtuple::Particle*>&
+                                    , const std::vector<TruthNtuple::Particle*>&
+                                    , const std::vector<TruthNtuple::Particle*>&
                                     , const TruthNtuple::Met&
                                     )
 {
@@ -58,9 +58,9 @@ HistogramHandlers::FlavorChannel::FlavorChannel() : HistogramHandlers::Handle()
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::FlavorChannel::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>&
-         , const std::vector<TruthNtuple::Muon*>&
-         , const std::vector<TruthNtuple::Jet*>&
+         , const std::vector<TruthNtuple::Particle*>&
+         , const std::vector<TruthNtuple::Particle*>&
+         , const std::vector<TruthNtuple::Particle*>&
          , const TruthNtuple::Met&
          )
 {
@@ -114,9 +114,9 @@ HistogramHandlers::ObjectMultiplicity::ObjectMultiplicity() : HistogramHandlers:
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::ObjectMultiplicity::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>& el_list
-         , const std::vector<TruthNtuple::Muon*>& mu_list
-         , const std::vector<TruthNtuple::Jet*>& jet_list
+         , const std::vector<TruthNtuple::Particle*>& el_list
+         , const std::vector<TruthNtuple::Particle*>& mu_list
+         , const std::vector<TruthNtuple::Particle*>& jet_list
          , const TruthNtuple::Met&
          )
 {
@@ -323,15 +323,14 @@ HistogramHandlers::LeptonKinematics::LeptonKinematics() : HistogramHandlers::Han
                                   , phi_bins, phi_min, phi_max
                                   )
                         );
-    
   }
 }
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::LeptonKinematics::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>& el_list
-         , const std::vector<TruthNtuple::Muon*>& mu_list
-         , const std::vector<TruthNtuple::Jet*>& /*jet_list*/
+         , const std::vector<TruthNtuple::Particle*>& el_list
+         , const std::vector<TruthNtuple::Particle*>& mu_list
+         , const std::vector<TruthNtuple::Particle*>& /*jet_list*/
          , const TruthNtuple::Met&
          )
 {
@@ -635,9 +634,9 @@ HistogramHandlers::JetKinematics::JetKinematics() : HistogramHandlers::Handle()
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::JetKinematics::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>& /*el_list*/
-         , const std::vector<TruthNtuple::Muon*>& /*mu_list*/
-         , const std::vector<TruthNtuple::Jet*>& jet_list
+         , const std::vector<TruthNtuple::Particle*>& /*el_list*/
+         , const std::vector<TruthNtuple::Particle*>& /*mu_list*/
+         , const std::vector<TruthNtuple::Particle*>& jet_list
          , const TruthNtuple::Met&
          )
 {
@@ -759,9 +758,9 @@ HistogramHandlers::Mll::Mll() : HistogramHandlers::Handle()
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::Mll::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>& el_list
-         , const std::vector<TruthNtuple::Muon*>& mu_list
-         , const std::vector<TruthNtuple::Jet*>& /*jet_list*/
+         , const std::vector<TruthNtuple::Particle*>& el_list
+         , const std::vector<TruthNtuple::Particle*>& mu_list
+         , const std::vector<TruthNtuple::Particle*>& /*jet_list*/
          , const TruthNtuple::Met&
          )
 {
@@ -834,9 +833,9 @@ HistogramHandlers::Met::Met() : HistogramHandlers::Handle()
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::Met::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>& /*el_list*/
-         , const std::vector<TruthNtuple::Muon*>& /*mu_list*/
-         , const std::vector<TruthNtuple::Jet*>& /*jet_list*/
+         , const std::vector<TruthNtuple::Particle*>& /*el_list*/
+         , const std::vector<TruthNtuple::Particle*>& /*mu_list*/
+         , const std::vector<TruthNtuple::Particle*>& /*jet_list*/
          , const TruthNtuple::Met& met
          )
 {
@@ -907,16 +906,16 @@ HistogramHandlers::Mjl::Mjl() : HistogramHandlers::Handle()
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::Mjl::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Electron*>& el_list
-         , const std::vector<TruthNtuple::Muon*>& mu_list
-         , const std::vector<TruthNtuple::Jet*>& jet_list
+         , const std::vector<TruthNtuple::Particle*>& el_list
+         , const std::vector<TruthNtuple::Particle*>& mu_list
+         , const std::vector<TruthNtuple::Particle*>& jet_list
          , const TruthNtuple::Met&
          )
 {
   if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
 
   // merge el and mu lists to lepton list
-  std::vector<TruthNtuple::Lepton*> lep_list;
+  std::vector<TruthNtuple::Particle*> lep_list;
   lep_list.reserve(el_list.size() + mu_list.size());
   lep_list.insert(lep_list.end(), el_list.begin(), el_list.end());
   lep_list.insert(lep_list.end(), mu_list.begin(), mu_list.end());

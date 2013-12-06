@@ -19,10 +19,10 @@ BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
   m_histograms.push_back(new HistogramHandlers::FlavorChannel());
   m_histograms.push_back(new HistogramHandlers::ObjectMultiplicity());
   m_histograms.push_back(new HistogramHandlers::LeptonKinematics());
-  m_histograms.push_back(new HistogramHandlers::JetKinematics());
+  // m_histograms.push_back(new HistogramHandlers::JetKinematics());
   m_histograms.push_back(new HistogramHandlers::Met());
   m_histograms.push_back(new HistogramHandlers::Mll());
-  m_histograms.push_back(new HistogramHandlers::Mjl());
+  // m_histograms.push_back(new HistogramHandlers::Mjl());
 
   m_h_mbl                = new HistogramHandlers::Mbl();
   m_h_bl_pair_kinematics = new HistogramHandlers::BLPairKinematics();
@@ -51,6 +51,7 @@ void BMinusL::Cutflow::clearObjects()
   m_daughter_el.clear();
   m_daughter_mu.clear();
   m_daughter_b_quarks.clear();
+  m_daughter_jet.clear();
 
   m_met.clear();
 }
@@ -92,73 +93,20 @@ void BMinusL::Cutflow::processEvent()
   //   return;
   // }
 
+  // print();
 
-  std::cout << "========================================"
-            << "\nevent number: " << EventNumber
-            << "\n\ttotal num el: " << m_el_list.size()
-            << "\n\ttotal num mu: " << m_mu_list.size()
-            << "\n\ttotal num jet: " << m_jet_list.size()
-            << "\n\tnum daughter el: " << num_el
-            << "\n\tnum daughter mu: " << num_mu
-            << "\n\tnum b quarks: " << num_truth_b_quarks
-            << "\n----------------------------------------"
-            << "\n";
+  // Fill "normal histograms"
+  size_t num_hists = m_histograms.size();
+  for (size_t hist_it = 0; hist_it != num_hists; ++hist_it) {
+    m_histograms.at(hist_it)->Fill( m_flavor_channel
+                                  , m_daughter_el
+                                  , m_daughter_mu
+                                  , m_daughter_jet
+                                  , m_met
+                                  );
+  }
 
-  /*
-  std::cout << "----------------------------------------"
-            << "\nall truth particles"
-            << "\n----------------------------------------"
-            << "\n";
-  for (size_t mc_it = 0; mc_it != m_particle_list.size(); ++mc_it) {
-    m_particle_list.at(mc_it).printGeneralInfo();
-  }
-  std::cout << "----------------------------------------"
-            << "\nall electrons"
-            << "\n----------------------------------------"
-            << "\n";
-  for (size_t el_it = 0; el_it != m_el_list.size(); ++el_it) {
-    m_el_list.at(el_it).print(this);
-  }
-  std::cout << "----------------------------------------"
-            << "\nall muons"
-            << "\n----------------------------------------"
-            << "\n";
-  for (size_t mu_it = 0; mu_it != m_mu_list.size(); ++mu_it) {
-    m_mu_list.at(mu_it).print(this);
-  }
-  std::cout << "----------------------------------------"
-            << "\ndaughter electrons"
-            << "\n----------------------------------------"
-            << "\n";
-  for (size_t el_it = 0; el_it != num_el; ++el_it) {
-    m_daughter_el.at(el_it)->print(this);
-  }
-  std::cout << "----------------------------------------"
-            << "\ndaughter muons"
-            << "\n----------------------------------------"
-            << "\n";
-  for (size_t mu_it = 0; mu_it != num_mu; ++mu_it) {
-    m_daughter_mu.at(mu_it)->print(this);
-  }
-  std::cout << "----------------------------------------"
-            << "\ndaughter b quarks"
-            << "\n----------------------------------------"
-            << "\n";
-  for (size_t q_it = 0; q_it != num_truth_b_quarks; ++q_it) {
-    m_daughter_b_quarks.at(q_it)->printGeneralInfo();
-  }
-  */
-
-  // size_t num_hists = m_histograms.size();
-  // for (size_t hist_it = 0; hist_it != num_hists; ++hist_it) {
-  //   m_histograms.at(hist_it)->Fill( m_flavor_channel
-  //                                 , m_daughter_el
-  //                                 , m_daughter_mu
-  //                                 , m_daughter_jet
-  //                                 , m_met
-  //                                 );
-  // }
-
+  // fill special histograms
   m_h_mbl->FillSpecial( m_flavor_channel
                       , m_daughter_el
                       , m_daughter_mu
@@ -241,4 +189,69 @@ void BMinusL::Cutflow::doObjectSelection()
   m_met.setMetNoint(MET_Truth_NonInt_etx, MET_Truth_NonInt_ety);
   // TODO calculate met-rel or remove
   // m_met.calculateMetRelNoint( m_daughter_el, m_daughter_mu, m_daughter_jet);
+}
+
+// -----------------------------------------------------------------------------
+void  BMinusL::Cutflow::print()
+{
+  size_t num_el  = m_daughter_el.size();
+  size_t num_mu  = m_daughter_mu.size();
+  // size_t num_jet = m_daughter_jet.size();
+  size_t num_truth_b_quarks = m_daughter_b_quarks.size();
+
+  std::cout << "========================================"
+            << "\nevent number: " << EventNumber
+            << "\n\ttotal num el: " << m_el_list.size()
+            << "\n\ttotal num mu: " << m_mu_list.size()
+            << "\n\ttotal num jet: " << m_jet_list.size()
+            << "\n\tnum daughter el: " << num_el
+            << "\n\tnum daughter mu: " << num_mu
+            << "\n\tnum b quarks: " << num_truth_b_quarks
+            << "\n----------------------------------------"
+            << "\n";
+
+  /*
+  std::cout << "----------------------------------------"
+            << "\nall truth particles"
+            << "\n----------------------------------------"
+            << "\n";
+  for (size_t mc_it = 0; mc_it != m_particle_list.size(); ++mc_it) {
+    m_particle_list.at(mc_it).printGeneralInfo();
+  }
+  std::cout << "----------------------------------------"
+            << "\nall electrons"
+            << "\n----------------------------------------"
+            << "\n";
+  for (size_t el_it = 0; el_it != m_el_list.size(); ++el_it) {
+    m_el_list.at(el_it).print(this);
+  }
+  std::cout << "----------------------------------------"
+            << "\nall muons"
+            << "\n----------------------------------------"
+            << "\n";
+  for (size_t mu_it = 0; mu_it != m_mu_list.size(); ++mu_it) {
+    m_mu_list.at(mu_it).print(this);
+  }
+  std::cout << "----------------------------------------"
+            << "\ndaughter electrons"
+            << "\n----------------------------------------"
+            << "\n";
+  for (size_t el_it = 0; el_it != num_el; ++el_it) {
+    m_daughter_el.at(el_it)->print(this);
+  }
+  std::cout << "----------------------------------------"
+            << "\ndaughter muons"
+            << "\n----------------------------------------"
+            << "\n";
+  for (size_t mu_it = 0; mu_it != num_mu; ++mu_it) {
+    m_daughter_mu.at(mu_it)->print(this);
+  }
+  std::cout << "----------------------------------------"
+            << "\ndaughter b quarks"
+            << "\n----------------------------------------"
+            << "\n";
+  for (size_t q_it = 0; q_it != num_truth_b_quarks; ++q_it) {
+    m_daughter_b_quarks.at(q_it)->printGeneralInfo();
+  }
+  */
 }

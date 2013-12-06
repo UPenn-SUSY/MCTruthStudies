@@ -14,10 +14,10 @@ class TFile;
 namespace TruthNtuple
 {
   class Particle;
-  class Lepton;
-  class Electron;
-  class Muon;
-  class Jet;
+  // class Lepton;
+  // class Electron;
+  // class Muon;
+  // class Jet;
   class Met;
 }
 
@@ -145,8 +145,8 @@ namespace HistogramHandlers
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
       // helper pointers to keep track of leptons from stop and anti-stop
-      TruthNtuple::Lepton* m_l_from_stop;
-      TruthNtuple::Lepton* m_l_from_astp;
+      TruthNtuple::Particle* m_l_from_stop;
+      TruthNtuple::Particle* m_l_from_astp;
 
       // helper pointers to keep track of b quarks from stop and anti-stop
       TruthNtuple::Particle* m_b_from_stop;

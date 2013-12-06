@@ -44,6 +44,7 @@ namespace BMinusL
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
       void doObjectSelection();
+      void print();
 
       TruthNtuple::FLAVOR_CHANNEL m_flavor_channel;
 
@@ -57,6 +58,7 @@ namespace BMinusL
       std::vector<TruthNtuple::Particle*> m_daughter_el;
       std::vector<TruthNtuple::Particle*> m_daughter_mu;
       std::vector<TruthNtuple::Particle*> m_daughter_b_quarks;
+      std::vector<TruthNtuple::Particle*> m_daughter_jet;
 
       TruthNtuple::Met m_met;
 
