@@ -400,9 +400,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
   setE(eFromPxPyPzM(m_px, m_py, m_pz, m_m));
 
   // set info about parents
-    if (verbose) {
-      std::cout << "about to get parent index for electron\n";
-    }
+  if (verbose) std::cout << "about to get parent index for electron\n";
 
   setParentMCIndex( TruthRecordHelpers::getParentIndex( m_mc_index
                                                       , tnl->mc_pdgId
@@ -410,9 +408,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
                                                       // , true
                                                       )
                   );
-  if (verbose) {
-    std::cout << "parent index: " << m_parent_index << "\n";
-  }
+  if (verbose) std::cout << "parent index: " << m_parent_index << "\n";
   if (m_parent_index >= 0) {
     setParentPdgid(tnl->mc_pdgId->at(m_parent_index));
     setParentBarcode(tnl->mc_barcode->at(m_parent_index));
@@ -433,6 +429,18 @@ void TruthNtuple::Electron::setElIndex(int val)
 int TruthNtuple::Electron::getElIndex() const
 {
   return m_el_index;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Electron::print(TruthNtuple::TruthNtupleLooper* tnl) const
+{
+  Lepton::print(tnl);
+
+  size_t num_parents = tnl->el_parent_index->at(m_el_index).size();
+  std::cout << "parents - " << num_parents << "\n";
+  for (size_t parent_it = 0; parent_it != num_parents; ++parent_it) {
+    std::cout << "\tparent it: " << parent_it << " - " << tnl->el_parent_index->at(m_el_index).at(parent_it) << "\n";
+  }
 }
 
 // =============================================================================
@@ -537,6 +545,18 @@ void TruthNtuple::Muon::setMuIndex(int val)
 int TruthNtuple::Muon::getMuIndex() const
 {
   return m_mu_index;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Muon::print(TruthNtuple::TruthNtupleLooper* tnl) const
+{
+  Lepton::print(tnl);
+
+  size_t num_parents = tnl->mu_parent_index->at(m_mu_index).size();
+  std::cout << "parents - " << num_parents << "\n";
+  for (size_t parent_it = 0; parent_it != num_parents; ++parent_it) {
+    std::cout << "\tparent it: " << parent_it << " - " << tnl->mu_parent_index->at(m_mu_index).at(parent_it) << "\n";
+  }
 }
 
 // =============================================================================

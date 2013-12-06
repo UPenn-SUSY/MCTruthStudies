@@ -18,16 +18,16 @@ BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
   // construct histogram list
   m_histograms.push_back(new HistogramHandlers::FlavorChannel());
   m_histograms.push_back(new HistogramHandlers::ObjectMultiplicity());
-  // m_histograms.push_back(new HistogramHandlers::LeptonKinematics());
-  // m_histograms.push_back(new HistogramHandlers::JetKinematics());
-  // m_histograms.push_back(new HistogramHandlers::Met());
-  // m_histograms.push_back(new HistogramHandlers::Mll());
-  // m_histograms.push_back(new HistogramHandlers::Mjl());
+  m_histograms.push_back(new HistogramHandlers::LeptonKinematics());
+  m_histograms.push_back(new HistogramHandlers::JetKinematics());
+  m_histograms.push_back(new HistogramHandlers::Met());
+  m_histograms.push_back(new HistogramHandlers::Mll());
+  m_histograms.push_back(new HistogramHandlers::Mjl());
 
-  m_h_mbl = new HistogramHandlers::Mbl();
+  m_h_mbl                = new HistogramHandlers::Mbl();
   m_h_bl_pair_kinematics = new HistogramHandlers::BLPairKinematics();
-  m_h_quark_kinematics = new HistogramHandlers::QuarkKinematics();
-  m_h_stop_kinematics = new HistogramHandlers::StopKinematics();
+  m_h_quark_kinematics   = new HistogramHandlers::QuarkKinematics();
+  m_h_stop_kinematics    = new HistogramHandlers::StopKinematics();
 }
 
 // -----------------------------------------------------------------------------
@@ -43,13 +43,14 @@ void BMinusL::Cutflow::clearObjects()
 
   m_flavor_channel = TruthNtuple::FLAVOR_NONE;
 
-  m_stops.clear();
-  m_b_quarks.clear();
+  m_truth_stops.clear();
+  m_truth_electrons.clear();
+  m_truth_muons.clear();
+  m_truth_b_quarks.clear();
 
   m_daughter_el.clear();
   m_daughter_mu.clear();
   m_daughter_b_quarks.clear();
-  m_daughter_jet.clear();
 
   m_met.clear();
 }
@@ -61,8 +62,8 @@ void BMinusL::Cutflow::processEvent()
 
   size_t num_el  = m_daughter_el.size();
   size_t num_mu  = m_daughter_mu.size();
-  size_t num_jet = m_daughter_jet.size();
-  size_t num_b_quarks = m_daughter_b_quarks.size();
+  // size_t num_jet = m_daughter_jet.size();
+  size_t num_truth_b_quarks = m_daughter_b_quarks.size();
 
   if (num_el == 2 && num_mu == 0) {
     m_flavor_channel = TruthNtuple::FLAVOR_EE;
@@ -80,12 +81,13 @@ void BMinusL::Cutflow::processEvent()
     m_flavor_channel = TruthNtuple::FLAVOR_NONE;
   }
 
+  // TODO decide if we want this
   // if (  m_flavor_channel == TruthNtuple::FLAVOR_NONE
-  //    || num_b_quarks != 2
+  //    || num_truth_b_quarks != 2
   //    )
   // {
   //   // std::cout << "\nskipping event -- flavor: " << m_flavor_channel
-  //   //           << " - num b quarks: " << num_b_quarks
+  //   //           << " - num b quarks: " << num_truth_b_quarks
   //   //           << "\n";
   //   return;
   // }
@@ -98,11 +100,11 @@ void BMinusL::Cutflow::processEvent()
             << "\n\ttotal num jet: " << m_jet_list.size()
             << "\n\tnum daughter el: " << num_el
             << "\n\tnum daughter mu: " << num_mu
-            << "\n\tnum daughter jet: " << num_jet
-            << "\n\tnum b quarks: " << num_b_quarks
+            << "\n\tnum b quarks: " << num_truth_b_quarks
             << "\n----------------------------------------"
             << "\n";
 
+  /*
   std::cout << "----------------------------------------"
             << "\nall truth particles"
             << "\n----------------------------------------"
@@ -124,13 +126,6 @@ void BMinusL::Cutflow::processEvent()
   for (size_t mu_it = 0; mu_it != m_mu_list.size(); ++mu_it) {
     m_mu_list.at(mu_it).print(this);
   }
-  // std::cout << "----------------------------------------"
-  //           << "\nall jets"
-  //           << "\n----------------------------------------"
-  //           << "\n";
-  // for (size_t jet_it = 0; jet_it != m_jet_list.size(); ++jet_it) {
-  //   m_jet_list.at(jet_it).print(this);
-  // }
   std::cout << "----------------------------------------"
             << "\ndaughter electrons"
             << "\n----------------------------------------"
@@ -146,29 +141,23 @@ void BMinusL::Cutflow::processEvent()
     m_daughter_mu.at(mu_it)->print(this);
   }
   std::cout << "----------------------------------------"
-            << "\ndaughter jets"
-            << "\n----------------------------------------"
-            << "\n";
-  for (size_t jet_it = 0; jet_it != num_jet; ++jet_it) {
-    m_daughter_jet.at(jet_it)->print(this);
-  }
-  std::cout << "----------------------------------------"
             << "\ndaughter b quarks"
             << "\n----------------------------------------"
             << "\n";
-  for (size_t q_it = 0; q_it != num_b_quarks; ++q_it) {
+  for (size_t q_it = 0; q_it != num_truth_b_quarks; ++q_it) {
     m_daughter_b_quarks.at(q_it)->printGeneralInfo();
   }
+  */
 
-  size_t num_hists = m_histograms.size();
-  for (size_t hist_it = 0; hist_it != num_hists; ++hist_it) {
-    m_histograms.at(hist_it)->Fill( m_flavor_channel
-                                  , m_daughter_el
-                                  , m_daughter_mu
-                                  , m_daughter_jet
-                                  , m_met
-                                  );
-  }
+  // size_t num_hists = m_histograms.size();
+  // for (size_t hist_it = 0; hist_it != num_hists; ++hist_it) {
+  //   m_histograms.at(hist_it)->Fill( m_flavor_channel
+  //                                 , m_daughter_el
+  //                                 , m_daughter_mu
+  //                                 , m_daughter_jet
+  //                                 , m_met
+  //                                 );
+  // }
 
   m_h_mbl->FillSpecial( m_flavor_channel
                       , m_daughter_el
@@ -184,7 +173,7 @@ void BMinusL::Cutflow::processEvent()
                                    , m_daughter_b_quarks
                                    );
   m_h_stop_kinematics->FillSpecial( m_flavor_channel
-                                  , m_stops
+                                  , m_truth_stops
                                   );
 }
 
@@ -208,56 +197,48 @@ void BMinusL::Cutflow::writeToFile()
 // -----------------------------------------------------------------------------
 void BMinusL::Cutflow::doObjectSelection()
 {
-  // look for stops and b quarks in full truth record
+  // look for stops, leptons, and b quarks in full truth record
   for ( size_t particle_it = 0
       ; particle_it != m_particle_list.size()
       ; ++particle_it
       ) {
-    if (  fabs(m_particle_list.at(particle_it).getPdgid()) == 1e6+6
-       // && mc_status->at(m_particle_list.at(particle_it).getMCIndex()) > 20
-       // && mc_status->at(m_particle_list.at(particle_it).getMCIndex()) < 30
-       ) {
-      m_stops.push_back(&m_particle_list.at(particle_it));
+    if (fabs(m_particle_list.at(particle_it).getPdgid()) == 1e6+6) {
+      m_truth_stops.push_back(&m_particle_list.at(particle_it));
     }
-    if (  fabs(m_particle_list.at(particle_it).getPdgid()) == 5
-       // && mc_status->at(m_particle_list.at(particle_it).getMCIndex()) > 20
-       // && mc_status->at(m_particle_list.at(particle_it).getMCIndex()) < 30
-       ) {
-      m_b_quarks.push_back(&m_particle_list.at(particle_it));
+    if (fabs(m_particle_list.at(particle_it).getPdgid()) == 11) {
+      m_truth_electrons.push_back(&m_particle_list.at(particle_it));
+    }
+    if (fabs(m_particle_list.at(particle_it).getPdgid()) == 13) {
+      m_truth_muons.push_back(&m_particle_list.at(particle_it));
+    }
+    if (fabs(m_particle_list.at(particle_it).getPdgid()) == 5) {
+      m_truth_b_quarks.push_back(&m_particle_list.at(particle_it));
     }
   }
 
   // pick electrons coming from a stop
-  m_daughter_el.reserve(m_el_list.size());
-  for (size_t el_it = 0; el_it != m_el_list.size(); ++el_it) {
-    if (fabs(m_el_list.at(el_it).getParentPdgid()) == 1e6+6)
-      m_daughter_el.push_back(&m_el_list.at(el_it));
+  m_daughter_el.reserve(m_truth_electrons.size());
+  for (size_t el_it = 0; el_it != m_truth_electrons.size(); ++el_it) {
+    if (fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6)
+      m_daughter_el.push_back(m_truth_electrons.at(el_it));
   }
 
   // pick muons coming from a stop
-  m_daughter_mu.reserve(m_mu_list.size());
-  for (size_t mu_it = 0; mu_it != m_mu_list.size(); ++mu_it) {
-    if (fabs(m_mu_list.at(mu_it).getParentPdgid()) == 1e6+6)
-      m_daughter_mu.push_back(&m_mu_list.at(mu_it));
+  m_daughter_mu.reserve(m_truth_muons.size());
+  for (size_t mu_it = 0; mu_it != m_truth_muons.size(); ++mu_it) {
+    if (fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6)
+      m_daughter_mu.push_back(m_truth_muons.at(mu_it));
   }
 
   // pick b quarks coming from a stop
-  m_daughter_b_quarks.reserve(m_b_quarks.size());
-  for (size_t b_quarks_it = 0; b_quarks_it != m_b_quarks.size(); ++b_quarks_it) {
-    if (fabs(m_b_quarks.at(b_quarks_it)->getParentPdgid()) == 1e6+6)
-      m_daughter_b_quarks.push_back(m_b_quarks.at(b_quarks_it));
-  }
-
-  // pick jets coming from a stop
-  m_daughter_jet.reserve(m_jet_list.size());
-  for (size_t jet_it = 0; jet_it != m_jet_list.size(); ++jet_it) {
-    if (!m_jet_list.at(jet_it).getIsBJet()) continue;
-
-    if (fabs(m_jet_list.at(jet_it).getParentPdgid()) == 1e6+6)
-      m_daughter_jet.push_back(&m_jet_list.at(jet_it));
+  m_daughter_b_quarks.reserve(m_truth_b_quarks.size());
+  for (size_t b_quarks_it = 0; b_quarks_it != m_truth_b_quarks.size(); ++b_quarks_it) {
+    if (fabs(m_truth_b_quarks.at(b_quarks_it)->getParentPdgid()) == 1e6+6)
+      m_daughter_b_quarks.push_back(m_truth_b_quarks.at(b_quarks_it));
   }
 
   // calculate met and metrel
   m_met.setMetNoint(MET_Truth_NonInt_etx, MET_Truth_NonInt_ety);
-  m_met.calculateMetRelNoint( m_daughter_el, m_daughter_mu, m_daughter_jet);
+  // TODO calculate met-rel or remove
+  // m_met.calculateMetRelNoint( m_daughter_el, m_daughter_mu, m_daughter_jet);
 }

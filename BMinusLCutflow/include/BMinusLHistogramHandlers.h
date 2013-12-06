@@ -131,15 +131,15 @@ namespace HistogramHandlers
       BLPairKinematics();
 
       virtual void FillSpecial( const TruthNtuple::FLAVOR_CHANNEL
-                              , const std::vector<TruthNtuple::Electron*>&
-                              , const std::vector<TruthNtuple::Muon*>&
-                              , const std::vector<TruthNtuple::Particle*>&
+                              , const std::vector<TruthNtuple::Particle*>& el
+                              , const std::vector<TruthNtuple::Particle*>& mu
+                              , const std::vector<TruthNtuple::Particle*>& b
                               );
       virtual void write(TFile*);
 
-      bool sortObjects( const std::vector<TruthNtuple::Electron*>&
-                      , const std::vector<TruthNtuple::Muon*>&
-                      , const std::vector<TruthNtuple::Particle*>&
+      bool sortObjects( const std::vector<TruthNtuple::Particle*>& el
+                      , const std::vector<TruthNtuple::Particle*>& mu
+                      , const std::vector<TruthNtuple::Particle*>& b
                       );
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -230,9 +230,9 @@ namespace HistogramHandlers
       Mbl();
 
       virtual void FillSpecial( const TruthNtuple::FLAVOR_CHANNEL
-                              , const std::vector<TruthNtuple::Electron*>&
-                              , const std::vector<TruthNtuple::Muon*>&
-                              , const std::vector<TruthNtuple::Particle*>&
+                              , const std::vector<TruthNtuple::Particle*>& el
+                              , const std::vector<TruthNtuple::Particle*>& mu
+                              , const std::vector<TruthNtuple::Particle*>& b
                               );
       virtual void write(TFile*);
 

@@ -112,6 +112,8 @@ namespace TruthNtuple
 
       int getElIndex() const;
 
+      virtual void print(TruthNtuple::TruthNtupleLooper* tnl = 0) const;
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
       int m_el_index;
@@ -132,6 +134,8 @@ namespace TruthNtuple
       void setMuIndex(int);
 
       int getMuIndex() const;
+
+      virtual void print(TruthNtuple::TruthNtupleLooper* tnl = 0) const;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:

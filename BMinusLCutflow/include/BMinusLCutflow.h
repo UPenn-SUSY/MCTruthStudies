@@ -48,22 +48,23 @@ namespace BMinusL
       TruthNtuple::FLAVOR_CHANNEL m_flavor_channel;
 
       // keep track of stops and ALL b quarks
-      std::vector<TruthNtuple::Particle*> m_stops;
-      std::vector<TruthNtuple::Particle*> m_b_quarks;
+      std::vector<TruthNtuple::Particle*> m_truth_stops;
+      std::vector<TruthNtuple::Particle*> m_truth_electrons;
+      std::vector<TruthNtuple::Particle*> m_truth_muons;
+      std::vector<TruthNtuple::Particle*> m_truth_b_quarks;
 
       // objects matched to SUSY mother
-      std::vector<TruthNtuple::Electron*> m_daughter_el;
-      std::vector<TruthNtuple::Muon*>     m_daughter_mu;
+      std::vector<TruthNtuple::Particle*> m_daughter_el;
+      std::vector<TruthNtuple::Particle*> m_daughter_mu;
       std::vector<TruthNtuple::Particle*> m_daughter_b_quarks;
-      std::vector<TruthNtuple::Jet*>      m_daughter_jet;
 
       TruthNtuple::Met m_met;
 
       std::vector<HistogramHandlers::Handle*> m_histograms;
-      HistogramHandlers::Mbl*    m_h_mbl;
-      HistogramHandlers::BLPairKinematics* m_h_bl_pair_kinematics;
-      HistogramHandlers::QuarkKinematics* m_h_quark_kinematics;
-      HistogramHandlers::StopKinematics* m_h_stop_kinematics;
+      HistogramHandlers::Mbl*                 m_h_mbl;
+      HistogramHandlers::BLPairKinematics*    m_h_bl_pair_kinematics;
+      HistogramHandlers::QuarkKinematics*     m_h_quark_kinematics;
+      HistogramHandlers::StopKinematics*      m_h_stop_kinematics;
   };
 }
 
