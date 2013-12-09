@@ -154,16 +154,19 @@ namespace HistogramHandlers
 
       // 1d plots of lepton kinematics. separate plots for leptons from stop
       // and anti-stop
+      std::vector<TH1F*> m_h_l_pt_all;
       std::vector<TH1F*> m_h_l_pt_stop;
       std::vector<TH1F*> m_h_l_pt_astp;
       std::vector<TH1F*> m_h_l_pt_diff;
       std::vector<TH2F*> m_h_l_pt_2d;
 
+      std::vector<TH1F*> m_h_l_eta_all;
       std::vector<TH1F*> m_h_l_eta_stop;
       std::vector<TH1F*> m_h_l_eta_astp;
       std::vector<TH1F*> m_h_l_eta_diff;
       std::vector<TH2F*> m_h_l_eta_2d;
 
+      std::vector<TH1F*> m_h_l_phi_all;
       std::vector<TH1F*> m_h_l_phi_stop;
       std::vector<TH1F*> m_h_l_phi_astp;
       std::vector<TH1F*> m_h_l_phi_diff;
@@ -171,16 +174,19 @@ namespace HistogramHandlers
 
       // 1d plots of b quark kinematics. separate plots for leptons from stop
       // and anti-stop
+      std::vector<TH1F*> m_h_b_pt_all;
       std::vector<TH1F*> m_h_b_pt_stop;
       std::vector<TH1F*> m_h_b_pt_astp;
       std::vector<TH1F*> m_h_b_pt_diff;
       std::vector<TH2F*> m_h_b_pt_2d;
 
+      std::vector<TH1F*> m_h_b_eta_all;
       std::vector<TH1F*> m_h_b_eta_stop;
       std::vector<TH1F*> m_h_b_eta_astp;
       std::vector<TH1F*> m_h_b_eta_diff;
       std::vector<TH2F*> m_h_b_eta_2d;
 
+      std::vector<TH1F*> m_h_b_phi_all;
       std::vector<TH1F*> m_h_b_phi_stop;
       std::vector<TH1F*> m_h_b_phi_astp;
       std::vector<TH1F*> m_h_b_phi_diff;
@@ -211,12 +217,14 @@ namespace HistogramHandlers
       std::vector<TH1F*> m_h_right_pair_mbl_stop;
       std::vector<TH1F*> m_h_right_pair_mbl_astp;
       std::vector<TH1F*> m_h_right_pair_mbl_diff;
+      std::vector<TH1F*> m_h_right_pair_mbl_ratio;
       std::vector<TH2F*> m_h_right_pair_mbl_2d;
 
       std::vector<TH1F*> m_h_wrong_pair_mbl_all;
       std::vector<TH1F*> m_h_wrong_pair_mbl_0;
       std::vector<TH1F*> m_h_wrong_pair_mbl_1;
       std::vector<TH1F*> m_h_wrong_pair_mbl_diff;
+      std::vector<TH1F*> m_h_wrong_pair_mbl_ratio;
       std::vector<TH2F*> m_h_wrong_pair_mbl_2d;
   };
 

@@ -25,6 +25,7 @@ def readInputConfig(in_file_name):
                                        , cd['color']
                                        , cd['shape']
                                        , cd['line']
+                                       , cd['xsec']
                                        )
                            )
     return file_handles
@@ -32,11 +33,12 @@ def readInputConfig(in_file_name):
 # ==============================================================================
 # input files:
 class FileHandle(object):
-    def __init__(self, title, in_file, directory, color, shape, line):
+    def __init__(self, title, in_file, directory, color, shape, line, xsec):
         self.title = title
         self.color = color
         self.shape = shape
         self.line  = line
+        self.xsec  = xsec
 
         self.in_file_name = in_file
         self.directory_name = directory
@@ -63,7 +65,7 @@ class FileHandle(object):
         hist_list = [obj.GetName() for obj in self.directory.GetListOfKeys()]
         return hist_list
 
-    def getHist(self, hist_name, normalize = True):
+    def getHist(self, hist_name, normalize = True, scale_to_xsec = 0.):
         this_hist_name = 'clone_%s' % hist_name
         if normalize:
             this_hist_name += '_norm'
@@ -74,6 +76,8 @@ class FileHandle(object):
 
         if normalize and hist.Integral() != 0.:
             hist.Scale(1./hist.Integral())
+        if scale_to_xsec > 0.:
+            hist.Scale(scale_to_xsec)
         return hist
 
 # ------------------------------------------------------------------------------

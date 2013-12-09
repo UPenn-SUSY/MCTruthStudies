@@ -27,26 +27,22 @@ def main():
     for i, loh in enumerate(list_of_hists):
         if 'fc_all__' not in loh: continue
         for is_log in [True, False]:
-            print 'hist (%d of %d): %s' % (i, num_hists, loh)
+            for norm in [True, False]:
+                for xsec in [True, False]:
+                    print 'hist (%d of %d): %s' % (i, num_hists, loh)
 
-            hm = HistMerger.HistMerger( files, loh, False , is_log)
-            hm.canvas.Write()
+                    hm = HistMerger.HistMerger( files, loh, norm , is_log, xsec)
+                    hm.canvas.Write()
 
-            hm_norm = HistMerger.HistMerger( files, loh, True, is_log)
-            hm_norm.canvas.Write()
+                    if 'channel' in loh and is_log is False and norm is False and xsec is False:
+                        if hm.leg_canvas is not None:
+                            hm.leg_canvas.Write('c__leg')
 
-            if 'channel' in loh:
-                if hm.leg_canvas is not None:
-                    hm.leg_canvas.Write('c__leg')
-
-            hm.canvas.Clear()
-            hm_norm.canvas.Clear()
-            if hm.leg_canvas is not None:
-                hm.leg_canvas.Clear()
-            for h in hm.hists:
-                h.Delete()
-            for h in hm_norm.hists:
-                h.Delete()
+                    hm.canvas.Clear()
+                    if hm.leg_canvas is not None:
+                        hm.leg_canvas.Clear()
+                    for h in hm.hists:
+                        h.Delete()
     out_file.Close()
 
 # ==============================================================================

@@ -14,13 +14,20 @@ BUFFER = 1.15
 
 # ==============================================================================
 class HistMerger(object):
-    def __init__(self, file_handles, hist_name, normalize = True, log = False):
+    def __init__(self, file_handles, hist_name, normalize = True, log = False, scale_to_xsec=False):
         self.name = hist_name
-        self.file_names = [fh.title              for fh in file_handles]
-        self.hists = [fh.getHist(hist_name, normalize) for fh in file_handles]
-        self.setStyle(file_handles, self.hists)
         self.normalize = normalize
         self.log = log
+        self.scale_to_xsec = scale_to_xsec
+
+        self.file_names = [fh.title for fh in file_handles]
+        self.hists = [ fh.getHist( hist_name
+                                 , normalize
+                                 , 0 if not scale_to_xsec else fh.xsec
+                                 )
+                       for fh in file_handles
+                     ]
+        self.setStyle(file_handles, self.hists)
 
         self.title = '%s;%s;%s' % ( self.hists[0].GetTitle()
                                   , self.hists[0].GetXaxis().GetTitle()
@@ -35,14 +42,10 @@ class HistMerger(object):
     def prep1DHistStack(self):
         self.stack = ROOT.THStack('s_%s' % self.name, self.title)
 
-        # leg_x1 = 0.80
-        # leg_x2 = 0.98
-        # leg_y1 = 0.98
-        # leg_y2 = leg_y1-(0.06*len(self.hists))
         leg_x1 = 0.20
         leg_x2 = 0.43
         leg_y1 = 0.93
-        leg_y2 = leg_y1-(0.06*len(self.hists))
+        leg_y2 = leg_y1-(0.05*len(self.hists))
 
         big_leg_x1 = 0.05
         big_leg_x2 = 0.95
@@ -56,8 +59,6 @@ class HistMerger(object):
         # set background color of legend
         self.legend.SetFillColor(0)
         self.big_legend.SetFillColor(0)
-        # self.legend.SetFillStyle(0)
-        # self.big_legend.SetFillStyle(0)
 
         self.legend.SetBorderSize(0)
         self.big_legend.SetBorderSize(0)
@@ -72,6 +73,8 @@ class HistMerger(object):
             canvas_name = canvas_name + "__norm"
         if self.log:
             canvas_name = canvas_name + "__log_y"
+        if self.scale_to_xsec > 0.:
+            canvas_name = canvas_name + "__xsec"
         self.canvas = ROOT.TCanvas(canvas_name)
         if self.log:
             self.canvas.SetLogy()
@@ -93,7 +96,8 @@ class HistMerger(object):
 
         # Draw plots and legend
         self.stack.Draw('nostack')
-        self.legend.Draw()
+        if len(self.hists) <= 5:
+            self.legend.Draw()
 
         self.leg_canvas = ROOT.TCanvas('%s__leg' % canvas_name)
         self.big_legend.Draw()
@@ -105,6 +109,8 @@ class HistMerger(object):
             canvas_name = canvas_name + "__norm"
         if self.log:
             canvas_name = canvas_name + "__log_z"
+        if self.scale_to_xsec > 0.:
+            canvas_name = canvas_name + "__xsec"
         self.canvas = ROOT.TCanvas(canvas_name)
 
         self.labels = []
@@ -133,9 +139,11 @@ class HistMerger(object):
                 self.canvas.Divide(2,3)
             elif len(self.hists) < 10:
                 self.canvas.Divide(3,3)
+            elif len(self.hists) < 13:
+                self.canvas.Divide(3,4)
             else:
                 self.canvas.Divide(3,3)
-                print 'Uh Oh! HistMerger cannot handle histogram lists of > 9 entries'
+                print 'Uh Oh! HistMerger cannot handle histogram lists of > 12 entries'
 
             for i, h in enumerate(self.hists):
                 if i > 9: break

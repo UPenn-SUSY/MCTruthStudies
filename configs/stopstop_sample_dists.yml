@@ -1,21 +1,79 @@
 - label: 'm(#tilde{t}) = 100 GeV'
-  file:  output_hists.m_st_100.root
+  file:  output_hists.400000.BMinusL_100_np1.root
   dir:   ""
   color: 602 # kBlue+2
   shape: 20 # kFullCircle
   line:  1
+  xsec:  3.654257e-01
+
+# - label: 'm(#tilde{t}) = 200 GeV'
+#   file:  output_hists.400002.BMinusL_200_np1.root
+#   dir:   ""
+#   color: 602 # kBlue+2
+#   shape: 20 # kFullCircle
+#   line:  1
+#   xsec: 1.088996e-02
+# 
+# - label: 'm(#tilde{t}) = 300 GeV'
+#   file:  output_hists.400004.BMinusL_300_np1.root
+#   dir:   ""
+#   color: 602 # kBlue+2
+#   shape: 20 # kFullCircle
+#   line:  1
+#   xsec: 1.119129e-03
+# 
+# - label: 'm(#tilde{t}) = 400 GeV'
+#   file:  output_hists.400004.BMinusL_300_np1.root
+#   dir:   ""
+#   color: 602 # kBlue+2
+#   shape: 20 # kFullCircle
+#   line:  1
+#   xsec: 1.925556e-04
 
 - label: 'm(#tilde{t}) = 500 GeV'
-  file:  output_hists.m_st_500.root
+  file:  output_hists.400008.BMinusL_500_np1.root
   dir:   ""
   color: 633 # kRed+1
   shape: 20 # kFullCircle
   line:  1
+  xsec: 4.432919e-05
+
+# - label: 'm(#tilde{t}) = 600 GeV'
+#   file:  output_hists.400010.BMinusL_600_np1.root
+#   dir:   ""
+#   color: 602 # kBlue+2
+#   shape: 20 # kFullCircle
+#   line:  1
+#   xsec: 1.222511e-05
+# 
+# - label: 'm(#tilde{t}) = 700 GeV'
+#   file:  output_hists.400012.BMinusL_700_np1.root
+#   dir:   ""
+#   color: 602 # kBlue+2
+#   shape: 20 # kFullCircle
+#   line:  1
+#   xsec: 3.802443e-06
+# 
+# - label: 'm(#tilde{t}) = 800 GeV'
+#   file:  output_hists.400014.BMinusL_800_np1.root
+#   dir:   ""
+#   color: 602 # kBlue+2
+#   shape: 20 # kFullCircle
+#   line:  1
+#   xsec: 1.287235e-06
+# 
+# - label: 'm(#tilde{t}) = 900 GeV'
+#   file:  output_hists.400016.BMinusL_900_np1.root
+#   dir:   ""
+#   color: 602 # kBlue+2
+#   shape: 20 # kFullCircle
+#   line:  1
+#   xsec: 4.644327e-07
 
 - label: 'm(#tilde{t}) = 1000 GeV'
-  file:  output_hists.m_st_1000.root
+  file:  output_hists.400018.BMinusL_1000_np1.root
   dir:   ""
   color: 419 # kGreen+3
   shape: 20 # kFullCircle
   line:  1
-
+  xsec: 1.743343e-07
