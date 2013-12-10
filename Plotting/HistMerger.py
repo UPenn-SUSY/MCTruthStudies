@@ -47,6 +47,10 @@ class HistMerger(object):
         leg_y1 = 0.93
         leg_y2 = leg_y1-(0.05*len(self.hists))
 
+        stat_box_x = 0.5
+        stat_box_y = 0.90
+        stat_box_text_size = 0.035
+
         big_leg_x1 = 0.05
         big_leg_x2 = 0.95
         big_leg_y1 = 0.98
@@ -63,10 +67,31 @@ class HistMerger(object):
         self.legend.SetBorderSize(0)
         self.big_legend.SetBorderSize(0)
 
+        # list of labels used as a stat box
+        self.stat_box = []
+
         for i, h in enumerate(self.hists):
             self.stack.Add(h, 'HIST')
             self.legend.AddEntry(h, self.file_names[i], 'L')
             self.big_legend.AddEntry(h, self.file_names[i], 'L')
+
+            num_entries = h.GetEntries()
+            mean = getMeanSafe(h)
+            rms = getRMSSafe(h)
+            tmp_label = ROOT.TText( stat_box_x
+                                  , stat_box_y
+                                  , "Entries: %d  Mean: %.2f  RMS: %.2f" % ( num_entries
+                                                                           , mean
+                                                                           , rms
+                                                                           )
+                                  )
+            tmp_label.SetTextSize(stat_box_text_size)
+            tmp_label.SetTextColor(h.GetLineColor())
+            tmp_label.SetNDC()
+            tmp_label.SetX(stat_box_x)
+            tmp_label.SetY(stat_box_y)
+            self.stat_box.append(tmp_label)
+            stat_box_y -= 0.05
 
         canvas_name = self.name.replace('h__', 'c__')
         if self.normalize:
@@ -98,6 +123,9 @@ class HistMerger(object):
         self.stack.Draw('nostack')
         if len(self.hists) <= 5:
             self.legend.Draw()
+
+            for sb in self.stat_box:
+                sb.Draw()
 
         self.leg_canvas = ROOT.TCanvas('%s__leg' % canvas_name)
         self.big_legend.Draw()
@@ -182,3 +210,22 @@ class HistMerger(object):
         this_label.SetTextSize(0.045)
         return this_label
 
+# ------------------------------------------------------------------------------
+def getMeanSafe(h):
+    integral = h.Integral()
+    weighted_sum = 0
+    for i in xrange(h.GetNbinsX()):
+        bin_center = h.GetXaxis().GetBinCenter(i+1)
+        weighted_sum += bin_center*h.GetBinContent(i+1)
+    return weighted_sum/integral
+
+# ------------------------------------------------------------------------------
+def getRMSSafe(h):
+    mean = getMeanSafe(h)
+    integral = h.Integral()
+    weighted_sum = 0
+    for i in xrange(h.GetNbinsX()):
+        bin_center = h.GetXaxis().GetBinCenter(i+1)
+        weighted_sum += bin_center*bin_center*h.GetBinContent(i+1)
+    return math.sqrt(weighted_sum/integral - mean*mean)
+    return h.GetRMS()

@@ -25,6 +25,7 @@ namespace TruthNtuple
 
       void setMCIndex(int);
       void setPdgid(int);
+      void setStatus(int);
       void setPt(double);
       void setEta(double);
       void setTheta(double);
@@ -40,6 +41,7 @@ namespace TruthNtuple
 
       int getMCIndex() const;
       int getPdgid() const;
+      int getStatus() const;
       double getPt() const;
       double getP() const;
       double getEta() const;
@@ -60,6 +62,7 @@ namespace TruthNtuple
     protected:
       int          m_mc_index;
       double       m_pdgid;
+      int          m_status;
       double       m_pt;
       double       m_eta;
       double       m_theta;

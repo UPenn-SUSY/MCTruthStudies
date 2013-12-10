@@ -20,7 +20,7 @@ namespace TruthNtuple
 namespace HistogramHandlers
 {
   class Handle;
-  class Mbl;
+  // class Mbl;
   class BLPairKinematics;
   class QuarkKinematics;
   class StopKinematics;
@@ -63,7 +63,7 @@ namespace BMinusL
       TruthNtuple::Met m_met;
 
       std::vector<HistogramHandlers::Handle*> m_histograms;
-      HistogramHandlers::Mbl*                 m_h_mbl;
+      // HistogramHandlers::Mbl*                 m_h_mbl;
       HistogramHandlers::BLPairKinematics*    m_h_bl_pair_kinematics;
       HistogramHandlers::QuarkKinematics*     m_h_quark_kinematics;
       HistogramHandlers::StopKinematics*      m_h_stop_kinematics;

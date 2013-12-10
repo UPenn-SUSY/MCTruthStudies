@@ -43,6 +43,7 @@ TruthNtuple::Particle::Particle( const TruthNtuple::TruthNtupleLooper* tnl
   // set quantities directly from d3pd
   setMCIndex(mc_index);
   setPdgid(tnl->mc_pdgId->at(mc_index));
+  setStatus(tnl->mc_status->at(mc_index));
   setPt(tnl->mc_pt->at(mc_index));
   setEta(tnl->mc_eta->at(mc_index));
   setPhi(tnl->mc_phi->at(mc_index));
@@ -90,6 +91,11 @@ void TruthNtuple::Particle::setPdgid(int val)
   m_pdgid = val;
 }
 
+// -----------------------------------------------------------------------------
+void TruthNtuple::Particle::setStatus(int val)
+{
+  m_status = val;
+}
 
 // -----------------------------------------------------------------------------
 void TruthNtuple::Particle::setPt(double val)
@@ -175,6 +181,12 @@ int TruthNtuple::Particle::getMCIndex() const
 int TruthNtuple::Particle::getPdgid() const
 {
   return m_pdgid;
+}
+
+// -----------------------------------------------------------------------------
+int TruthNtuple::Particle::getStatus() const
+{
+  return m_status;
 }
 
 // -----------------------------------------------------------------------------
@@ -358,6 +370,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
 
   // set quantities directly from d3pd
   if (get_final_state) {
+    setStatus(tnl->el_status->at(el_index));
     setPt(    tnl->el_pt->at(el_index));
     setEta(   tnl->el_eta->at(el_index));
     setPhi(   tnl->el_phi->at(el_index));
@@ -374,6 +387,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
               );
     if (m_mc_index >= 0) {
       if (verbose) std::cout << "getting electron quantities from MC truth block - mc index: " << m_mc_index << "\n";
+      setStatus(tnl->mc_status->at(m_mc_index));
       setPt(    tnl->mc_pt->at(m_mc_index));
       setEta(   tnl->mc_eta->at(m_mc_index));
       setPhi(   tnl->mc_phi->at(m_mc_index));
@@ -382,6 +396,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
     }
     else {
       if (verbose) std::cout << "getting electron quantities from electron block - mc index: " << m_mc_index << "\n";
+      setStatus(tnl->el_status->at(el_index));
       setPt(    tnl->el_pt->at(el_index));
       setEta(   tnl->el_eta->at(el_index));
       setPhi(   tnl->el_phi->at(el_index));
@@ -473,6 +488,7 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
 
   // set quantities directly from d3pd
   if (get_final_state) {
+    setStatus(tnl->mu_status->at(mu_index));
     setPt(    tnl->mu_pt->at(mu_index));
     setEta(   tnl->mu_eta->at(mu_index));
     setPhi(   tnl->mu_phi->at(mu_index));
@@ -488,6 +504,7 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
                                                   )
               );
     if (m_mc_index >= 0) {
+      setStatus(tnl->mc_status->at(m_mc_index));
       setPt(    tnl->mc_pt->at(m_mc_index));
       setEta(   tnl->mc_eta->at(m_mc_index));
       setPhi(   tnl->mc_phi->at(m_mc_index));
@@ -495,6 +512,7 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
       setCharge(tnl->mu_charge->at(mu_index));
     }
     else {
+      setStatus(tnl->mu_status->at(mu_index));
       setPt(    tnl->mu_pt->at(mu_index));
       setEta(   tnl->mu_eta->at(mu_index));
       setPhi(   tnl->mu_phi->at(mu_index));

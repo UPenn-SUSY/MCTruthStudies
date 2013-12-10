@@ -44,7 +44,7 @@ double TruthNtuple::ptDiObject( const TruthNtuple::Particle* p1
   double py = p1->getPy() + p2->getPy();
 
   double pt2 = px*px + py*py;
-  return pt2*pt2/fabs(pt2);
+  return sqrt(pt2)*pt2/fabs(pt2);
 }
 
 // -----------------------------------------------------------------------------

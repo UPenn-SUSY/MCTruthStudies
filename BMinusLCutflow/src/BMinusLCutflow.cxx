@@ -24,7 +24,7 @@ BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
   m_histograms.push_back(new HistogramHandlers::Mll());
   // m_histograms.push_back(new HistogramHandlers::Mjl());
 
-  m_h_mbl                = new HistogramHandlers::Mbl();
+  // m_h_mbl                = new HistogramHandlers::Mbl();
   m_h_bl_pair_kinematics = new HistogramHandlers::BLPairKinematics();
   m_h_quark_kinematics   = new HistogramHandlers::QuarkKinematics();
   m_h_stop_kinematics    = new HistogramHandlers::StopKinematics();
@@ -82,14 +82,14 @@ void BMinusL::Cutflow::processEvent()
     m_flavor_channel = TruthNtuple::FLAVOR_NONE;
   }
 
-  // TODO decide if we want this
+  // // TODO decide if we want this
   // if (  m_flavor_channel == TruthNtuple::FLAVOR_NONE
   //    || num_truth_b_quarks != 2
   //    )
   // {
-  //   // std::cout << "\nskipping event -- flavor: " << m_flavor_channel
-  //   //           << " - num b quarks: " << num_truth_b_quarks
-  //   //           << "\n";
+  //   std::cout << "\nskipping event -- flavor: " << m_flavor_channel
+  //             << " - num b quarks: " << num_truth_b_quarks
+  //             << "\n";
   //   return;
   // }
 
@@ -107,11 +107,11 @@ void BMinusL::Cutflow::processEvent()
   }
 
   // fill special histograms
-  m_h_mbl->FillSpecial( m_flavor_channel
-                      , m_daughter_el
-                      , m_daughter_mu
-                      , m_daughter_b_quarks
-                      );
+  // m_h_mbl->FillSpecial( m_flavor_channel
+  //                     , m_daughter_el
+  //                     , m_daughter_mu
+  //                     , m_daughter_b_quarks
+  //                     );
   m_h_bl_pair_kinematics->FillSpecial( m_flavor_channel
                                      , m_daughter_el
                                      , m_daughter_mu
@@ -136,7 +136,7 @@ void BMinusL::Cutflow::writeToFile()
     m_histograms.at(hist_it)->write(f);
   }
 
-  m_h_mbl->write(f);
+  // m_h_mbl->write(f);
   m_h_bl_pair_kinematics->write(f);
   m_h_quark_kinematics->write(f);
   m_h_stop_kinematics->write(f);
@@ -153,13 +153,19 @@ void BMinusL::Cutflow::doObjectSelection()
     if (fabs(m_particle_list.at(particle_it).getPdgid()) == 1e6+6) {
       m_truth_stops.push_back(&m_particle_list.at(particle_it));
     }
-    if (fabs(m_particle_list.at(particle_it).getPdgid()) == 11) {
+    if (  fabs(m_particle_list.at(particle_it).getPdgid()) == 11
+       && m_particle_list.at(particle_it).getStatus() == 3
+       ) {
       m_truth_electrons.push_back(&m_particle_list.at(particle_it));
     }
-    if (fabs(m_particle_list.at(particle_it).getPdgid()) == 13) {
+    if (  fabs(m_particle_list.at(particle_it).getPdgid()) == 13
+       && m_particle_list.at(particle_it).getStatus() == 3
+       ) {
       m_truth_muons.push_back(&m_particle_list.at(particle_it));
     }
-    if (fabs(m_particle_list.at(particle_it).getPdgid()) == 5) {
+    if (  fabs(m_particle_list.at(particle_it).getPdgid()) == 5
+       && m_particle_list.at(particle_it).getStatus() == 3
+       ) {
       m_truth_b_quarks.push_back(&m_particle_list.at(particle_it));
     }
   }

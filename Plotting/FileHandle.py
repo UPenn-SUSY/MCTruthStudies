@@ -69,7 +69,9 @@ class FileHandle(object):
         this_hist_name = 'clone_%s' % hist_name
         if normalize:
             this_hist_name += '_norm'
+        this_hist_name += '__%s' % self.title
         hist = self.directory.Get(hist_name).Clone(this_hist_name)
+        hist.Sumw2()
 
         if not isinstance(hist, ROOT.TH2):
             moveOverflowToLastBin(hist)
@@ -94,6 +96,7 @@ def moveOverflowToLastBin(h, x_min=None, x_max=None):
 
     # find total underflow
     underflow = h.GetBinContent(0)
+    # if we want to truncate additional bins, loop over these bins
     min_bin = 1
     for i, x in enumerate(x_bins):
         if x < x_min:
