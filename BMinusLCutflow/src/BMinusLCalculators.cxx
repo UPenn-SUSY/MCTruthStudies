@@ -75,20 +75,10 @@ std::vector< std::pair< TruthNtuple::Particle*
                              );
 
     if (mbl_ratio_00_11 >= mbl_ratio_01_10) {
-      // std::cout << "picking mbl_ratio_00_11 ("
-      //           << mbl_ratio_00_11
-      //           << ") instead of mbl_ratio_01_10("
-      //           << mbl_ratio_01_10
-      //           << ")\n";
       best_pairs.push_back(std::make_pair( b_list.at(0), l_list.at(0) ));
       best_pairs.push_back(std::make_pair( b_list.at(1), l_list.at(1) ));
     }
     else {
-      // std::cout << "picking mbl_ratio_01_10 ("
-      //           << mbl_ratio_01_10
-      //           << ") instead of mbl_ratio_00_11("
-      //           << mbl_ratio_00_11
-      //           << ")\n";
       best_pairs.push_back(std::make_pair( b_list.at(0), l_list.at(1) ));
       best_pairs.push_back(std::make_pair( b_list.at(1), l_list.at(0) ));
     }

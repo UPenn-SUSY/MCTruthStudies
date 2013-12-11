@@ -242,6 +242,7 @@ namespace HistogramHandlers
       std::vector<TH1D*> m_h_diff_pair_mbl_ratio;
       std::vector<TH1D*> m_h_diff_pair_mbl_sq_sum;
       std::vector<TH2D*> m_h_diff_pair_mbl_2d;
+      std::vector<TH1D*> m_h_diff_pair_cor_pairing;
 
       std::vector<TH1D*> m_h_ratio_pair_mbl_all;
       std::vector<TH1D*> m_h_ratio_pair_mbl_0;
@@ -250,6 +251,7 @@ namespace HistogramHandlers
       std::vector<TH1D*> m_h_ratio_pair_mbl_ratio;
       std::vector<TH1D*> m_h_ratio_pair_mbl_sq_sum;
       std::vector<TH2D*> m_h_ratio_pair_mbl_2d;
+      std::vector<TH1D*> m_h_ratio_pair_cor_pairing;
 
       std::vector<TH1D*> m_h_sq_sum_pair_mbl_all;
       std::vector<TH1D*> m_h_sq_sum_pair_mbl_0;
@@ -258,6 +260,7 @@ namespace HistogramHandlers
       std::vector<TH1D*> m_h_sq_sum_pair_mbl_ratio;
       std::vector<TH1D*> m_h_sq_sum_pair_mbl_sq_sum;
       std::vector<TH2D*> m_h_sq_sum_pair_mbl_2d;
+      std::vector<TH1D*> m_h_sq_sum_pair_cor_pairing;
 
       // pt_bl invariant mass plots - do for right and wrong pairing
       std::vector<TH1D*> m_h_right_pair_ptbl_all;

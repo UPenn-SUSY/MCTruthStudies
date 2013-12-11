@@ -1715,7 +1715,6 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
                                                 )
                                       );
 
-
     m_h_diff_pair_mbl_2d.push_back( new TH2D( ( TruthNtuple::FlavorChannelStrings[fc_it]
                                               + "__diff_pair_mbl_2d" // name suffix
                                               ).c_str()
@@ -1728,6 +1727,20 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
                                             , mbl_bins, mbl_min, mbl_max
                                             )
                                    );
+
+    m_h_diff_pair_cor_pairing.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                   + "__diff_pair_cor_pairing" // name suffix
+                                                   ).c_str()
+                                                 , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                   + " - pairing eff" // title suffix
+                                                   + "; pairing" // x-axis label
+                                                   + "; Entries" // y-axis label
+                                                   ).c_str()
+                                                 , 2, -0.5, 1.5
+                                                 )
+                                       );
+    m_h_diff_pair_cor_pairing.at(m_h_diff_pair_cor_pairing.size()-1)->GetXaxis()->SetBinLabel(1, "Incorrect");
+    m_h_diff_pair_cor_pairing.at(m_h_diff_pair_cor_pairing.size()-1)->GetXaxis()->SetBinLabel(2, "Correct");
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_ratio_pair_mbl_all.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -1815,6 +1828,20 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
                                              )
                                    );
 
+    m_h_ratio_pair_cor_pairing.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                    + "__ratio_pair_cor_pairing" // name suffix
+                                                    ).c_str()
+                                                  , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                    + " - pairing eff" // title suffix
+                                                    + "; pairing" // x-axis label
+                                                    + "; Entries" // y-axis label
+                                                    ).c_str()
+                                                  , 2, -0.5, 1.5
+                                                  )
+                                        );
+    m_h_ratio_pair_cor_pairing.at(m_h_ratio_pair_cor_pairing.size()-1)->GetXaxis()->SetBinLabel(1, "Incorrect");
+    m_h_ratio_pair_cor_pairing.at(m_h_ratio_pair_cor_pairing.size()-1)->GetXaxis()->SetBinLabel(2, "Correct");
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_sq_sum_pair_mbl_all.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
                                                  + "__sq_sum_pair_mbl_all" // name suffix
@@ -1900,6 +1927,20 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
                                               , mbl_bins, mbl_min, mbl_max
                                               )
                                     );
+
+    m_h_sq_sum_pair_cor_pairing.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                     + "__sq_sum_pair_cor_pairing" // name suffix
+                                                     ).c_str()
+                                                   , ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                     + " - pairing eff" // title suffix
+                                                     + "; pairing" // x-axis label
+                                                     + "; Entries" // y-axis label
+                                                     ).c_str()
+                                                   , 2, -0.5, 1.5
+                                                   )
+                                         );
+    m_h_sq_sum_pair_cor_pairing.at(m_h_ratio_pair_cor_pairing.size()-1)->GetXaxis()->SetBinLabel(1, "Incorrect");
+    m_h_sq_sum_pair_cor_pairing.at(m_h_ratio_pair_cor_pairing.size()-1)->GetXaxis()->SetBinLabel(2, "Correct");
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_wrong_vs_right_mbl_diff.push_back( new TH2D( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -2212,6 +2253,17 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
   double mbl_diff_diff   = fabs(mbl_diff_0 - mbl_diff_1);
   double mbl_diff_ratio  = mbl_diff_1 / mbl_diff_0;
   double mbl_diff_sq_sum = sqrt(mbl_diff_0*mbl_diff_0 + mbl_diff_1*mbl_diff_1);
+  bool diff_pariing = (  (  diff_pairs.at(0).first  == m_b_from_stop
+                         && diff_pairs.at(0).second == m_l_from_stop
+                         && diff_pairs.at(1).first  == m_b_from_astp
+                         && diff_pairs.at(1).second == m_l_from_astp
+                         )
+                      || (  diff_pairs.at(0).first  == m_b_from_astp
+                         && diff_pairs.at(0).second == m_l_from_astp
+                         && diff_pairs.at(1).first  == m_b_from_stop
+                         && diff_pairs.at(1).second == m_l_from_stop
+                         )
+                      );
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // compute mbl for ratio pairing
@@ -2228,6 +2280,17 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
   double mbl_ratio_diff   = fabs(mbl_ratio_0 - mbl_ratio_1);
   double mbl_ratio_ratio  = mbl_ratio_1 / mbl_ratio_0;
   double mbl_ratio_sq_sum = sqrt(mbl_ratio_0*mbl_ratio_0 + mbl_ratio_1*mbl_ratio_1);
+  bool ratio_pariing = (  (  ratio_pairs.at(0).first  == m_b_from_stop
+                          && ratio_pairs.at(0).second == m_l_from_stop
+                          && ratio_pairs.at(1).first  == m_b_from_astp
+                          && ratio_pairs.at(1).second == m_l_from_astp
+                          )
+                       || (  ratio_pairs.at(0).first  == m_b_from_astp
+                          && ratio_pairs.at(0).second == m_l_from_astp
+                          && ratio_pairs.at(1).first  == m_b_from_stop
+                          && ratio_pairs.at(1).second == m_l_from_stop
+                          )
+                       );
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // compute mbl for squared sum pairing
@@ -2244,6 +2307,18 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
   double mbl_sq_sum_diff   = fabs(mbl_sq_sum_0 - mbl_sq_sum_1);
   double mbl_sq_sum_ratio  = mbl_sq_sum_1 / mbl_sq_sum_0;
   double mbl_sq_sum_sq_sum = sqrt(mbl_sq_sum_0*mbl_sq_sum_0 + mbl_sq_sum_1*mbl_sq_sum_1);
+  bool sq_sum_pariing = (  (  sq_sum_pairs.at(0).first  == m_b_from_stop
+                           && sq_sum_pairs.at(0).second == m_l_from_stop
+                           && sq_sum_pairs.at(1).first  == m_b_from_astp
+                           && sq_sum_pairs.at(1).second == m_l_from_astp
+                           )
+                        || (  sq_sum_pairs.at(0).first  == m_b_from_astp
+                           && sq_sum_pairs.at(0).second == m_l_from_astp
+                           && sq_sum_pairs.at(1).first  == m_b_from_stop
+                           && sq_sum_pairs.at(1).second == m_l_from_stop
+                           )
+                        );
+
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // compute ptbl for correct pairing
@@ -2266,7 +2341,6 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
   double wrong_ptbl_diff   = fabs(ptbl_wrong_0 - ptbl_wrong_1);
   double wrong_ptbl_ratio  = ptbl_wrong_1 / ptbl_wrong_0;
   double wrong_ptbl_sq_sum = sqrt(ptbl_wrong_0*ptbl_wrong_0 - ptbl_wrong_1*ptbl_wrong_1);
-
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // loop through flavor channels
@@ -2487,6 +2561,7 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
       m_h_diff_pair_mbl_ratio.at(fc)->Fill(mbl_diff_ratio);
       m_h_diff_pair_mbl_sq_sum.at(fc)->Fill(mbl_diff_sq_sum);
       m_h_diff_pair_mbl_2d.at(fc)->Fill(mbl_diff_0, mbl_diff_1);
+      m_h_diff_pair_cor_pairing.at(fc)->Fill(diff_pariing);
 
       m_h_ratio_pair_mbl_all.at(fc)->Fill(mbl_ratio_0);
       m_h_ratio_pair_mbl_all.at(fc)->Fill(mbl_ratio_1);
@@ -2496,6 +2571,7 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
       m_h_ratio_pair_mbl_ratio.at(fc)->Fill(mbl_ratio_ratio);
       m_h_ratio_pair_mbl_sq_sum.at(fc)->Fill(mbl_ratio_sq_sum);
       m_h_ratio_pair_mbl_2d.at(fc)->Fill(mbl_ratio_0, mbl_ratio_1);
+      m_h_ratio_pair_cor_pairing.at(fc)->Fill(ratio_pariing);
 
       m_h_sq_sum_pair_mbl_all.at(fc)->Fill(mbl_sq_sum_0);
       m_h_sq_sum_pair_mbl_all.at(fc)->Fill(mbl_sq_sum_1);
@@ -2505,6 +2581,7 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
       m_h_sq_sum_pair_mbl_ratio.at(fc)->Fill(mbl_sq_sum_ratio);
       m_h_sq_sum_pair_mbl_sq_sum.at(fc)->Fill(mbl_sq_sum_sq_sum);
       m_h_sq_sum_pair_mbl_2d.at(fc)->Fill(mbl_sq_sum_0, mbl_sq_sum_1);
+      m_h_sq_sum_pair_cor_pairing.at(fc)->Fill(sq_sum_pariing);
 
       // fill mbl histograms wrong vs right pairing
       m_h_wrong_vs_right_mbl_diff.at(fc)->Fill(  mbl_right_diff  , mbl_wrong_diff  );
@@ -2629,6 +2706,7 @@ void HistogramHandlers::BLPairKinematics::write(TFile* f)
     m_h_diff_pair_mbl_ratio.at(fc_it)->Write();
     m_h_diff_pair_mbl_sq_sum.at(fc_it)->Write();
     m_h_diff_pair_mbl_2d.at(fc_it)->Write();
+    m_h_diff_pair_cor_pairing.at(fc_it)->Write();
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_ratio_pair_mbl_all.at(fc_it)->Write();
@@ -2638,6 +2716,7 @@ void HistogramHandlers::BLPairKinematics::write(TFile* f)
     m_h_ratio_pair_mbl_ratio.at(fc_it)->Write();
     m_h_ratio_pair_mbl_sq_sum.at(fc_it)->Write();
     m_h_ratio_pair_mbl_2d.at(fc_it)->Write();
+    m_h_ratio_pair_cor_pairing.at(fc_it)->Write();
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_sq_sum_pair_mbl_all.at(fc_it)->Write();
@@ -2647,6 +2726,7 @@ void HistogramHandlers::BLPairKinematics::write(TFile* f)
     m_h_sq_sum_pair_mbl_ratio.at(fc_it)->Write();
     m_h_sq_sum_pair_mbl_sq_sum.at(fc_it)->Write();
     m_h_sq_sum_pair_mbl_2d.at(fc_it)->Write();
+    m_h_sq_sum_pair_cor_pairing.at(fc_it)->Write();
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_wrong_vs_right_mbl_diff.at(fc_it)->Write();
