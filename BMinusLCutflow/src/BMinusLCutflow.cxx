@@ -19,12 +19,12 @@ BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
   m_histograms.push_back(new HistogramHandlers::FlavorChannel());
   m_histograms.push_back(new HistogramHandlers::ObjectMultiplicity());
   m_histograms.push_back(new HistogramHandlers::LeptonKinematics());
-  // m_histograms.push_back(new HistogramHandlers::JetKinematics());
+  m_histograms.push_back(new HistogramHandlers::JetKinematics());
   m_histograms.push_back(new HistogramHandlers::Met());
   m_histograms.push_back(new HistogramHandlers::Mll());
   // m_histograms.push_back(new HistogramHandlers::Mjl());
 
-  // m_h_mbl                = new HistogramHandlers::Mbl();
+  m_h_mbl                = new HistogramHandlers::Mbl();
   m_h_bl_pair_kinematics = new HistogramHandlers::BLPairKinematics();
   m_h_quark_kinematics   = new HistogramHandlers::QuarkKinematics();
   m_h_stop_kinematics    = new HistogramHandlers::StopKinematics();
@@ -47,11 +47,14 @@ void BMinusL::Cutflow::clearObjects()
   m_truth_electrons.clear();
   m_truth_muons.clear();
   m_truth_b_quarks.clear();
+  m_b_jets.clear();
 
   m_daughter_el.clear();
   m_daughter_mu.clear();
   m_daughter_b_quarks.clear();
-  m_daughter_jet.clear();
+  // m_daughter_jet.clear();
+
+  m_leading_b_jets.clear();
 
   m_met.clear();
 }
@@ -63,8 +66,8 @@ void BMinusL::Cutflow::processEvent()
 
   size_t num_el  = m_daughter_el.size();
   size_t num_mu  = m_daughter_mu.size();
-  // size_t num_jet = m_daughter_jet.size();
   size_t num_truth_b_quarks = m_daughter_b_quarks.size();
+  size_t num_b_jet = m_b_jets.size();
 
   if (num_el == 2 && num_mu == 0) {
     m_flavor_channel = TruthNtuple::FLAVOR_EE;
@@ -101,17 +104,17 @@ void BMinusL::Cutflow::processEvent()
     m_histograms.at(hist_it)->Fill( m_flavor_channel
                                   , m_daughter_el
                                   , m_daughter_mu
-                                  , m_daughter_jet
+                                  , m_leading_b_jets
                                   , m_met
                                   );
   }
 
   // fill special histograms
-  // m_h_mbl->FillSpecial( m_flavor_channel
-  //                     , m_daughter_el
-  //                     , m_daughter_mu
-  //                     , m_daughter_b_quarks
-  //                     );
+  m_h_mbl->FillSpecial( m_flavor_channel
+                      , m_daughter_el
+                      , m_daughter_mu
+                      , m_leading_b_jets
+                      );
   m_h_bl_pair_kinematics->FillSpecial( m_flavor_channel
                                      , m_daughter_el
                                      , m_daughter_mu
@@ -136,7 +139,7 @@ void BMinusL::Cutflow::writeToFile()
     m_histograms.at(hist_it)->write(f);
   }
 
-  // m_h_mbl->write(f);
+  m_h_mbl->write(f);
   m_h_bl_pair_kinematics->write(f);
   m_h_quark_kinematics->write(f);
   m_h_stop_kinematics->write(f);
@@ -191,6 +194,25 @@ void BMinusL::Cutflow::doObjectSelection()
       m_daughter_b_quarks.push_back(m_truth_b_quarks.at(b_quarks_it));
   }
 
+  // pick b jets
+  m_b_jets.reserve(m_jet_list.size());
+  for (size_t jet_it = 0; jet_it != m_jet_list.size(); ++jet_it) {
+    if (  jet_it > 0
+       && m_jet_list.at(jet_it).getPt() > m_jet_list.at(jet_it-1).getPt()
+       ) {
+      std::cout << "\nWARNING!!! Jets are not pt ordered!\n";
+    }
+    if (m_jet_list.at(jet_it).getIsBJet()) {
+      m_b_jets.push_back(&m_jet_list.at(jet_it));
+    }
+  }
+
+  // fill leading b jets list
+  m_leading_b_jets.reserve(m_b_jets.size());
+  for (size_t jet_it = 0; jet_it != m_b_jets.size() && jet_it != 2; ++jet_it) {
+    m_leading_b_jets.push_back(m_b_jets.at(jet_it));
+  }
+
   // calculate met and metrel
   m_met.setMetNoint(MET_Truth_NonInt_etx, MET_Truth_NonInt_ety);
   // TODO calculate met-rel or remove
@@ -202,8 +224,8 @@ void  BMinusL::Cutflow::print()
 {
   size_t num_el  = m_daughter_el.size();
   size_t num_mu  = m_daughter_mu.size();
-  // size_t num_jet = m_daughter_jet.size();
   size_t num_truth_b_quarks = m_daughter_b_quarks.size();
+  size_t num_b_jet = m_b_jets.size();
 
   std::cout << "========================================"
             << "\nevent number: " << EventNumber
@@ -213,6 +235,7 @@ void  BMinusL::Cutflow::print()
             << "\n\tnum daughter el: " << num_el
             << "\n\tnum daughter mu: " << num_mu
             << "\n\tnum b quarks: " << num_truth_b_quarks
+            << "\n\tnum b jets: " << num_b_jet
             << "\n----------------------------------------"
             << "\n";
 

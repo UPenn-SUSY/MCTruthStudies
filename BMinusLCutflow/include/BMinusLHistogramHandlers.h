@@ -297,15 +297,21 @@ namespace HistogramHandlers
       virtual void FillSpecial( const TruthNtuple::FLAVOR_CHANNEL
                               , const std::vector<TruthNtuple::Particle*>& el
                               , const std::vector<TruthNtuple::Particle*>& mu
-                              , const std::vector<TruthNtuple::Particle*>& b
+                              , const std::vector<TruthNtuple::Particle*>& b_jets
                               );
       virtual void write(TFile*);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
-      std::vector<TH1D*> m_h_mbl_truth;
-      std::vector<TH1D*> m_h_mbl_dphi_matching;
-      std::vector<TH1D*> m_h_mbl_dr_matching;
+      std::vector<TH1D*> m_h_ratio_pair_mbl_all;
+      std::vector<TH1D*> m_h_ratio_pair_mbl_0;
+      std::vector<TH1D*> m_h_ratio_pair_mbl_1;
+      std::vector<TH1D*> m_h_ratio_pair_mbl_diff;
+      std::vector<TH1D*> m_h_ratio_pair_mbl_ratio;
+      std::vector<TH1D*> m_h_ratio_pair_mbl_sq_sum;
+      std::vector<TH2D*> m_h_ratio_pair_mbl_2d;
+      // std::vector<TH1D*> m_h_ratio_pair_cor_pairing;
+
   };
 }
 
