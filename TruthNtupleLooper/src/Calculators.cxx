@@ -90,10 +90,8 @@ double TruthNtuple::deltaPhi( const TruthNtuple::Particle* p1
 double TruthNtuple::deltaPhi(double phi1, double phi2)
 {
   double delta_phi = fabs( phi1 - phi2 );
-  while (delta_phi > PI)
-    delta_phi -= 2*PI;
-  while (delta_phi < -PI)
-    delta_phi += 2*PI;
+  while (delta_phi > +PI) delta_phi -= 2*PI;
+  while (delta_phi < -PI) delta_phi += 2*PI;
 
   return fabs(delta_phi);
 }
@@ -140,13 +138,13 @@ double TruthNtuple::pyFromPtPhi(double pt, double phi)
 // -----------------------------------------------------------------------------
 double TruthNtuple::pzFromPtTheta(double pt, double theta)
 {
-  return pt*cos(theta);
+  return pt/tan(theta);
 }
 
 // -----------------------------------------------------------------------------
 double TruthNtuple::pzFromPtEta(double pt, double eta)
 {
-  return pt*cos(thetaFromEta(eta));
+  return pzFromPtTheta(pt, thetaFromEta(eta));
 }
 
 // -----------------------------------------------------------------------------
