@@ -1,0 +1,31 @@
+# - label: 'm(#tilde{t}) = 500 GeV (old production)'
+#   file:  output_hists.400008.BMinusL_500_np1.root
+#   dir:   ""
+#   color: 419 # kGreen+3
+#   shape: 20 # kFullCircle
+#   line:  1
+#   xsec: 4.432919e-05
+
+- label: 'm(#tilde{t}) = 500 GeV (no #tau)'
+  file:  output_hists.m_st_500.no_tau.root
+  dir:   ""
+  color: 602 # kBlue+2
+  shape: 20 # kFullCircle
+  line:  1
+  xsec: 4.432919e-05
+
+- label: 'm(#tilde{t}) = 500 GeV (with #tau)'
+  file:  output_hists.m_st_500.w_tau.root
+  dir:   ""
+  color: 633 # kRed+1
+  shape: 20 # kFullCircle
+  line:  1
+  xsec: 4.432919e-05
+
+- label: 'm(#tilde{t}) = 500 GeV (decay through #tau)'
+  file:  output_hists.m_st_500.w_tau.only_tau_events.root
+  dir:   ""
+  color: 616 #
+  shape: 20 # kFullCircle
+  line:  1
+  xsec: 4.432919e-05
