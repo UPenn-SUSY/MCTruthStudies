@@ -11,6 +11,9 @@ namespace TruthNtuple
                       , FLAVOR_MM
                       , FLAVOR_EM
                       , FLAVOR_ME
+                      , FLAVOR_ET
+                      , FLAVOR_MT
+                      , FLAVOR_TT
                       , FLAVOR_NONE
                       , FLAVOR_N
                       };
@@ -19,6 +22,9 @@ namespace TruthNtuple
                                              , "fc_mm"
                                              , "fc_em"
                                              , "fc_me"
+                                             , "fc_et"
+                                             , "fc_mt"
+                                             , "fc_tt"
                                              , "fc_none"
                                              , "fc_n"
                                              };

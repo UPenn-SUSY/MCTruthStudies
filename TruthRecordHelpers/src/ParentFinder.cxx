@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <math.h>
 #include "include/ParentFinder.h"
 
 #include "TPython.h"
@@ -91,6 +92,7 @@ namespace TruthRecordHelpers
   int getInitialIndex( int mc_index
                      , const std::vector<int>* mc_pdg_id
                      , const std::vector<std::vector<int> >* mc_parent_index
+                     , bool follow_tau_parent
                      , bool verbose
                      )
   {
@@ -128,6 +130,12 @@ namespace TruthRecordHelpers
                       << " -- mother index: " << parent_index
                       << "\n";
           }
+          if (follow_tau_parent && fabs(parent_pdgid) == 15) {
+            if (verbose) {
+              std::cout << "The parent is a tau: Stepping back a level to find the tau's parent\n";
+            }
+            return getInitialIndex(parent_index, mc_pdg_id, mc_parent_index, follow_tau_parent, verbose);
+          }
           return current_index;
         }
       }
@@ -143,6 +151,7 @@ namespace TruthRecordHelpers
   int getParentIndex( int mc_index
                     , const std::vector<int>* mc_pdg_id
                     , const std::vector<std::vector<int> >* mc_parent_index
+                    , bool follow_tau_parent
                     , bool verbose
                     )
   {
@@ -167,10 +176,17 @@ namespace TruthRecordHelpers
         }
         else {
           if (verbose) {
-            std::cout << "found mother! -- original_pdgid" << original_pdgid
+            std::cout << "found mother! -- original_pdgid " << original_pdgid
                       << " -- mother pdg id: " << parent_pdgid
                       << " -- mother index: " << parent_index
+                      << " -- follow tau parent: " << follow_tau_parent
                       << "\n";
+          }
+          if (follow_tau_parent && fabs(parent_pdgid) == 15) {
+            if (verbose) {
+              std::cout << "The parent is a tau: Stepping back a level to find the tau's parent\n";
+            }
+            return getParentIndex(parent_index, mc_pdg_id, mc_parent_index, follow_tau_parent, verbose);
           }
           // mother = parent_pdgid;
           return parent_index;

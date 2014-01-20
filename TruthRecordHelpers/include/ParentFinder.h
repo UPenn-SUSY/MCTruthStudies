@@ -39,12 +39,14 @@ namespace TruthRecordHelpers
   int getInitialIndex( int mc_index
                      , const std::vector<int>* mc_mc_pdg_id
                      , const std::vector<std::vector<int> >* mc_parent_index
+                     , bool follow_tau_parent = false
                      , bool verbose = false
                      );
   // from the particle's mc index, get the parent index
   int getParentIndex( int mc_index
                     , const std::vector<int>* mc_mc_pdg_id
                     , const std::vector<std::vector<int> >* mc_parent_index
+                    , bool follow_tau_parent = false
                     , bool verbose = false
                     );
   // from the particle's mc index, get the parent pdgid

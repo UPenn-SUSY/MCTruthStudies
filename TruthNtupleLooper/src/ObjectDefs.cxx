@@ -63,7 +63,8 @@ TruthNtuple::Particle::Particle( const TruthNtuple::TruthNtupleLooper* tnl
   setParentMCIndex( TruthRecordHelpers::getParentIndex( m_mc_index
                                                       , tnl->mc_pdgId
                                                       , tnl->mc_parent_index
-                                                      , verbose
+                                                      // , verbose
+                                                      // , true, true
                                                       )
                   );
   if (verbose) {
@@ -421,6 +422,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
                                                       , tnl->mc_pdgId
                                                       , tnl->mc_parent_index
                                                       // , true
+                                                      // , true, true
                                                       )
                   );
   if (verbose) std::cout << "parent index: " << m_parent_index << "\n";
@@ -538,6 +540,7 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
                                                      , tnl->mc_pdgId
                                                      , tnl->mc_parent_index
                                                      // , true
+                                                     // , true, true
                                                      )
                   );
   if (verbose) {
@@ -634,6 +637,7 @@ TruthNtuple::Jet::Jet( const TruthNtuple::TruthNtupleLooper* tnl
     setParentMCIndex(TruthRecordHelpers::getParentIndex( m_b_quark_index
                                                        , tnl->mc_pdgId
                                                        , tnl->mc_parent_index
+                                                       // , true, true
                                                        )
                     );
     if (verbose) {

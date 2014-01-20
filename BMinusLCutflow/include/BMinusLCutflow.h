@@ -52,11 +52,13 @@ namespace BMinusL
       std::vector<TruthNtuple::Particle*> m_truth_stops;
       std::vector<TruthNtuple::Particle*> m_truth_electrons;
       std::vector<TruthNtuple::Particle*> m_truth_muons;
+      std::vector<TruthNtuple::Particle*> m_truth_taus;
       std::vector<TruthNtuple::Particle*> m_truth_b_quarks;
 
       // objects matched to SUSY mother
       std::vector<TruthNtuple::Particle*> m_daughter_el;
       std::vector<TruthNtuple::Particle*> m_daughter_mu;
+      std::vector<TruthNtuple::Particle*> m_daughter_tau;
       std::vector<TruthNtuple::Particle*> m_daughter_b_quarks;
       std::vector<TruthNtuple::Particle*> m_daughter_jet;
 

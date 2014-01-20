@@ -3,3 +3,5 @@ TO DO
 ACTUALLY MAKE A README
 
 Brett was here :-)
+./BMinusLCutflow/BMinusLCutflow ../truth_d3pd/evgen.400008.BMinusL_500_np1__w_tau.TRUTH.root
+./Plotting/PlotTruthDists.py configs/stopstop_sample_dists.yml

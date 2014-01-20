@@ -2776,15 +2776,23 @@ bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNt
 
   // I'm probably being overly careful here
   for (size_t lep_it = 0; lep_it != m_l_list.size(); ++lep_it) {
-    // if parent is stop
-    if (m_l_list.at(lep_it)->getParentPdgid() == +(1e6+6))  {
-      if (m_l_from_stop == 0) m_l_from_stop = m_l_list.at(lep_it);
+    // if parent is stop (or anti-tau)
+    // if (m_l_list.at(lep_it)->getParentPdgid() == +(1e6+6))  {
+    if (  m_l_list.at(lep_it)->getParentPdgid() == +(1e6+6)
+       || m_l_list.at(lep_it)->getParentPdgid() == -15
+       )  {
+      if (m_l_from_stop == 0)
+        m_l_from_stop = m_l_list.at(lep_it);
       else
         std::cout << "WARNING! Found multiple leptons paired to stop!\n";
     }
-    // if parent is anti-stop
-    if (m_l_list.at(lep_it)->getParentPdgid() == -(1e6+6)) {
-      if (m_l_from_astp == 0) m_l_from_astp = m_l_list.at(lep_it);
+    // if parent is anti-stop (or tau)
+    // if (m_l_list.at(lep_it)->getParentPdgid() == -(1e6+6)) {
+    if (  m_l_list.at(lep_it)->getParentPdgid() == -(1e6+6)
+       || m_l_list.at(lep_it)->getParentPdgid() == +15
+       ) {
+      if (m_l_from_astp == 0)
+        m_l_from_astp = m_l_list.at(lep_it);
       else
         std::cout << "WARNING! Found multiple leptons paired to anti-stop!\n";
     }
@@ -2826,13 +2834,19 @@ bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNt
   }
 
   // check that the objects from the stop have the same parent barcode
-  if (m_l_from_stop->getParentBarcode() != m_b_from_stop->getParentBarcode()) {
+  if (  m_l_from_stop->getParentBarcode() != m_b_from_stop->getParentBarcode()
+     && m_l_from_stop->getParentPdgid() != -15
+     ) {
     std::cout << "ERROR! Lepton and b from stop have different parent barcodes\n";
+    std::cout << "lep parent: " << m_l_from_stop->getParentPdgid() << "\n";
     return false;
   }
   // check that the objects from the anti-stop have the same parent barcode
-  if (m_l_from_astp->getParentBarcode() != m_b_from_astp->getParentBarcode()) {
+  if (  m_l_from_astp->getParentBarcode() != m_b_from_astp->getParentBarcode()
+     && m_l_from_astp->getParentPdgid() != +15
+     ) {
     std::cout << "ERROR! Lepton and b from anti-stop have different parent barcodes\n";
+    std::cout << "lep parent: " << m_l_from_astp->getParentPdgid() << "\n";
     return false;
   }
 

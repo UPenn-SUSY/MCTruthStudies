@@ -58,11 +58,11 @@ HistogramHandlers::FlavorChannel::FlavorChannel() : HistogramHandlers::Handle()
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::FlavorChannel::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Particle*>&
-         , const std::vector<TruthNtuple::Particle*>&
-         , const std::vector<TruthNtuple::Particle*>&
-         , const TruthNtuple::Met&
-         )
+                                           , const std::vector<TruthNtuple::Particle*>&
+                                           , const std::vector<TruthNtuple::Particle*>&
+                                           , const std::vector<TruthNtuple::Particle*>&
+                                           , const TruthNtuple::Met&
+                                           )
 {
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
