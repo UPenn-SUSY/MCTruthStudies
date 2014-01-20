@@ -2859,41 +2859,104 @@ bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNt
 // =============================================================================
 HistogramHandlers::Mbl::Mbl() : HistogramHandlers::Handle()
 {
-  const int bins   = 150;
-  const double min = 0;
-  const double max = 1500;
+  const int mbl_bins   = 150;
+  const double mbl_min = 0;
+  const double mbl_max = 1500;
+
+  const int    mbl_ratio_bins = 110;
+  const double mbl_ratio_min  = 0.;
+  const double mbl_ratio_max  = 1.1;
+
+  const int    mbl_sq_sum_bins = 300;
+  const double mbl_sq_sum_min  = 0.;
+  const double mbl_sq_sum_max  = 3000.;
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-    m_h_mbl_truth.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                       + "__mbl_truth"
-                                       ).c_str()
-                                     , ( "m_{bl}^{truth} - "
-                                       + TruthNtuple::FlavorChannelStrings[fc_it]
-                                       + "; m_{bl}^{truth} [GeV] ; Entries"
-                                       ).c_str()
-                                     , bins, min, max
-                                     )
-                           );
-    m_h_mbl_dphi_matching.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "__mbl_dphi_matching"
+    m_h_ratio_pair_mbl_all.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                + "__mjl__ratio_pair_mbl_all"
+                                                ).c_str()
+                                              , ( "m_{bl}^{truth} - "
+                                                + TruthNtuple::FlavorChannelStrings[fc_it]
+                                                + " - mbl" // title suffix
+                                                + "; m_{bl} [GeV]" // x-axis label
+                                                + "; Entries" // y-axis label
+                                                ).c_str()
+                                              , mbl_bins, mbl_min, mbl_max
+                                              )
+                                    );
+    m_h_ratio_pair_mbl_0.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                              + "__mjl__ratio_pair_mbl_0"
+                                              ).c_str()
+                                            , ( "m_{bl}^{truth} - "
+                                              + TruthNtuple::FlavorChannelStrings[fc_it]
+                                              + " - mbl" // title suffix
+                                              + "; m_{bl}^{0} [GeV]" // x-axis label
+                                              + "; Entries" // y-axis label
+                                              ).c_str()
+                                            , mbl_bins, mbl_min, mbl_max
+                                            )
+                                  );
+    m_h_ratio_pair_mbl_1.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                              + "__mjl__ratio_pair_mbl_1"
+                                              ).c_str()
+                                            , ( "m_{bl}^{truth} - "
+                                              + TruthNtuple::FlavorChannelStrings[fc_it]
+                                              + " - mbl" // title suffix
+                                              + "; m_{bl}^{1} [GeV]" // x-axis label
+                                              + "; Entries" // y-axis label
+                                              ).c_str()
+                                            , mbl_bins, mbl_min, mbl_max
+                                            )
+                                  );
+    m_h_ratio_pair_mbl_diff.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + "__mjl__ratio_pair_mbl_diff"
+                                                 ).c_str()
+                                               , ( "m_{bl}^{truth} - "
+                                                 + TruthNtuple::FlavorChannelStrings[fc_it]
+                                                 + " - mbl" // title suffix
+                                                 + "; |m_{bl}^{0} - m_{bl}^{1}| [GeV]" // x-axis label
+                                                 + "; Entries" // y-axis label
+                                                 ).c_str()
+                                               , mbl_bins, mbl_min, mbl_max
+                                               )
+                                     );
+    m_h_ratio_pair_mbl_ratio.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                  + "__mjl__ratio_pair_mbl_ratio"
+                                                  ).c_str()
+                                                , ( "m_{bl}^{truth} - "
+                                                  + TruthNtuple::FlavorChannelStrings[fc_it]
+                                                  + " - mbl" // title suffix
+                                                  + "; m_{bl}^{1}/m_{bl}^{0}" // x-axis label
+                                                  + "; Entries" // y-axis label
+                                                  ).c_str()
+                                                , mbl_ratio_bins, mbl_ratio_min, mbl_ratio_max
+                                                )
+                                      );
+    m_h_ratio_pair_mbl_sq_sum.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                                   + "__mjl__ratio_pair_mbl_sq_sum"
+                                                   ).c_str()
+                                                 , ( "m_{bl}^{truth} - "
+                                                   + TruthNtuple::FlavorChannelStrings[fc_it]
+                                                   + " - mbl" // title suffix
+                                                   + "; #sqrt{m_{bl}^{0 2} + m_{bl}^{1 2}} [GeV]" // x-axis label
+                                                   + "; Entries" // y-axis label
+                                                   ).c_str()
+                                                 , mbl_bins, mbl_min, mbl_max
+                                                 )
+                                       );
+    m_h_ratio_pair_mbl_2d.push_back( new TH2D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                               + "__mjl__ratio_pair_mbl_2d"
                                                ).c_str()
-                                             , ( "m_{bl} - "
+                                             , ( "m_{bl}^{truth} - "
                                                + TruthNtuple::FlavorChannelStrings[fc_it]
-                                               + "; m_{bl} [GeV] ; Entries"
+                                               + " - mbl" // title suffix
+                                               + "; m_{bl}^{0} [GeV]" // x-axis label
+                                               + "; #m_{bl}^{1} [GeV]" // y-axis label
                                                ).c_str()
-                                             , bins, min, max
+                                             , mbl_bins, mbl_min, mbl_max
+                                             , mbl_bins, mbl_min, mbl_max
                                              )
                                    );
-    m_h_mbl_dr_matching.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                             + "__mbl_dr_matching"
-                                             ).c_str()
-                                           , ( "m_{bl} - "
-                                             + TruthNtuple::FlavorChannelStrings[fc_it]
-                                             + "; m_{bl} [GeV] ; Entries"
-                                             ).c_str()
-                                           , bins, min, max
-                                           )
-                                 );
   }
 }
 
@@ -2901,38 +2964,48 @@ HistogramHandlers::Mbl::Mbl() : HistogramHandlers::Handle()
 void HistogramHandlers::Mbl::FillSpecial( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
          , const std::vector<TruthNtuple::Particle*>& el_list
          , const std::vector<TruthNtuple::Particle*>& mu_list
-         , const std::vector<TruthNtuple::Particle*>& quark_list
+         , const std::vector<TruthNtuple::Particle*>& b_jet_list
          )
 {
   if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
+  if (b_jet_list.size() != 2) return;
 
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // merge el and mu lists to lepton list
   std::vector<TruthNtuple::Particle*> lep_list;
   lep_list.reserve(el_list.size() + mu_list.size());
   lep_list.insert(lep_list.end(), el_list.begin(), el_list.end());
   lep_list.insert(lep_list.end(), mu_list.begin(), mu_list.end());
 
-  // get lists of mbl values for different matching methods
-  std::vector<double> mbl_list_truth         = TruthNtuple::getInvariantMassList(lep_list, quark_list, 0);
-  std::vector<double> mbl_list_dphi_matching = TruthNtuple::getInvariantMassList(lep_list, quark_list, 1);
-  std::vector<double> mbl_list_dr_matching   = TruthNtuple::getInvariantMassList(lep_list, quark_list, 2);
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // compute mbl for ratio pairing
+  std::vector<std::pair<TruthNtuple::Particle*, TruthNtuple::Particle*> >
+      ratio_pairs = BMinusL::doMblRatioPairing(b_jet_list, lep_list);
+  double mbl_ratio_0 = TruthNtuple::invariantMass( ratio_pairs.at(0).first
+                                                 , ratio_pairs.at(0).second
+                                                 )/1.e3;
+  double mbl_ratio_1 = TruthNtuple::invariantMass( ratio_pairs.at(1).first
+                                                 , ratio_pairs.at(1).second
+                                                 )/1.e3;
+  if (mbl_ratio_0 < mbl_ratio_1) std::swap(mbl_ratio_0, mbl_ratio_1);
 
+  double mbl_ratio_diff   = fabs(mbl_ratio_0 - mbl_ratio_1);
+  double mbl_ratio_ratio  = mbl_ratio_1 / mbl_ratio_0;
+  double mbl_ratio_sq_sum = sqrt(mbl_ratio_0*mbl_ratio_0 + mbl_ratio_1*mbl_ratio_1);
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // loop over flavor channels
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
-      // fill mbl truth histogram
-      for (size_t mbl_it = 0; mbl_it != mbl_list_truth.size(); ++mbl_it) {
-        m_h_mbl_truth.at(fc)->Fill(mbl_list_truth.at(mbl_it)/1.e3);
-      }
-      // fill mbl dphi matching histogram
-      for (size_t mbl_it = 0; mbl_it != mbl_list_dphi_matching.size(); ++mbl_it) {
-        m_h_mbl_dphi_matching.at(fc)->Fill(mbl_list_dphi_matching.at(mbl_it)/1.e3);
-      }
-      // fill mbl dr matching histogram
-      for (size_t mbl_it = 0; mbl_it != mbl_list_dr_matching.size(); ++mbl_it) {
-        m_h_mbl_dr_matching.at(fc)->Fill(mbl_list_dr_matching.at(mbl_it)/1.e3);
-      }
+      m_h_ratio_pair_mbl_all.at(fc)->Fill(mbl_ratio_0);
+      m_h_ratio_pair_mbl_all.at(fc)->Fill(mbl_ratio_1);
+      m_h_ratio_pair_mbl_0.at(fc)->Fill(mbl_ratio_0);
+      m_h_ratio_pair_mbl_1.at(fc)->Fill(mbl_ratio_1);
+      m_h_ratio_pair_mbl_diff.at(fc)->Fill(mbl_ratio_diff);
+      m_h_ratio_pair_mbl_ratio.at(fc)->Fill(mbl_ratio_ratio);
+      m_h_ratio_pair_mbl_sq_sum.at(fc)->Fill(mbl_ratio_sq_sum);
+      m_h_ratio_pair_mbl_2d.at(fc)->Fill(mbl_ratio_0, mbl_ratio_1);
     }
   }
 }
@@ -2943,9 +3016,12 @@ void HistogramHandlers::Mbl::write(TFile* f)
   f->cd();
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-      m_h_mbl_truth.at(fc_it)->Write();
-      m_h_mbl_dphi_matching.at(fc_it)->Write();
-      m_h_mbl_dr_matching.at(fc_it)->Write();
+      m_h_ratio_pair_mbl_all.at(fc_it)->Write();
+      m_h_ratio_pair_mbl_0.at(fc_it)->Write();
+      m_h_ratio_pair_mbl_1.at(fc_it)->Write();
+      m_h_ratio_pair_mbl_diff.at(fc_it)->Write();
+      m_h_ratio_pair_mbl_ratio.at(fc_it)->Write();
+      m_h_ratio_pair_mbl_sq_sum.at(fc_it)->Write();
+      m_h_ratio_pair_mbl_2d.at(fc_it)->Write();
   }
 }
-

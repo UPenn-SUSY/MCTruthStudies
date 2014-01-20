@@ -20,7 +20,7 @@ namespace TruthNtuple
 namespace HistogramHandlers
 {
   class Handle;
-  // class Mbl;
+  class Mbl;
   class BLPairKinematics;
   class QuarkKinematics;
   class StopKinematics;
@@ -54,18 +54,20 @@ namespace BMinusL
       std::vector<TruthNtuple::Particle*> m_truth_muons;
       std::vector<TruthNtuple::Particle*> m_truth_taus;
       std::vector<TruthNtuple::Particle*> m_truth_b_quarks;
+      std::vector<TruthNtuple::Jet*> m_b_jets;
 
       // objects matched to SUSY mother
       std::vector<TruthNtuple::Particle*> m_daughter_el;
       std::vector<TruthNtuple::Particle*> m_daughter_mu;
       std::vector<TruthNtuple::Particle*> m_daughter_tau;
       std::vector<TruthNtuple::Particle*> m_daughter_b_quarks;
-      std::vector<TruthNtuple::Particle*> m_daughter_jet;
+
+      std::vector<TruthNtuple::Particle*> m_leading_b_jets;
 
       TruthNtuple::Met m_met;
 
       std::vector<HistogramHandlers::Handle*> m_histograms;
-      // HistogramHandlers::Mbl*                 m_h_mbl;
+      HistogramHandlers::Mbl*                 m_h_mbl;
       HistogramHandlers::BLPairKinematics*    m_h_bl_pair_kinematics;
       HistogramHandlers::QuarkKinematics*     m_h_quark_kinematics;
       HistogramHandlers::StopKinematics*      m_h_stop_kinematics;

@@ -213,6 +213,7 @@ class HistMerger(object):
 # ------------------------------------------------------------------------------
 def getMeanSafe(h):
     integral = h.Integral()
+    if integral == 0: return 0
     weighted_sum = 0
     for i in xrange(h.GetNbinsX()):
         bin_center = h.GetXaxis().GetBinCenter(i+1)
@@ -223,9 +224,15 @@ def getMeanSafe(h):
 def getRMSSafe(h):
     mean = getMeanSafe(h)
     integral = h.Integral()
+    if integral == 0: return 0
     weighted_sum = 0
     for i in xrange(h.GetNbinsX()):
         bin_center = h.GetXaxis().GetBinCenter(i+1)
         weighted_sum += bin_center*bin_center*h.GetBinContent(i+1)
+    # print 'weighted sum: %s' % weighted_sum
+    # print 'integral: %s' % integral
+    # print 'weighted sum/integral: %s' % (weighted_sum/integral)
+    # print 'mean^2: %s' % (mean*mean)
+    # print '(weighted_sum/integral - mean*mean): %s' % (weighted_sum/integral - mean*mean)
+    if weighted_sum/integral < mean*mean: return 0
     return math.sqrt(weighted_sum/integral - mean*mean)
-    return h.GetRMS()
