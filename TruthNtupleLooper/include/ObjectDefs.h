@@ -12,10 +12,10 @@ namespace TruthNtuple
 // =============================================================================
 namespace TruthNtuple
 {
-  // =============================================================================
+  // ===========================================================================
   class Particle
   {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
       Particle();
       Particle( const TruthNtuple::TruthNtupleLooper*
@@ -58,7 +58,7 @@ namespace TruthNtuple
 
       virtual void printGeneralInfo() const;
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
       int          m_mc_index;
       double       m_pdgid;
@@ -77,10 +77,10 @@ namespace TruthNtuple
       int m_parent_barcode;
   };
 
-  // =============================================================================
+  // ===========================================================================
   class Lepton : public Particle
   {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
       Lepton();
 
@@ -93,13 +93,13 @@ namespace TruthNtuple
 
       virtual void print(TruthNtuple::TruthNtupleLooper* tnl = 0) const;
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
       bool m_is_electron;
       double m_charge;
   };
 
-  // =============================================================================
+  // ===========================================================================
   class Electron : public Lepton
   {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -117,15 +117,15 @@ namespace TruthNtuple
 
       virtual void print(TruthNtuple::TruthNtupleLooper* tnl = 0) const;
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
       int m_el_index;
   };
 
-  // =============================================================================
+  // ===========================================================================
   class Muon : public Lepton
   {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
       Muon();
       Muon( const TruthNtuple::TruthNtupleLooper*
@@ -140,15 +140,15 @@ namespace TruthNtuple
 
       virtual void print(TruthNtuple::TruthNtupleLooper* tnl = 0) const;
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
       int m_mu_index;
   };
 
-  // =============================================================================
+  // ===========================================================================
   class Jet : public Particle
   {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
       Jet();
       Jet( const TruthNtuple::TruthNtupleLooper*
@@ -166,17 +166,17 @@ namespace TruthNtuple
 
       virtual void print(TruthNtuple::TruthNtupleLooper* tnl = 0) const;
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
       int m_jet_index;
       bool m_is_b_jet;
       int m_b_quark_index;
   };
 
-  // =============================================================================
+  // ===========================================================================
   class Met
   {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
       Met();
       Met( double met_etx_noint
@@ -196,7 +196,7 @@ namespace TruthNtuple
       double getMetPhiNoint() const;
       double getMetRelNoint() const;
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:
       double m_met_etx_noint;
       double m_met_ety_noint;

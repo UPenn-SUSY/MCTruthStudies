@@ -369,63 +369,63 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_phi_all.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                    + "__stop_phi_all"
+                                     + "__stop_phi_all"
+                                     ).c_str()
+                                   , ( "#phi - "
+                                     + TruthNtuple::FlavorChannelStrings[fc_it]
+                                     + "; #phi ; Entries"
+                                     ).c_str()
+                                   , phi_bins, phi_min, phi_max
+                                   )
+                         );
+    m_h_phi_stop.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                      + "__stop_phi_stop"
+                                      ).c_str()
+                                    , ( "#phi - "
+                                      + TruthNtuple::FlavorChannelStrings[fc_it]
+                                      + "; #phi^{#tilde{t}} ; Entries"
+                                      ).c_str()
+                                    , phi_bins, phi_min, phi_max
+                                    )
+                          );
+    m_h_phi_astp.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                      + "__stop_phi_astp"
+                                      ).c_str()
+                                    , ( "#phi - "
+                                      + TruthNtuple::FlavorChannelStrings[fc_it]
+                                      + "; #phi^{#tilde{t}*} ; Entries"
+                                      ).c_str()
+                                    , phi_bins, phi_min, phi_max
+                                    )
+                          );
+    m_h_phi_diff.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                      + "__stop_phi_diff"
+                                      ).c_str()
+                                    , ( "#phi diff - "
+                                      + TruthNtuple::FlavorChannelStrings[fc_it]
+                                      + "; #phi^{#tilde{t}} - #phi^{#tilde{t}*} ; Entries"
+                                      ).c_str()
+                                    , phi_bins/2, 0, phi_max
+                                    )
+                          );
+    m_h_phi_2d.push_back( new TH2D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                    + "__stop_phi_2d"
                                     ).c_str()
-                                  , ( "#phi - "
+                                  , ( "p_{T} map - "
                                     + TruthNtuple::FlavorChannelStrings[fc_it]
-                                    + "; #phi ; Entries"
+                                    + "; #phi^{#tilde{t}} ; #phi^{#tilde{t}*}"
                                     ).c_str()
+                                  , phi_bins, phi_min, phi_max
                                   , phi_bins, phi_min, phi_max
                                   )
                         );
-    m_h_phi_stop.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                  + "__stop_phi_stop"
-                                  ).c_str()
-                                , ( "#phi - "
-                                  + TruthNtuple::FlavorChannelStrings[fc_it]
-                                  + "; #phi^{#tilde{t}} ; Entries"
-                                  ).c_str()
-                                , phi_bins, phi_min, phi_max
-                                )
-                      );
-    m_h_phi_astp.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                  + "__stop_phi_astp"
-                                  ).c_str()
-                                , ( "#phi - "
-                                  + TruthNtuple::FlavorChannelStrings[fc_it]
-                                  + "; #phi^{#tilde{t}*} ; Entries"
-                                  ).c_str()
-                                , phi_bins, phi_min, phi_max
-                                )
-                      );
-    m_h_phi_diff.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                     + "__stop_phi_diff"
-                                     ).c_str()
-                                   , ( "#phi diff - "
-                                     + TruthNtuple::FlavorChannelStrings[fc_it]
-                                     + "; #phi^{#tilde{t}} - #phi^{#tilde{t}*} ; Entries"
-                                     ).c_str()
-                                   , phi_bins/2, 0, phi_max
-                                   )
-                         );
-    m_h_phi_2d.push_back( new TH2D( ( TruthNtuple::FlavorChannelStrings[fc_it]
-                                   + "__stop_phi_2d"
-                                   ).c_str()
-                                 , ( "p_{T} map - "
-                                   + TruthNtuple::FlavorChannelStrings[fc_it]
-                                   + "; #phi^{#tilde{t}} ; #phi^{#tilde{t}*}"
-                                   ).c_str()
-                                 , phi_bins, phi_min, phi_max
-                                 , phi_bins, phi_min, phi_max
-                                 )
-                       );
   }
 }
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Particle*>& stop_list
-         )
+                                                   , const std::vector<TruthNtuple::Particle*>& stop_list
+                                                   )
 {
   if (stop_list.size() != 2) {
     std::cout << "ERROR! Number stops (" << stop_list.size() << " != 2\n";
@@ -588,48 +588,48 @@ void HistogramHandlers::StopKinematics::write(TFile* f)
   f->cd();
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
-      m_h_e_com.at(fc_it)->Write();
-      m_h_e_all.at(fc_it)->Write();
-      m_h_e_stop.at(fc_it)->Write();
-      m_h_e_astp.at(fc_it)->Write();
-      m_h_e_diff.at(fc_it)->Write();
-      m_h_e_2d.at(fc_it)->Write();
+    m_h_e_com.at(fc_it)->Write();
+    m_h_e_all.at(fc_it)->Write();
+    m_h_e_stop.at(fc_it)->Write();
+    m_h_e_astp.at(fc_it)->Write();
+    m_h_e_diff.at(fc_it)->Write();
+    m_h_e_2d.at(fc_it)->Write();
 
-      m_h_p_all.at(fc_it)->Write();
-      m_h_p_stop.at(fc_it)->Write();
-      m_h_p_astp.at(fc_it)->Write();
-      m_h_p_diff.at(fc_it)->Write();
-      m_h_p_2d.at(fc_it)->Write();
+    m_h_p_all.at(fc_it)->Write();
+    m_h_p_stop.at(fc_it)->Write();
+    m_h_p_astp.at(fc_it)->Write();
+    m_h_p_diff.at(fc_it)->Write();
+    m_h_p_2d.at(fc_it)->Write();
 
-      m_h_pt_all.at(fc_it)->Write();
-      m_h_pt_stop.at(fc_it)->Write();
-      m_h_pt_astp.at(fc_it)->Write();
-      m_h_pt_diff.at(fc_it)->Write();
-      m_h_pt_2d.at(fc_it)->Write();
+    m_h_pt_all.at(fc_it)->Write();
+    m_h_pt_stop.at(fc_it)->Write();
+    m_h_pt_astp.at(fc_it)->Write();
+    m_h_pt_diff.at(fc_it)->Write();
+    m_h_pt_2d.at(fc_it)->Write();
 
-      m_h_p_over_m_all.at(fc_it)->Write();
-      m_h_p_over_m_stop.at(fc_it)->Write();
-      m_h_p_over_m_astp.at(fc_it)->Write();
-      m_h_p_over_m_diff.at(fc_it)->Write();
-      m_h_p_over_m_2d.at(fc_it)->Write();
+    m_h_p_over_m_all.at(fc_it)->Write();
+    m_h_p_over_m_stop.at(fc_it)->Write();
+    m_h_p_over_m_astp.at(fc_it)->Write();
+    m_h_p_over_m_diff.at(fc_it)->Write();
+    m_h_p_over_m_2d.at(fc_it)->Write();
 
-      m_h_pt_over_m_all.at(fc_it)->Write();
-      m_h_pt_over_m_stop.at(fc_it)->Write();
-      m_h_pt_over_m_astp.at(fc_it)->Write();
-      m_h_pt_over_m_diff.at(fc_it)->Write();
-      m_h_pt_over_m_2d.at(fc_it)->Write();
+    m_h_pt_over_m_all.at(fc_it)->Write();
+    m_h_pt_over_m_stop.at(fc_it)->Write();
+    m_h_pt_over_m_astp.at(fc_it)->Write();
+    m_h_pt_over_m_diff.at(fc_it)->Write();
+    m_h_pt_over_m_2d.at(fc_it)->Write();
 
-      m_h_eta_all.at(fc_it)->Write();
-      m_h_eta_stop.at(fc_it)->Write();
-      m_h_eta_astp.at(fc_it)->Write();
-      m_h_eta_diff.at(fc_it)->Write();
-      m_h_eta_2d.at(fc_it)->Write();
+    m_h_eta_all.at(fc_it)->Write();
+    m_h_eta_stop.at(fc_it)->Write();
+    m_h_eta_astp.at(fc_it)->Write();
+    m_h_eta_diff.at(fc_it)->Write();
+    m_h_eta_2d.at(fc_it)->Write();
 
-      m_h_phi_all.at(fc_it)->Write();
-      m_h_phi_stop.at(fc_it)->Write();
-      m_h_phi_astp.at(fc_it)->Write();
-      m_h_phi_diff.at(fc_it)->Write();
-      m_h_phi_2d.at(fc_it)->Write();
+    m_h_phi_all.at(fc_it)->Write();
+    m_h_phi_stop.at(fc_it)->Write();
+    m_h_phi_astp.at(fc_it)->Write();
+    m_h_phi_diff.at(fc_it)->Write();
+    m_h_phi_2d.at(fc_it)->Write();
   }
 }
 
@@ -2941,7 +2941,7 @@ HistogramHandlers::Mbl::Mbl() : HistogramHandlers::Handle()
                                                    + "; #sqrt{m_{bl}^{0 2} + m_{bl}^{1 2}} [GeV]" // x-axis label
                                                    + "; Entries" // y-axis label
                                                    ).c_str()
-                                                 , mbl_bins, mbl_min, mbl_max
+                                                 , mbl_sq_sum_bins, mbl_sq_sum_min, mbl_sq_sum_max
                                                  )
                                        );
     m_h_ratio_pair_mbl_2d.push_back( new TH2D( ( TruthNtuple::FlavorChannelStrings[fc_it]

@@ -26,12 +26,17 @@ namespace HistogramHandlers
   class StopKinematics;
 }
 
+namespace BMinusL
+{
+  class BMinusLStandAloneHistograms;
+}
+
 // =============================================================================
 namespace BMinusL
 {
   class Cutflow : public TruthNtuple::TruthNtupleLooper
   {
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
       Cutflow(TTree *tree=0);
       ~Cutflow();
@@ -41,7 +46,7 @@ namespace BMinusL
 
       void writeToFile();
 
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
       void doObjectSelection();
       void print();
@@ -71,7 +76,30 @@ namespace BMinusL
       HistogramHandlers::BLPairKinematics*    m_h_bl_pair_kinematics;
       HistogramHandlers::QuarkKinematics*     m_h_quark_kinematics;
       HistogramHandlers::StopKinematics*      m_h_stop_kinematics;
+
+      BMinusL::BMinusLStandAloneHistograms* m_sa_hists;
+
+      friend class BMinusLStandAloneHistograms;
   };
+
+  // ===========================================================================
+  // = Stand alone histograms
+  // ===========================================================================
+  class BMinusLStandAloneHistograms
+  {
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    public:
+      BMinusLStandAloneHistograms();
+
+      void Fill( const BMinusL::Cutflow* );
+
+      void write(TFile*);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    private:
+      TH1D* m_h_meff;
+  };
+
 }
 
 #endif

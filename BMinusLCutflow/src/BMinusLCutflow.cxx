@@ -28,6 +28,8 @@ BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
   m_h_bl_pair_kinematics = new HistogramHandlers::BLPairKinematics();
   m_h_quark_kinematics   = new HistogramHandlers::QuarkKinematics();
   m_h_stop_kinematics    = new HistogramHandlers::StopKinematics();
+
+  m_sa_hists = new BMinusL::BMinusLStandAloneHistograms();
 }
 
 // -----------------------------------------------------------------------------
@@ -70,8 +72,8 @@ void BMinusL::Cutflow::processEvent()
   size_t num_mu  = m_daughter_mu.size();
   // size_t num_tau = m_daughter_tau.size();
   // size_t num_jet = m_daughter_jet.size();
-  size_t num_truth_b_quarks = m_daughter_b_quarks.size();
-  size_t num_b_jet = m_b_jets.size();
+  // size_t num_truth_b_quarks = m_daughter_b_quarks.size();
+  // size_t num_b_jet = m_b_jets.size();
 
   // count the number of light leptons which come from tau decays
   size_t num_tau = 0;
@@ -146,6 +148,8 @@ void BMinusL::Cutflow::processEvent()
   m_h_stop_kinematics->FillSpecial( m_flavor_channel
                                   , m_truth_stops
                                   );
+
+  m_sa_hists->Fill(this);
 }
 
 // -----------------------------------------------------------------------------
@@ -163,6 +167,7 @@ void BMinusL::Cutflow::writeToFile()
   m_h_bl_pair_kinematics->write(f);
   m_h_quark_kinematics->write(f);
   m_h_stop_kinematics->write(f);
+  m_sa_hists->write(f);
 }
 
 // -----------------------------------------------------------------------------
@@ -342,3 +347,52 @@ void  BMinusL::Cutflow::print()
   }
   */
 }
+
+// =============================================================================
+// = BMinusLStandAlone
+// =============================================================================
+BMinusL::BMinusLStandAloneHistograms::BMinusLStandAloneHistograms()
+{
+  // initialize histograms here
+  m_h_meff = new TH1D( "meff"
+                     , "m_{eff} ; m_{eff} [GeV] ; Entries"
+                     , 500 , 0, 5000
+                     );
+}
+
+// -----------------------------------------------------------------------------
+void BMinusL::BMinusLStandAloneHistograms::Fill( const BMinusL::Cutflow* cutflow)
+{
+  // calculate event variables used to fill histograms
+  float m_eff = 0;
+
+  size_t num_b  = cutflow->m_daughter_b_quarks.size();
+  for (size_t b_it = 0; b_it != num_b; ++b_it) {
+    m_eff += cutflow->m_daughter_b_quarks.at(b_it)->getPt();
+  }
+
+  size_t num_el = cutflow->m_daughter_el.size();
+  for (size_t el_it = 0; el_it != num_el; ++el_it) {
+    m_eff += cutflow->m_daughter_el.at(el_it)->getPt();
+  }
+
+
+  size_t num_mu = cutflow->m_daughter_mu.size();
+  for (size_t mu_it = 0; mu_it != num_mu; ++mu_it) {
+    m_eff += cutflow->m_daughter_mu.at(mu_it)->getPt();
+  }
+
+  // Fill histograms based on this event
+  m_h_meff->Fill(m_eff/1.e3);
+}
+
+// -----------------------------------------------------------------------------
+void BMinusL::BMinusLStandAloneHistograms::write(TFile* f)
+{
+  // change directory to output file
+  f->cd();
+
+  // write histograms to output histogram file
+  m_h_meff->Write();
+}
+
