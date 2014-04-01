@@ -152,3 +152,11 @@ double TruthNtuple::eFromPxPyPzM(double px, double py, double pz, double m)
 {
   return sqrt(px*px + py*py + pz*pz + m*m);
 }
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::rapidity(const TruthNtuple::Particle* p)
+{
+  double e  = p->getE();
+  double pz = p->getPz();
+  return (0.5*log( (e + pz)/(e-pz) ));
+}

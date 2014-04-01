@@ -32,6 +32,10 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
   const double eta_min = -5.;
   const double eta_max = +5.;
 
+  const int y_bins   = 50;
+  const double y_min = -5.;
+  const double y_max = +5.;
+
   const int phi_bins   = 64;
   const double phi_min = -3.2;
   const double phi_max = +3.2;
@@ -368,6 +372,59 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                        );
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    m_h_y_all.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                     + "__stop_y_all"
+                                     ).c_str()
+                                   , ( "y - "
+                                     + TruthNtuple::FlavorChannelStrings[fc_it]
+                                     + "; y ; Entries"
+                                     ).c_str()
+                                   , y_bins, y_min, y_max
+                                   )
+                         );
+    m_h_y_stop.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                  + "__stop_y_stop"
+                                  ).c_str()
+                                , ( "y - "
+                                  + TruthNtuple::FlavorChannelStrings[fc_it]
+                                  + "; y^{#tilde{t}} ; Entries"
+                                  ).c_str()
+                                , y_bins, y_min, y_max
+                                )
+                      );
+    m_h_y_astp.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                  + "__stop_y_astp"
+                                  ).c_str()
+                                , ( "y - "
+                                  + TruthNtuple::FlavorChannelStrings[fc_it]
+                                  + "; y^{#tilde{t}*} ; Entries"
+                                  ).c_str()
+                                , y_bins, y_min, y_max
+                                )
+                      );
+    m_h_y_diff.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                     + "__stop_y_diff"
+                                     ).c_str()
+                                   , ( "y diff - "
+                                     + TruthNtuple::FlavorChannelStrings[fc_it]
+                                     + "; y^{#tilde{t}} - y^{#tilde{t}*} ; Entries"
+                                     ).c_str()
+                                   , y_bins/2, 0, y_max
+                                   )
+                         );
+    m_h_y_2d.push_back( new TH2D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                   + "__stop_y_2d"
+                                   ).c_str()
+                                 , ( "y map - "
+                                   + TruthNtuple::FlavorChannelStrings[fc_it]
+                                   + "; y^{#tilde{t}} ; y^{#tilde{t}*}"
+                                   ).c_str()
+                                 , y_bins, y_min, y_max
+                                 , y_bins, y_min, y_max
+                                 )
+                       );
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_phi_all.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "__stop_phi_all"
                                      ).c_str()
@@ -449,6 +506,9 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
   double eta_stop = 0;
   double eta_astp = 0;
 
+  double y_stop = 0;
+  double y_astp = 0;
+
   double phi_stop = 0;
   double phi_astp = 0;
 
@@ -470,6 +530,9 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
     eta_stop = stop_list.at(0)->getEta();
     eta_astp = stop_list.at(1)->getEta();
 
+    y_stop = TruthNtuple::rapidity(stop_list.at(0));
+    y_astp = TruthNtuple::rapidity(stop_list.at(1));
+
     phi_stop = stop_list.at(0)->getPhi();
     phi_astp = stop_list.at(1)->getPhi();
   }
@@ -490,6 +553,9 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
 
     eta_stop = stop_list.at(1)->getEta();
     eta_astp = stop_list.at(0)->getEta();
+
+    y_stop = TruthNtuple::rapidity(stop_list.at(1));
+    y_astp = TruthNtuple::rapidity(stop_list.at(0));
 
     phi_stop = stop_list.at(1)->getPhi();
     phi_astp = stop_list.at(0)->getPhi();
@@ -569,6 +635,16 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
       m_h_eta_diff.at(fc)->Fill(TruthNtuple::deltaEta(eta_stop, eta_astp));
       m_h_eta_2d.at(fc)->Fill(eta_stop, eta_astp);
 
+      // Fill y
+      m_h_y_all.at(fc)->Fill(y_stop);
+      m_h_y_all.at(fc)->Fill(y_astp);
+
+      m_h_y_stop.at(fc)->Fill(y_stop);
+      m_h_y_astp.at(fc)->Fill(y_astp);
+
+      m_h_y_diff.at(fc)->Fill(TruthNtuple::deltaEta(y_stop, y_astp));
+      m_h_y_2d.at(fc)->Fill(y_stop, y_astp);
+
       // Fill phi
       m_h_phi_all.at(fc)->Fill(phi_stop);
       m_h_phi_all.at(fc)->Fill(phi_astp);
@@ -624,6 +700,12 @@ void HistogramHandlers::StopKinematics::write(TFile* f)
     m_h_eta_astp.at(fc_it)->Write();
     m_h_eta_diff.at(fc_it)->Write();
     m_h_eta_2d.at(fc_it)->Write();
+
+    m_h_y_all.at(fc_it)->Write();
+    m_h_y_stop.at(fc_it)->Write();
+    m_h_y_astp.at(fc_it)->Write();
+    m_h_y_diff.at(fc_it)->Write();
+    m_h_y_2d.at(fc_it)->Write();
 
     m_h_phi_all.at(fc_it)->Write();
     m_h_phi_stop.at(fc_it)->Write();
