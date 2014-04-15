@@ -182,23 +182,25 @@ void BMinusL::Cutflow::doObjectSelection()
       m_truth_stops.push_back(&m_particle_list.at(particle_it));
     }
     if (  fabs(m_particle_list.at(particle_it).getPdgid()) == 11
-       // && m_particle_list.at(particle_it).getStatus() == 3
        && (  m_particle_list.at(particle_it).getStatus() == 3
           || m_particle_list.at(particle_it).getStatus() == 1
+          || m_particle_list.at(particle_it).getStatus() == 11 // herwig++
           )
        ) {
       m_truth_electrons.push_back(&m_particle_list.at(particle_it));
     }
     if (  fabs(m_particle_list.at(particle_it).getPdgid()) == 13
-       // && m_particle_list.at(particle_it).getStatus() == 3
        && (  m_particle_list.at(particle_it).getStatus() == 3
           || m_particle_list.at(particle_it).getStatus() == 1
+          || m_particle_list.at(particle_it).getStatus() == 11 // herwig++
           )
        ) {
       m_truth_muons.push_back(&m_particle_list.at(particle_it));
     }
     if (  fabs(m_particle_list.at(particle_it).getPdgid()) == 5
-       && m_particle_list.at(particle_it).getStatus() == 3
+       && (  m_particle_list.at(particle_it).getStatus() == 3
+          || m_particle_list.at(particle_it).getStatus() == 11 // herwig++
+          )
        ) {
       m_truth_b_quarks.push_back(&m_particle_list.at(particle_it));
     }
@@ -207,47 +209,37 @@ void BMinusL::Cutflow::doObjectSelection()
   // pick electrons coming from a stop
   m_daughter_el.reserve(m_truth_electrons.size());
   for (size_t el_it = 0; el_it != m_truth_electrons.size(); ++el_it) {
-    // if (fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6)
-    // if (  fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6
-    //    || fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
-    //    )
-    // std::cout << "electron parent: " << m_truth_electrons.at(el_it)->getParentPdgid() << " -- daughter el: ";
-    if (  (  m_truth_electrons.at(el_it)->getStatus() == 3
+    if (  (  (  m_truth_electrons.at(el_it)->getStatus() == 3
+             || m_truth_electrons.at(el_it)->getStatus() == 11 // herwig++
+             )
           && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6
           )
-       || (  m_truth_electrons.at(el_it)->getStatus() == 1
+       || (  (  m_truth_electrons.at(el_it)->getStatus() == 1
+             || m_truth_electrons.at(el_it)->getStatus() == 11 // herwig++
+             )
           && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
           )
        ) {
-      // std::cout << "true\n";
       m_daughter_el.push_back(m_truth_electrons.at(el_it));
     }
-    // else {
-    //   std::cout << "false\n";
-    // }
   }
 
   // pick muons coming from a stop
   m_daughter_mu.reserve(m_truth_muons.size());
   for (size_t mu_it = 0; mu_it != m_truth_muons.size(); ++mu_it) {
-    // if (fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6)
-    // if (  fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6
-    //    || fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
-    //    )
-    // std::cout << "muon parent: " << m_truth_muons.at(mu_it)->getParentPdgid() << " -- daughter mu: ";
-    if (  (  m_truth_muons.at(mu_it)->getStatus() == 3
+    if (  (  (  m_truth_muons.at(mu_it)->getStatus() == 3
+             || m_truth_muons.at(mu_it)->getStatus() == 11 // herwig++
+             )
           && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6
           )
-       || (  m_truth_muons.at(mu_it)->getStatus() == 1
+       || (  (  m_truth_muons.at(mu_it)->getStatus() == 1
+             || m_truth_muons.at(mu_it)->getStatus() == 11 // herwig++
+             )
           && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
           )
        ) {
-      // std::cout << "true\n";
       m_daughter_mu.push_back(m_truth_muons.at(mu_it));
     }
-    // else {
-    //   std::cout << "false\n";
-    // }
   }
 
   // pick b quarks coming from a stop
@@ -256,6 +248,17 @@ void BMinusL::Cutflow::doObjectSelection()
     if (fabs(m_truth_b_quarks.at(b_quarks_it)->getParentPdgid()) == 1e6+6)
       m_daughter_b_quarks.push_back(m_truth_b_quarks.at(b_quarks_it));
   }
+
+  size_t num_stops_before_cleaning = m_truth_stops.size();
+  cleanParticleList(m_truth_stops);
+  size_t num_stops_after_cleaning = m_truth_stops.size();
+  // std::cout << "num stops: " << m_truth_stops.size()
+  // std::cout << "num stops before cleaning: " << num_stops_before_cleaning
+  //           << " -- num_stops after cleaning: " << num_stops_after_cleaning
+  //           << " -- num daughter e: " << m_daughter_el.size()
+  //           << " -- num daughter mu: " << m_daughter_mu.size()
+  //           << " -- num_daughter b: " << m_daughter_b_quarks.size()
+  //           << "\n";
 
   // pick b jets
   m_b_jets.reserve(m_jet_list.size());

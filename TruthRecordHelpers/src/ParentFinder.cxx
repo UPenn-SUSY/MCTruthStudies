@@ -155,22 +155,55 @@ namespace TruthRecordHelpers
                     , bool verbose
                     )
   {
-    if (mc_index < 0) return -1;
+    if (mc_index < 0) {
+      if (verbose)
+        std::cout << "mc_index = " << mc_index << " -- assigning default value of -1\n";
+      return -1;
+    }
 
     int original_pdgid = mc_pdg_id->at(mc_index);
     int current_index = mc_index;
     int mother = 0;
 
+    if (verbose) {
+      std::cout << "\noriginal pdgid: " << original_pdgid
+                << " -- current index: " << current_index
+                << " -- mother: " << mother
+                << " -- size of mc_parent_index: " << mc_parent_index->size()
+                << "\n";
+      for (size_t parent_it = 0; parent_it != mc_parent_index->size() ; ++parent_it) {
+        std::cout << "\tparent_it: " << parent_it
+                  << " num parents: " << mc_parent_index->at(parent_it).size()
+                  << "\n";
+      }
+    }
+
     // this counter is just to prevent infinite loops. mother == 0 check should
     // get us out of this loop!
     for (unsigned int itr = 0; itr != 100 && mother == 0; ++itr) {
       size_t num_parents = mc_parent_index->at(current_index).size();
+      if (verbose) {
+        std::cout << "\titr: " << itr
+                  << " -- current index: " << current_index
+                  << " -- num_parents: " << num_parents
+                  << "\n";
+      }
 
       for (size_t it_parent = 0; it_parent != num_parents; ++it_parent) {
         int parent_index = mc_parent_index->at(current_index).at(it_parent);
         int parent_pdgid = mc_pdg_id->at(parent_index);
 
+        if (verbose) {
+          std::cout << "\t\tit parent: " << it_parent
+                    << " -- parent index: " << parent_index
+                    << " -- parent_pdgid: " << parent_pdgid
+                    << "\n";
+        }
+
         if (parent_pdgid == original_pdgid) {
+          if (verbose) {
+            std::cout << "\t\t\tparent pdg id == original_pdgid -- update current index\n";
+          }
           current_index = parent_index;
           break;
         }
@@ -232,5 +265,24 @@ namespace TruthRecordHelpers
                                      , verbose
                                      );
     return mc_barcode->at(parent_index);
+  }
+
+  // -----------------------------------------------------------------------------
+  int getImmediateParentIndex( int mc_index
+                             , const std::vector<int>* mc_pdg_id
+                             , const std::vector<std::vector<int> >* mc_parent_index
+                             , bool verbose
+                             )
+  {
+    if (mc_index < 0) {
+      if (verbose)
+        std::cout << "mc_index = " << mc_index << " -- assigning default value of -1\n";
+      return -1;
+    }
+
+    if (mc_parent_index->at(mc_index).size() > 0) {
+      return mc_parent_index->at(mc_index).at(0);
+    }
+    return -1;
   }
 }

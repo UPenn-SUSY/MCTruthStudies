@@ -2859,7 +2859,6 @@ bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNt
   // I'm probably being overly careful here
   for (size_t lep_it = 0; lep_it != m_l_list.size(); ++lep_it) {
     // if parent is stop (or anti-tau)
-    // if (m_l_list.at(lep_it)->getParentPdgid() == +(1e6+6))  {
     if (  m_l_list.at(lep_it)->getParentPdgid() == +(1e6+6)
        || m_l_list.at(lep_it)->getParentPdgid() == -15
        )  {
@@ -2869,7 +2868,6 @@ bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNt
         std::cout << "WARNING! Found multiple leptons paired to stop!\n";
     }
     // if parent is anti-stop (or tau)
-    // if (m_l_list.at(lep_it)->getParentPdgid() == -(1e6+6)) {
     if (  m_l_list.at(lep_it)->getParentPdgid() == -(1e6+6)
        || m_l_list.at(lep_it)->getParentPdgid() == +15
        ) {

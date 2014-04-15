@@ -3,6 +3,7 @@
 
 #include <vector>
 
+// ==============================================================================
 namespace TruthRecordHelpers
 {
   // given a barcode, find the corresponding index within the mc truth block
@@ -62,6 +63,13 @@ namespace TruthRecordHelpers
                       , const std::vector<std::vector<int> >* mc_parent_index
                       , bool verbose = false
                       );
+
+  // from the particle's mc index, get the immediate parent index
+  int getImmediateParentIndex( int mc_index
+                             , const std::vector<int>* mc_mc_pdg_id
+                             , const std::vector<std::vector<int> >* mc_parent_index
+                             , bool verbose = false
+                             );
 }
 
 #endif

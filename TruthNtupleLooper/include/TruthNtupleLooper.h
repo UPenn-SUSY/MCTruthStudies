@@ -31,6 +31,11 @@ namespace TruthNtuple
       virtual void constructObjects();
       virtual void processEvent();
 
+
+      // Clean multiple instances of same particle in std::vector
+      // protect us from times when particle "decays" to itself many times
+      virtual void cleanParticleList( std::vector<TruthNtuple::Particle*>& );
+
     protected:
       std::vector<TruthNtuple::Particle> m_particle_list;
       std::vector<TruthNtuple::Electron> m_el_list;
