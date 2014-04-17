@@ -393,7 +393,7 @@ void TruthNtuple::TruthNtupleLooper::processEvent()
 void TruthNtuple::TruthNtupleLooper::cleanParticleList(
     std::vector<TruthNtuple::Particle*>& part_list)
 {
-  // std::cout << "cleaning particle list!!!\n";
+  // std::cout << "cleaning particle list!!! -- event number: " << EventNumber << "\n";
 
   // total nubmer of particles before cleaning
   size_t num_part = part_list.size();
@@ -403,8 +403,26 @@ void TruthNtuple::TruthNtupleLooper::cleanParticleList(
   // vector to tell us if this particle is to be removed
   std::vector<bool> to_remove(num_part, false);
 
+  // loop over all particles to look for negative mass particles because I have Herwig
+  for (size_t part_it = 0; part_it != num_part; ++part_it) {
+    if (part_list.at(part_it)->getM() < 0) {
+      // std::cout << "\tparticle at it " << part_it << " has negative mass - flagging for removal\n";
+      to_remove.at(part_it) = true;
+    }
+  }
+
   // loop over all particles to look for a particle who is its own parent
   for (size_t part_it = 0; part_it != num_part; ++part_it) {
+    // std::cout << "\t\touter loop it: " << part_it;
+    if (part_list.at(part_it)->getM() < 0) {
+      to_remove.at(part_it) = true;
+      continue;
+    }
+    // if (to_remove.at(part_it)) {
+    //   std::cout << "\t -- already flagged for removal\n";
+    //   continue;
+    // }
+
     // store the pdgid and parent index of this particle
     int this_pdgid = part_list.at(part_it)->getPdgid();
     int this_barcode = part_list.at(part_it)->getBarcode();
@@ -412,7 +430,7 @@ void TruthNtuple::TruthNtupleLooper::cleanParticleList(
     int this_parent_barcode = part_list.at(part_it)->getImmediateParentBarcode();
 
     // std::cout << "\t\touter loop it: " << part_it
-    //           << " -- this pdgid: " << this_pdgid
+    // std::cout << " -- this pdgid: " << this_pdgid
     //           << " -- this barcode: " << this_barcode
     //           << " -- this parent_index: " << this_parent_index
     //           << " -- this parent barcode: " << this_parent_barcode
@@ -422,16 +440,46 @@ void TruthNtuple::TruthNtupleLooper::cleanParticleList(
     // parent have the same pdgid, we will say they are the same and flag this
     // particle for removal
     for (size_t inner_part_it = 0; inner_part_it != num_part; ++inner_part_it) {
+      // std::cout << "\t\t\tinner loop it: " << inner_part_it;
+      // if (to_remove.at(inner_part_it)) {
+      if (part_list.at(inner_part_it)->getM() < 0 ) {
+        // std::cout << "\t -- already flagged for removal\n";
+        // std::cout << "\t -- has negative mass - skipping \n";
+        continue;
+      }
+
       // std::cout << "\t\t\tinner loop it: " << inner_part_it
-      //           << " -- inner index: " << part_list.at(inner_part_it)->getMCIndex()
+      // std::cout << " -- inner index: " << part_list.at(inner_part_it)->getMCIndex()
       //           << " -- inner pdgid: " << part_list.at(inner_part_it)->getPdgid()
       //           << " -- inner barcode: " << part_list.at(inner_part_it)->getBarcode()
       //           << "\n";
       if ( part_list.at(inner_part_it)->getMCIndex() == this_parent_index ) {
+        // std::cout << "\t\t\t\tWe found the parent -- parent it: " << part_it
+        //           << "  --  this pdgid: " << this_pdgid
+        //           << "  --  parent pdgid: " << part_list.at(inner_part_it)->getPdgid()
+        //           << "  --  equal: " << (  part_list.at(inner_part_it)->getPdgid()
+        //                                 == this_pdgid
+        //                                 )
+        //           << "\n"
+        //           << "\t\t\t\t\t"
+        //           << " -- this px: " << part_list.at(part_it)->getPx()
+        //           << " -- this py: " << part_list.at(part_it)->getPy()
+        //           << " -- this pz: " << part_list.at(part_it)->getPz()
+        //           << "\n"
+        //           << "\t\t\t\t\t"
+        //           << " -- parent px: " << part_list.at(inner_part_it)->getPx()
+        //           << " -- parent py: " << part_list.at(inner_part_it)->getPy()
+        //           << " -- parent pz: " << part_list.at(inner_part_it)->getPz()
+        //           << "\n";
         // we found the parent, do the pdgid's match
-        if ( part_list.at(inner_part_it)->getPdgid() == this_pdgid ) {
+        int parent_pdgid = part_list.at(inner_part_it)->getPdgid();
+        if ( parent_pdgid == this_pdgid ) {
           // std::cout << "\t\t\t\tREMOVE PARTICLE " << part_it << "\n";
           to_remove.at(part_it) = true;
+        }
+        if ( parent_pdgid == -this_pdgid ) {
+          // std::cout << "\t\t\t\tREMOVE PARTICLE " << part_it << "\n";
+          to_remove.at(inner_part_it) = true;
         }
         // we already found the parent, we don't need to continue the inner loop
         break;

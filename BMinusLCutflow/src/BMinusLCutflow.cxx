@@ -91,19 +91,31 @@ void BMinusL::Cutflow::processEvent()
   // if (num_tau == 0) return;
 
   // define the flavor channel based on the number of each lepton flavor
+  // std::cout << "\n--------------------------------------------------------------------------------"
+  //           << "\nEvent number: " << EventNumber
+  //           << "\nchecking the flavor channel -- num_el: " << num_el << " -- num_mu: " << num_mu
+  //           << "\n";
   if (num_el == 2 && num_mu == 0) {
+    // std::cout << "\tthis event is EE\n";
     m_flavor_channel = TruthNtuple::FLAVOR_EE;
   }
   else if (num_el == 0 && num_mu == 2) {
+    // std::cout << "\tthis event is MM\n";
     m_flavor_channel = TruthNtuple::FLAVOR_MM;
   }
   else if (num_el == 1 && num_mu == 1) {
-    if (m_daughter_el.at(0)->getPt() >= m_daughter_mu.at(0)->getPt())
+    // std::cout << "\tthis event is EM or ME\n";
+    if (m_daughter_el.at(0)->getPt() >= m_daughter_mu.at(0)->getPt()) {
+      // std::cout << "\t\tthis event is really EM\n";
       m_flavor_channel = TruthNtuple::FLAVOR_EM;
-    else
+    }
+    else {
+      // std::cout << "\t\tthis event is really ME\n";
       m_flavor_channel = TruthNtuple::FLAVOR_ME;
+    }
   }
   else {
+    // std::cout << "\tthis event is NONE\n";
     m_flavor_channel = TruthNtuple::FLAVOR_NONE;
   }
 
@@ -214,11 +226,12 @@ void BMinusL::Cutflow::doObjectSelection()
              )
           && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6
           )
-       || (  (  m_truth_electrons.at(el_it)->getStatus() == 1
-             || m_truth_electrons.at(el_it)->getStatus() == 11 // herwig++
-             )
-          && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
-          )
+        // TODO reimpliment the stop decays thgrouh a tau
+       // || (  (  m_truth_electrons.at(el_it)->getStatus() == 1
+       //       || m_truth_electrons.at(el_it)->getStatus() == 11 // herwig++
+       //       )
+       //    && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
+       //    )
        ) {
       m_daughter_el.push_back(m_truth_electrons.at(el_it));
     }
@@ -232,11 +245,12 @@ void BMinusL::Cutflow::doObjectSelection()
              )
           && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6
           )
-       || (  (  m_truth_muons.at(mu_it)->getStatus() == 1
-             || m_truth_muons.at(mu_it)->getStatus() == 11 // herwig++
-             )
-          && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
-          )
+        // TODO reimpliment the stop decays thgrouh a tau
+       // || (  (  m_truth_muons.at(mu_it)->getStatus() == 1
+       //       || m_truth_muons.at(mu_it)->getStatus() == 11 // herwig++
+       //       )
+       //    && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
+       //    )
        ) {
       m_daughter_mu.push_back(m_truth_muons.at(mu_it));
     }

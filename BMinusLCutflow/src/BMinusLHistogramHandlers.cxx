@@ -24,9 +24,9 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
   const double pt_min = 0.;
   const double pt_max = 1500.;
 
-  const int pt_ratio_bins   = 100;
+  const int pt_ratio_bins   = 300;
   const double pt_ratio_min = 0.;
-  const double pt_ratio_max = 1.;
+  const double pt_ratio_max = 3.;
 
   const int eta_bins   = 50;
   const double eta_min = -5.;
@@ -596,6 +596,21 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
       m_h_p_2d.at(fc)->Fill(p_stop, p_astp);
 
       // fill pt/m
+      if ( (pt_stop/m_stop) < 0) {
+        std::cout << "\nSTOP pt/m is less than 0!!!:"
+                  << "\n\tpt: " << pt_stop
+                  << "\n\tm: " << m_stop
+                  << "\n\tpt/m: " << pt_stop/m_stop
+                  << "\n";
+      }
+      if ( (pt_astp/m_astp) < 0) {
+        std::cout << "\nANTI-STOP pt/m is less than 0!!!:"
+                  << "\n\tpt: " << pt_astp
+                  << "\n\tm: " << m_astp
+                  << "\n\tpt/m: " << pt_astp/m_astp
+                  << "\n";
+      }
+
       m_h_pt_over_m_all.at(fc)->Fill(pt_stop/m_stop);
       m_h_pt_over_m_all.at(fc)->Fill(pt_astp/m_astp);
 
@@ -606,6 +621,21 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
       m_h_pt_over_m_2d.at(fc)->Fill(pt_stop/m_stop, pt_astp/m_astp);
 
       // fill p/m
+      if ( (p_stop/m_stop) < 0) {
+        std::cout << "\nSTOP p/m is less than 0!!!:"
+                  << "\n\tp: " << p_stop
+                  << "\n\tm: " << m_stop
+                  << "\n\tp/m: " << p_stop/m_stop
+                  << "\n";
+      }
+      if ( (p_astp/m_astp) < 0) {
+        std::cout << "\nANTI-STOP p/m is less than 0!!!:"
+                  << "\n\tp: " << p_astp
+                  << "\n\tm: " << m_astp
+                  << "\n\tp/m: " << p_astp/m_astp
+                  << "\n";
+      }
+
       m_h_p_over_m_all.at(fc)->Fill(p_stop/m_stop);
       m_h_p_over_m_all.at(fc)->Fill(p_astp/m_astp);
 
@@ -2289,10 +2319,20 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
          , const std::vector<TruthNtuple::Particle*>& quark_list
          )
 {
-  if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
+  if (flavor_channel == TruthNtuple::FLAVOR_NONE) {
+    std::cout << "\nflavor channel = NONE -- skipping event for the b-l kinematics plot"
+              << "\n\t-- num el: " << el_list.size()
+              << "\n\t-- num mu: " << mu_list.size()
+              << "\n\t-- num quark: " << quark_list.size()
+              << "\n";
+    return;
+  }
 
   // sort objects based on parent particle - if sorting fails, exis the function
-  if (sortObjects(el_list, mu_list, quark_list) == false) return;
+  if (sortObjects(el_list, mu_list, quark_list) == false) {
+    std::cout << "\nfailed to sort objects -- skipping event for the b-l kinematics plot\n";
+    return;
+  }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   // compute mbl for correct pairing
