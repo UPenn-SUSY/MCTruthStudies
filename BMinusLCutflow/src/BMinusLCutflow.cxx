@@ -9,6 +9,8 @@
 
 #include "TruthNtupleLooper/include/ObjectDefs.h"
 
+#include "TruthRecordHelpers/include/ParentFinder.h"
+
 #include "HistogramHandlers/include/HistogramHandlers.h"
 #include "BMinusLCutflow/include/BMinusLHistogramHandlers.h"
 
@@ -221,40 +223,63 @@ void BMinusL::Cutflow::doObjectSelection()
   // pick electrons coming from a stop
   m_daughter_el.reserve(m_truth_electrons.size());
   for (size_t el_it = 0; el_it != m_truth_electrons.size(); ++el_it) {
-    if (  (  (  m_truth_electrons.at(el_it)->getStatus() == 3
-             || m_truth_electrons.at(el_it)->getStatus() == 11 // herwig++
-             )
-          && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6
+   //  std::cout << "\nfound a truth electron!\n";
+   //  std::cout << "\tstatus code: "  << m_truth_electrons.at(el_it)->getStatus() << "\n";
+   //  std::cout << "\tparent pdgid: " << m_truth_electrons.at(el_it)->getParentPdgid() << "\n";
+
+    if (  (  m_truth_electrons.at(el_it)->getStatus() == 3
+          || m_truth_electrons.at(el_it)->getStatus() == 11 // herwig++
           )
-        // TODO reimpliment the stop decays thgrouh a tau
-       // || (  (  m_truth_electrons.at(el_it)->getStatus() == 1
-       //       || m_truth_electrons.at(el_it)->getStatus() == 11 // herwig++
-       //       )
-       //    && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
-       //    )
+       && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6
        ) {
       m_daughter_el.push_back(m_truth_electrons.at(el_it));
+    }
+    else if (  (  m_truth_electrons.at(el_it)->getStatus() == 1
+               || m_truth_electrons.at(el_it)->getStatus() == 3
+               || true
+               )
+            && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
+            ) {
+      // std::cout << "\nthis leptons has a tau parent -- checking the tau's parents\n";
+
+      if (isLeptonFromTauFromStop(m_truth_electrons.at(el_it))) {
+        m_daughter_el.push_back(m_truth_electrons.at(el_it));
+      }
     }
   }
 
   // pick muons coming from a stop
   m_daughter_mu.reserve(m_truth_muons.size());
   for (size_t mu_it = 0; mu_it != m_truth_muons.size(); ++mu_it) {
-    if (  (  (  m_truth_muons.at(mu_it)->getStatus() == 3
-             || m_truth_muons.at(mu_it)->getStatus() == 11 // herwig++
-             )
-          && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6
+
+    // std::cout << "\nfound a truth muon!\n";
+    // std::cout << "\tstatus code: " << m_truth_muons.at(mu_it)->getStatus() << "\n";
+    // std::cout << "\tparent pdgid: " << m_truth_muons.at(mu_it)->getParentPdgid() << "\n";
+
+    if (  (  m_truth_muons.at(mu_it)->getStatus() == 3
+          || m_truth_muons.at(mu_it)->getStatus() == 11 // herwig++
           )
-        // TODO reimpliment the stop decays thgrouh a tau
-       // || (  (  m_truth_muons.at(mu_it)->getStatus() == 1
-       //       || m_truth_muons.at(mu_it)->getStatus() == 11 // herwig++
-       //       )
-       //    && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
-       //    )
+       && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6 
        ) {
       m_daughter_mu.push_back(m_truth_muons.at(mu_it));
     }
+    else if (  (  m_truth_muons.at(mu_it)->getStatus() == 1
+               || m_truth_muons.at(mu_it)->getStatus() == 3
+               || true
+               )
+            && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
+            ) {
+      // std::cout << "\nthis leptons has a tau parent -- checking the tau's parents\n";
+
+      if (isLeptonFromTauFromStop(m_truth_muons.at(mu_it))) {
+        m_daughter_mu.push_back(m_truth_muons.at(mu_it));
+      }
+    }
   }
+
+  // std::cout << "total number el: " << m_daughter_el.size() << "\n";
+  // std::cout << "total number mu: " << m_daughter_mu.size() << "\n";
+  // std::cout << "total number leptons: " << m_daughter_el.size() + m_daughter_mu.size() << "\n";
 
   // pick b quarks coming from a stop
   m_daughter_b_quarks.reserve(m_truth_b_quarks.size());
@@ -363,6 +388,47 @@ void  BMinusL::Cutflow::print()
     m_daughter_b_quarks.at(q_it)->printGeneralInfo();
   }
   */
+}
+
+// -----------------------------------------------------------------------------
+bool BMinusL::Cutflow::isLeptonFromTauFromStop(const TruthNtuple::Particle* part)
+{
+  // get the tau index using the barcode
+  int tau_index = TruthRecordHelpers::getParentIndexFromBarcode( part->getBarcode()
+                                                                , mc_barcode
+                                                                , mc_pdgId
+                                                                , mc_parent_index
+                                                                );
+  // find the tau's parent
+  int tau_parent_pdgid = TruthRecordHelpers::getParentPdgId( tau_index
+                                                           , mc_pdgId
+                                                           , mc_parent_index
+                                                           );
+
+  // if the parent is 0, we probably lost part of the truth record -- do dR matching to find the correct parent 
+  if ( tau_parent_pdgid == 0 ) {
+    // do dR matching to find the first tau in this chain
+    int first_tau_mc_index = TruthRecordHelpers::doDrMatchForParent( tau_index
+                                                                   , mc_pdgId
+                                                                   , mc_status
+                                                                   , mc_eta
+                                                                   , mc_phi
+                                                                   , 3
+                                                                   , 0.1
+                                                                   );
+    tau_parent_pdgid = TruthRecordHelpers::getParentPdgId( first_tau_mc_index
+                                                         , mc_pdgId
+                                                         , mc_parent_index
+                                                         );
+  }
+
+  // check if taur parent is a tau
+  if ( fabs(tau_parent_pdgid) == 1e6+6 ) {
+    return true;
+  }
+
+  // the parent is not a stop
+  return false;
 }
 
 // =============================================================================

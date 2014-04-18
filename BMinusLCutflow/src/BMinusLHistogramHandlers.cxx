@@ -2320,13 +2320,18 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
          )
 {
   if (flavor_channel == TruthNtuple::FLAVOR_NONE) {
-    std::cout << "\nflavor channel = NONE -- skipping event for the b-l kinematics plot"
-              << "\n\t-- num el: " << el_list.size()
-              << "\n\t-- num mu: " << mu_list.size()
-              << "\n\t-- num quark: " << quark_list.size()
-              << "\n";
+    // std::cout << "\nflavor channel = NONE -- skipping event for the b-l kinematics plot"
+    //           << "\n\t-- num el: " << el_list.size()
+    //           << "\n\t-- num mu: " << mu_list.size()
+    //           << "\n\t-- num quark: " << quark_list.size()
+    //           << "\n";
     return;
   }
+  // std::cout << "\nflavor channel = " << TruthNtuple::FlavorChannelStrings[flavor_channel]
+  //           << "\n\t-- num el: " << el_list.size()
+  //           << "\n\t-- num mu: " << mu_list.size()
+  //           << "\n\t-- num quark: " << quark_list.size()
+  //           << "\n";
 
   // sort objects based on parent particle - if sorting fails, exis the function
   if (sortObjects(el_list, mu_list, quark_list) == false) {

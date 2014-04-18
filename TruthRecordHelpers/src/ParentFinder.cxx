@@ -285,4 +285,51 @@ namespace TruthRecordHelpers
     }
     return -1;
   }
+
+  // -----------------------------------------------------------------------------
+  int doDrMatchForParent( int mc_index
+                        , const std::vector<int>* mc_pdg_id
+                        , const std::vector<int>* mc_status_code
+                        , const std::vector<float>* mc_eta
+                        , const std::vector<float>* mc_phi
+                        , int limit_status_code
+                        , float dr_threshold
+                        )
+  {
+    int start_pdgid = mc_pdg_id->at(mc_index);
+    float start_eta = mc_eta->at(mc_index);
+    float start_phi = mc_phi->at(mc_index);
+    float dr_threshold_2 = dr_threshold*dr_threshold;
+    int closest_mc_index = -1;
+
+    size_t mc_n = mc_pdg_id->size();
+    for (size_t mc_it = 0; mc_it != mc_n; ++mc_it) {
+      // Don't match to same mc particle!
+      if (mc_it == mc_index) continue;
+
+      // if the pdg id of the start particle and the particle in the loop don't agree, skip
+      if (start_pdgid != mc_pdg_id->at(mc_it)) continue;
+
+      // if we want to limit the search to certain status codes, and this does not match, skip
+      if (  limit_status_code > 0
+         && mc_status_code->at(mc_it) != limit_status_code
+         )
+        continue;
+
+      // calculate deta/dphi
+      float deta = (start_eta - mc_eta->at(mc_it));
+      float dphi = fabs(start_phi - mc_phi->at(mc_it));
+      while (dphi > +3.14159) dphi -= 2*3.14159;
+      while (dphi < -3.14159) dphi += 2*3.14159;
+
+      // Find dR^2 and check if it is below threshold - if yes, update threshold and the closest mc index
+      float dr2 = (deta*deta + dphi*dphi);
+      if (dr2 < dr_threshold_2) {
+        dr_threshold_2 = dr2;
+        closest_mc_index = mc_it;
+      }
+    }
+
+    return closest_mc_index;
+  }
 }
