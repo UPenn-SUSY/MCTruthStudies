@@ -28,8 +28,8 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
   const double p_min = 0.;
   const double p_max = 3000.;
 
-  const int pz_bins   = 300;
-  const double pz_min = 0.;
+  const int pz_bins   = 600;
+  const double pz_min = -3000.;
   const double pz_max = 3000.;
 
   const int pt_ratio_bins   = 500;

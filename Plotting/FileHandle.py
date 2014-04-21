@@ -12,7 +12,7 @@ import rootlogon
 import yaml
 
 # ==============================================================================
-def readInputConfig(in_file_name):
+def readInputConfig(in_file_name, ignore_missing_channel_hists = False):
     print 'finput config file: %s' % in_file_name
     config_file = open(in_file_name)
     config_dict = yaml.load(config_file)
@@ -26,6 +26,7 @@ def readInputConfig(in_file_name):
                                        , cd['shape']
                                        , cd['line']
                                        , cd['xsec']
+                                       , ignore_missing_channel_hists
                                        )
                            )
     return file_handles
@@ -33,7 +34,16 @@ def readInputConfig(in_file_name):
 # ==============================================================================
 # input files:
 class FileHandle(object):
-    def __init__(self, title, in_file, directory, color, shape, line, xsec):
+    def __init__( self
+                , title
+                , in_file
+                , directory
+                , color
+                , shape
+                , line
+                , xsec
+                , ignore_missing_channel_hists=False
+                ):
         self.title = title
         self.color = color
         self.shape = shape
@@ -51,15 +61,18 @@ class FileHandle(object):
 
         keys = [lok.GetName() for lok in self.directory.GetListOfKeys()]
         print keys
-        channel_name = [lok.GetName() for lok in self.directory.GetListOfKeys() if lok.GetName().startswith('fc_all__flavor_channel')]
-        print 'channel_name: %s' % channel_name
-        assert len(channel_name) == 1
-        channel_name = channel_name[0]
+        if not ignore_missing_channel_hists:
+            channel_name = [lok.GetName() for lok in self.directory.GetListOfKeys() if lok.GetName().startswith('fc_all__flavor_channel')]
+            print 'channel_name: %s' % channel_name
+            assert len(channel_name) == 1
+            channel_name = channel_name[0]
 
-        print channel_name
-        print 'channels' in keys
-        self.scale = self.directory.Get(channel_name).Integral()
-        self.scale = 1/self.scale if self.scale != 0. else 1.
+            print channel_name
+            print 'channels' in keys
+            self.scale = self.directory.Get(channel_name).Integral()
+            self.scale = 1/self.scale if self.scale != 0. else 1.
+        else:
+            self.scale = 1
 
     def getListOfHists(self):
         hist_list = [obj.GetName() for obj in self.directory.GetListOfKeys()]
@@ -71,15 +84,17 @@ class FileHandle(object):
             this_hist_name += '_norm'
         this_hist_name += '__%s' % self.title
         hist = self.directory.Get(hist_name).Clone(this_hist_name)
-        hist.Sumw2()
+        if not isinstance(hist, ROOT.TGraph):
+            hist.Sumw2()
 
-        if not isinstance(hist, ROOT.TH2):
+        if not isinstance(hist, ROOT.TH2) and not isinstance(hist, ROOT.TGraph):
             moveOverflowToLastBin(hist)
 
-        if normalize and hist.Integral() != 0.:
-            hist.Scale(1./hist.Integral())
-        if scale_to_xsec > 0.:
-            hist.Scale(scale_to_xsec)
+        if not isinstance(hist, ROOT.TGraph):
+            if normalize and hist.Integral() != 0.:
+                hist.Scale(1./hist.Integral())
+            if scale_to_xsec > 0.:
+                hist.Scale(scale_to_xsec)
         return hist
 
 # ------------------------------------------------------------------------------

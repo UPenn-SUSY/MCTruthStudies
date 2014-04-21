@@ -17,7 +17,14 @@ import FileHandle
 # ------------------------------------------------------------------------------
 def main():
     config_file_name = sys.argv[1]
-    files = FileHandle.readInputConfig(config_file_name)
+    special_graph_only_mode = False
+    if len(sys.argv) > 2:
+        print sys.argv[2]
+        if sys.argv[2] == '1':
+            special_graph_only_mode = True
+        print special_graph_only_mode
+
+    files = FileHandle.readInputConfig(config_file_name, special_graph_only_mode)
     print 'FILES: %s' % files
 
     out_file = ROOT.TFile.Open('truth_compare.canv.root', 'RECREATE')
@@ -27,8 +34,11 @@ def main():
     for i, loh in enumerate(list_of_hists):
         if 'fc_all__' not in loh: continue
         for is_log in [True, False]:
+            if special_graph_only_mode and is_log: continue
             for norm in [True, False]:
+                if special_graph_only_mode and norm: continue
                 for xsec in [True, False]:
+                    if special_graph_only_mode and xsec: continue
                     print 'hist (%d of %d): %s' % (i, num_hists, loh)
 
                     hm = HistMerger.HistMerger( files, loh, norm , is_log, xsec)
