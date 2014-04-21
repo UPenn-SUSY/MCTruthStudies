@@ -60,6 +60,12 @@ namespace HistogramHandlers
       std::vector<TH1D*> m_h_pt_diff;
       std::vector<TH2D*> m_h_pt_2d;
 
+      std::vector<TH1D*> m_h_pz_all;
+      std::vector<TH1D*> m_h_pz_stop; // stop
+      std::vector<TH1D*> m_h_pz_astp; // anti-stop
+      std::vector<TH1D*> m_h_pz_diff;
+      std::vector<TH2D*> m_h_pz_2d;
+
       std::vector<TH1D*> m_h_p_over_m_all;
       std::vector<TH1D*> m_h_p_over_m_stop;
       std::vector<TH1D*> m_h_p_over_m_astp;

@@ -24,9 +24,21 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
   const double pt_min = 0.;
   const double pt_max = 1500.;
 
-  const int pt_ratio_bins   = 300;
+  const int p_bins   = 300;
+  const double p_min = 0.;
+  const double p_max = 3000.;
+
+  const int pz_bins   = 300;
+  const double pz_min = 0.;
+  const double pz_max = 3000.;
+
+  const int pt_ratio_bins   = 500;
   const double pt_ratio_min = 0.;
-  const double pt_ratio_max = 3.;
+  const double pt_ratio_max = 5.;
+
+  const int p_ratio_bins   = 1000;
+  const double p_ratio_min = 0.;
+  const double p_ratio_max = 10.;
 
   const int eta_bins   = 50;
   const double eta_min = -5.;
@@ -114,7 +126,7 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                     + TruthNtuple::FlavorChannelStrings[fc_it]
                                     + "; p [GeV] ; Entries"
                                     ).c_str()
-                                  , pt_bins, pt_min, pt_max
+                                  , p_bins, p_min, p_max
                                   )
                         );
     m_h_p_stop.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -124,7 +136,7 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                   + TruthNtuple::FlavorChannelStrings[fc_it]
                                   + "; p^{#tilde{t}} [GeV] ; Entries"
                                   ).c_str()
-                                , pt_bins, pt_min, pt_max
+                                , p_bins, p_min, p_max
                                 )
                       );
     m_h_p_astp.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -134,7 +146,7 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                   + TruthNtuple::FlavorChannelStrings[fc_it]
                                   + "; p^{#tilde{t}*} [GeV] ; Entries"
                                   ).c_str()
-                                , pt_bins, pt_min, pt_max
+                                , p_bins, p_min, p_max
                                 )
                       );
     m_h_p_diff.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -144,7 +156,7 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                      + TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "; p^{#tilde{t}} - p^{#tilde{t}*} [GeV] ; Entries"
                                      ).c_str()
-                                   , 2*pt_bins, -pt_max, pt_max
+                                   , 2*p_bins, -p_max, p_max
                                    )
                          );
     m_h_p_2d.push_back( new TH2D( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -154,8 +166,8 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                    + TruthNtuple::FlavorChannelStrings[fc_it]
                                    + "; p^{#tilde{t}} [GeV] ; p^{#tilde{t}*} [GeV]"
                                    ).c_str()
-                                 , pt_bins, pt_min, pt_max
-                                 , pt_bins, pt_min, pt_max
+                                 , p_bins, p_min, p_max
+                                 , p_bins, p_min, p_max
                                  )
                        );
 
@@ -213,6 +225,59 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                        );
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    m_h_pz_all.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                    + "__stop_pz_all"
+                                    ).c_str()
+                                  , ( "p_{Z} - "
+                                    + TruthNtuple::FlavorChannelStrings[fc_it]
+                                    + "; p_{Z} [GeV] ; Entries"
+                                    ).c_str()
+                                  , pz_bins, pz_min, pz_max
+                                  )
+                        );
+    m_h_pz_stop.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                  + "__stop_pz_stop"
+                                  ).c_str()
+                                , ( "p_{Z} - "
+                                  + TruthNtuple::FlavorChannelStrings[fc_it]
+                                  + "; p_{Z}^{#tilde{t}} [GeV] ; Entries"
+                                  ).c_str()
+                                , pz_bins, pz_min, pz_max
+                                )
+                      );
+    m_h_pz_astp.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                  + "__stop_pz_astp"
+                                  ).c_str()
+                                , ( "p_{Z} - "
+                                  + TruthNtuple::FlavorChannelStrings[fc_it]
+                                  + "; p_{Z}^{#tilde{t}*} [GeV] ; Entries"
+                                  ).c_str()
+                                , pz_bins, pz_min, pz_max
+                                )
+                      );
+    m_h_pz_diff.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                     + "__stop_pz_diff"
+                                     ).c_str()
+                                   , ( "p_{Z} diff - "
+                                     + TruthNtuple::FlavorChannelStrings[fc_it]
+                                     + "; p_{Z}^{#tilde{t}} - p_{Z}^{#tilde{t}*} [GeV] ; Entries"
+                                     ).c_str()
+                                   , 2*pz_bins, -pz_max, pz_max
+                                   )
+                         );
+    m_h_pz_2d.push_back( new TH2D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                   + "__stop_pz_2d"
+                                   ).c_str()
+                                 , ( "p_{Z} map - "
+                                   + TruthNtuple::FlavorChannelStrings[fc_it]
+                                   + "; p_{Z}^{#tilde{t}} [GeV] ; p_{Z}^{#tilde{t}*} [GeV]"
+                                   ).c_str()
+                                 , pz_bins, pz_min, pz_max
+                                 , pz_bins, pz_min, pz_max
+                                 )
+                       );
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_p_over_m_all.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
                                     + "__stop_p_over_m_all"
                                     ).c_str()
@@ -220,7 +285,7 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                     + TruthNtuple::FlavorChannelStrings[fc_it]
                                     + "; p/m ; Entries"
                                     ).c_str()
-                                  , pt_ratio_bins, pt_ratio_min, pt_ratio_max
+                                  , p_ratio_bins, p_ratio_min, p_ratio_max
                                   )
                         );
     m_h_p_over_m_stop.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -230,7 +295,7 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                   + TruthNtuple::FlavorChannelStrings[fc_it]
                                   + "; p^{#tilde{t}}/m ; Entries"
                                   ).c_str()
-                                , pt_ratio_bins, pt_ratio_min, pt_ratio_max
+                                , p_ratio_bins, p_ratio_min, p_ratio_max
                                 )
                       );
     m_h_p_over_m_astp.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -240,7 +305,7 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                   + TruthNtuple::FlavorChannelStrings[fc_it]
                                   + "; p^{#tilde{t}*}/m ; Entries"
                                   ).c_str()
-                                , pt_ratio_bins, pt_ratio_min, pt_ratio_max
+                                , p_ratio_bins, p_ratio_min, p_ratio_max
                                 )
                       );
     m_h_p_over_m_diff.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -250,7 +315,7 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                      + TruthNtuple::FlavorChannelStrings[fc_it]
                                      + "; p^{#tilde{t}}/m - p^{#tilde{t}*}/m ; Entries"
                                      ).c_str()
-                                   , 2*pt_ratio_bins, -pt_ratio_max, pt_ratio_max
+                                   , 2*p_ratio_bins, -p_ratio_max, p_ratio_max
                                    )
                          );
     m_h_p_over_m_2d.push_back( new TH2D( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -260,8 +325,8 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                    + TruthNtuple::FlavorChannelStrings[fc_it]
                                    + "; p^{#tilde{t}}/m ; p^{#tilde{t}*}/m"
                                    ).c_str()
-                                 , pt_ratio_bins, pt_ratio_min, pt_ratio_max
-                                 , pt_ratio_bins, pt_ratio_min, pt_ratio_max
+                                 , p_ratio_bins, p_ratio_min, p_ratio_max
+                                 , p_ratio_bins, p_ratio_min, p_ratio_max
                                  )
                        );
 
@@ -503,6 +568,9 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
   double pt_stop = 0;
   double pt_astp = 0;
 
+  double pz_stop = 0;
+  double pz_astp = 0;
+
   double eta_stop = 0;
   double eta_astp = 0;
 
@@ -527,6 +595,9 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
     pt_stop = stop_list.at(0)->getPt()/1.e3;
     pt_astp = stop_list.at(1)->getPt()/1.e3;
 
+    pz_stop = stop_list.at(0)->getPz()/1.e3;
+    pz_astp = stop_list.at(1)->getPz()/1.e3;
+
     eta_stop = stop_list.at(0)->getEta();
     eta_astp = stop_list.at(1)->getEta();
 
@@ -550,6 +621,9 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
 
     pt_stop = stop_list.at(1)->getPt()/1.e3;
     pt_astp = stop_list.at(0)->getPt()/1.e3;
+
+    pz_stop = stop_list.at(1)->getPz()/1.e3;
+    pz_astp = stop_list.at(0)->getPz()/1.e3;
 
     eta_stop = stop_list.at(1)->getEta();
     eta_astp = stop_list.at(0)->getEta();
@@ -655,6 +729,16 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
       m_h_pt_diff.at(fc)->Fill(pt_stop - pt_astp);
       m_h_pt_2d.at(fc)->Fill(pt_stop, pt_astp);
 
+      // fill pz
+      m_h_pz_all.at(fc)->Fill(pz_stop);
+      m_h_pz_all.at(fc)->Fill(pz_astp);
+
+      m_h_pz_stop.at(fc)->Fill(pz_stop);
+      m_h_pz_astp.at(fc)->Fill(pz_astp);
+
+      m_h_pz_diff.at(fc)->Fill(pz_stop - pz_astp);
+      m_h_pz_2d.at(fc)->Fill(pz_stop, pz_astp);
+
       // Fill eta
       m_h_eta_all.at(fc)->Fill(eta_stop);
       m_h_eta_all.at(fc)->Fill(eta_astp);
@@ -712,6 +796,12 @@ void HistogramHandlers::StopKinematics::write(TFile* f)
     m_h_pt_astp.at(fc_it)->Write();
     m_h_pt_diff.at(fc_it)->Write();
     m_h_pt_2d.at(fc_it)->Write();
+
+    m_h_pz_all.at(fc_it)->Write();
+    m_h_pz_stop.at(fc_it)->Write();
+    m_h_pz_astp.at(fc_it)->Write();
+    m_h_pz_diff.at(fc_it)->Write();
+    m_h_pz_2d.at(fc_it)->Write();
 
     m_h_p_over_m_all.at(fc_it)->Write();
     m_h_p_over_m_stop.at(fc_it)->Write();
