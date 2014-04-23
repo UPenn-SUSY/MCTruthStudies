@@ -10,6 +10,8 @@
 
 #include "TruthNtupleLooper/include/ObjectDefs.h"
 
+#include "TruthRecordHelpers/include/ParentFinder.h"
+
 #include "HistogramHandlers/include/HistogramHandlers.h"
 #include "BMinusLCutflow/include/BMinusLHistogramHandlers.h"
 
@@ -92,19 +94,31 @@ void BMinusL::Cutflow::processEvent()
   // if (num_tau == 0) return;
 
   // define the flavor channel based on the number of each lepton flavor
+  // std::cout << "\n--------------------------------------------------------------------------------"
+  //           << "\nEvent number: " << EventNumber
+  //           << "\nchecking the flavor channel -- num_el: " << num_el << " -- num_mu: " << num_mu
+  //           << "\n";
   if (num_el == 2 && num_mu == 0) {
+    // std::cout << "\tthis event is EE\n";
     m_flavor_channel = TruthNtuple::FLAVOR_EE;
   }
   else if (num_el == 0 && num_mu == 2) {
+    // std::cout << "\tthis event is MM\n";
     m_flavor_channel = TruthNtuple::FLAVOR_MM;
   }
   else if (num_el == 1 && num_mu == 1) {
-    if (m_daughter_el.at(0)->getPt() >= m_daughter_mu.at(0)->getPt())
+    // std::cout << "\tthis event is EM or ME\n";
+    if (m_daughter_el.at(0)->getPt() >= m_daughter_mu.at(0)->getPt()) {
+      // std::cout << "\t\tthis event is really EM\n";
       m_flavor_channel = TruthNtuple::FLAVOR_EM;
-    else
+    }
+    else {
+      // std::cout << "\t\tthis event is really ME\n";
       m_flavor_channel = TruthNtuple::FLAVOR_ME;
+    }
   }
   else {
+    // std::cout << "\tthis event is NONE\n";
     m_flavor_channel = TruthNtuple::FLAVOR_NONE;
   }
 
@@ -183,23 +197,25 @@ void BMinusL::Cutflow::doObjectSelection()
       m_truth_stops.push_back(&m_particle_list.at(particle_it));
     }
     if (  fabs(m_particle_list.at(particle_it).getPdgid()) == 11
-       // && m_particle_list.at(particle_it).getStatus() == 3
        && (  m_particle_list.at(particle_it).getStatus() == 3
           || m_particle_list.at(particle_it).getStatus() == 1
+          || m_particle_list.at(particle_it).getStatus() == 11 // herwig++
           )
        ) {
       m_truth_electrons.push_back(&m_particle_list.at(particle_it));
     }
     if (  fabs(m_particle_list.at(particle_it).getPdgid()) == 13
-       // && m_particle_list.at(particle_it).getStatus() == 3
        && (  m_particle_list.at(particle_it).getStatus() == 3
           || m_particle_list.at(particle_it).getStatus() == 1
+          || m_particle_list.at(particle_it).getStatus() == 11 // herwig++
           )
        ) {
       m_truth_muons.push_back(&m_particle_list.at(particle_it));
     }
     if (  fabs(m_particle_list.at(particle_it).getPdgid()) == 5
-       && m_particle_list.at(particle_it).getStatus() == 3
+       && (  m_particle_list.at(particle_it).getStatus() == 3
+          || m_particle_list.at(particle_it).getStatus() == 11 // herwig++
+          )
        ) {
       m_truth_b_quarks.push_back(&m_particle_list.at(particle_it));
     }
@@ -208,48 +224,63 @@ void BMinusL::Cutflow::doObjectSelection()
   // pick electrons coming from a stop
   m_daughter_el.reserve(m_truth_electrons.size());
   for (size_t el_it = 0; el_it != m_truth_electrons.size(); ++el_it) {
-    // if (fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6)
-    // if (  fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6
-    //    || fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
-    //    )
-    // std::cout << "electron parent: " << m_truth_electrons.at(el_it)->getParentPdgid() << " -- daughter el: ";
+   //  std::cout << "\nfound a truth electron!\n";
+   //  std::cout << "\tstatus code: "  << m_truth_electrons.at(el_it)->getStatus() << "\n";
+   //  std::cout << "\tparent pdgid: " << m_truth_electrons.at(el_it)->getParentPdgid() << "\n";
+
     if (  (  m_truth_electrons.at(el_it)->getStatus() == 3
-          && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6
+          || m_truth_electrons.at(el_it)->getStatus() == 11 // herwig++
           )
-       || (  m_truth_electrons.at(el_it)->getStatus() == 1
-          && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
-          )
+       && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6
        ) {
-      // std::cout << "true\n";
       m_daughter_el.push_back(m_truth_electrons.at(el_it));
     }
-    // else {
-    //   std::cout << "false\n";
-    // }
+    else if (  (  m_truth_electrons.at(el_it)->getStatus() == 1
+               || m_truth_electrons.at(el_it)->getStatus() == 3
+               || true
+               )
+            && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
+            ) {
+      // std::cout << "\nthis leptons has a tau parent -- checking the tau's parents\n";
+
+      if (isLeptonFromTauFromStop(m_truth_electrons.at(el_it))) {
+        m_daughter_el.push_back(m_truth_electrons.at(el_it));
+      }
+    }
   }
 
   // pick muons coming from a stop
   m_daughter_mu.reserve(m_truth_muons.size());
   for (size_t mu_it = 0; mu_it != m_truth_muons.size(); ++mu_it) {
-    // if (fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6)
-    // if (  fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6
-    //    || fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
-    //    )
-    // std::cout << "muon parent: " << m_truth_muons.at(mu_it)->getParentPdgid() << " -- daughter mu: ";
+
+    // std::cout << "\nfound a truth muon!\n";
+    // std::cout << "\tstatus code: " << m_truth_muons.at(mu_it)->getStatus() << "\n";
+    // std::cout << "\tparent pdgid: " << m_truth_muons.at(mu_it)->getParentPdgid() << "\n";
+
     if (  (  m_truth_muons.at(mu_it)->getStatus() == 3
-          && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6
+          || m_truth_muons.at(mu_it)->getStatus() == 11 // herwig++
           )
-       || (  m_truth_muons.at(mu_it)->getStatus() == 1
-          && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
-          )
+       && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6 
        ) {
-      // std::cout << "true\n";
       m_daughter_mu.push_back(m_truth_muons.at(mu_it));
     }
-    // else {
-    //   std::cout << "false\n";
-    // }
+    else if (  (  m_truth_muons.at(mu_it)->getStatus() == 1
+               || m_truth_muons.at(mu_it)->getStatus() == 3
+               || true
+               )
+            && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
+            ) {
+      // std::cout << "\nthis leptons has a tau parent -- checking the tau's parents\n";
+
+      if (isLeptonFromTauFromStop(m_truth_muons.at(mu_it))) {
+        m_daughter_mu.push_back(m_truth_muons.at(mu_it));
+      }
+    }
   }
+
+  // std::cout << "total number el: " << m_daughter_el.size() << "\n";
+  // std::cout << "total number mu: " << m_daughter_mu.size() << "\n";
+  // std::cout << "total number leptons: " << m_daughter_el.size() + m_daughter_mu.size() << "\n";
 
   // pick b quarks coming from a stop
   m_daughter_b_quarks.reserve(m_truth_b_quarks.size());
@@ -257,6 +288,17 @@ void BMinusL::Cutflow::doObjectSelection()
     if (fabs(m_truth_b_quarks.at(b_quarks_it)->getParentPdgid()) == 1e6+6)
       m_daughter_b_quarks.push_back(m_truth_b_quarks.at(b_quarks_it));
   }
+
+  size_t num_stops_before_cleaning = m_truth_stops.size();
+  cleanParticleList(m_truth_stops);
+  size_t num_stops_after_cleaning = m_truth_stops.size();
+  // std::cout << "num stops: " << m_truth_stops.size()
+  // std::cout << "num stops before cleaning: " << num_stops_before_cleaning
+  //           << " -- num_stops after cleaning: " << num_stops_after_cleaning
+  //           << " -- num daughter e: " << m_daughter_el.size()
+  //           << " -- num daughter mu: " << m_daughter_mu.size()
+  //           << " -- num_daughter b: " << m_daughter_b_quarks.size()
+  //           << "\n";
 
   // pick b jets
   m_b_jets.reserve(m_jet_list.size());
@@ -347,6 +389,47 @@ void  BMinusL::Cutflow::print()
     m_daughter_b_quarks.at(q_it)->printGeneralInfo();
   }
   */
+}
+
+// -----------------------------------------------------------------------------
+bool BMinusL::Cutflow::isLeptonFromTauFromStop(const TruthNtuple::Particle* part)
+{
+  // get the tau index using the barcode
+  int tau_index = TruthRecordHelpers::getParentIndexFromBarcode( part->getBarcode()
+                                                                , mc_barcode
+                                                                , mc_pdgId
+                                                                , mc_parent_index
+                                                                );
+  // find the tau's parent
+  int tau_parent_pdgid = TruthRecordHelpers::getParentPdgId( tau_index
+                                                           , mc_pdgId
+                                                           , mc_parent_index
+                                                           );
+
+  // if the parent is 0, we probably lost part of the truth record -- do dR matching to find the correct parent 
+  if ( tau_parent_pdgid == 0 ) {
+    // do dR matching to find the first tau in this chain
+    int first_tau_mc_index = TruthRecordHelpers::doDrMatchForParent( tau_index
+                                                                   , mc_pdgId
+                                                                   , mc_status
+                                                                   , mc_eta
+                                                                   , mc_phi
+                                                                   , 3
+                                                                   , 0.1
+                                                                   );
+    tau_parent_pdgid = TruthRecordHelpers::getParentPdgId( first_tau_mc_index
+                                                         , mc_pdgId
+                                                         , mc_parent_index
+                                                         );
+  }
+
+  // check if taur parent is a tau
+  if ( fabs(tau_parent_pdgid) == 1e6+6 ) {
+    return true;
+  }
+
+  // the parent is not a stop
+  return false;
 }
 
 // =============================================================================

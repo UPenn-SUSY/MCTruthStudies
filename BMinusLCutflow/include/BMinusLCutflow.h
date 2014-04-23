@@ -51,6 +51,8 @@ namespace BMinusL
       void doObjectSelection();
       void print();
 
+      bool isLeptonFromTauFromStop(const TruthNtuple::Particle*);
+
       TruthNtuple::FLAVOR_CHANNEL m_flavor_channel;
 
       // keep track of stops and ALL b quarks

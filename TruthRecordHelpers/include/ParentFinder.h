@@ -3,6 +3,7 @@
 
 #include <vector>
 
+// ==============================================================================
 namespace TruthRecordHelpers
 {
   // given a barcode, find the corresponding index within the mc truth block
@@ -62,6 +63,26 @@ namespace TruthRecordHelpers
                       , const std::vector<std::vector<int> >* mc_parent_index
                       , bool verbose = false
                       );
+
+  // from the particle's mc index, get the immediate parent index
+  int getImmediateParentIndex( int mc_index
+                             , const std::vector<int>* mc_mc_pdg_id
+                             , const std::vector<std::vector<int> >* mc_parent_index
+                             , bool verbose = false
+                             );
+
+  // search through the truth record for the particle with the same pdgID which is closest in dR
+  // return the mc index of the found particle
+  int doDrMatchForParent( int mc_index
+                        , const std::vector<int>* mc_pdg_id
+                        , const std::vector<int>* mc_status_code
+                        , const std::vector<float>* mc_eta
+                        , const std::vector<float>* mc_phi
+                        , int limit_status_code = -1
+                        , float dr_threshold = 0.1
+                        );
+
+
 }
 
 #endif

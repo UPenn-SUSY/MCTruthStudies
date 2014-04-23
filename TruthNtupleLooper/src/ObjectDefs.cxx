@@ -44,6 +44,7 @@ TruthNtuple::Particle::Particle( const TruthNtuple::TruthNtupleLooper* tnl
   setMCIndex(mc_index);
   setPdgid(tnl->mc_pdgId->at(mc_index));
   setStatus(tnl->mc_status->at(mc_index));
+  setBarcode(tnl->mc_barcode->at(mc_index));
   setPt(tnl->mc_pt->at(mc_index));
   setEta(tnl->mc_eta->at(mc_index));
   setPhi(tnl->mc_phi->at(mc_index));
@@ -67,6 +68,13 @@ TruthNtuple::Particle::Particle( const TruthNtuple::TruthNtupleLooper* tnl
                                                       // , true, true
                                                       )
                   );
+  setImmediateParentMCIndex( TruthRecordHelpers::getImmediateParentIndex( m_mc_index
+                                                                        , tnl->mc_pdgId
+                                                                        , tnl->mc_parent_index
+                                                                        // , true
+                                                                        // , true, true
+                                                                        )
+                           );
   if (verbose) {
     std::cout << "parent index: " << m_parent_index << "\n";
   }
@@ -77,6 +85,14 @@ TruthNtuple::Particle::Particle( const TruthNtuple::TruthNtupleLooper* tnl
   else {
     setParentPdgid(0);
     setParentBarcode(0);
+  }
+  if (m_immediate_parent_index >= 0) {
+    setImmediateParentPdgid(tnl->mc_pdgId->at(m_immediate_parent_index));
+    setImmediateParentBarcode(tnl->mc_barcode->at(m_immediate_parent_index));
+  }
+  else {
+    setImmediateParentPdgid(0);
+    setImmediateParentBarcode(0);
   }
 }
 
@@ -96,6 +112,12 @@ void TruthNtuple::Particle::setPdgid(int val)
 void TruthNtuple::Particle::setStatus(int val)
 {
   m_status = val;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Particle::setBarcode(int val)
+{
+  m_barcode = val;
 }
 
 // -----------------------------------------------------------------------------
@@ -171,6 +193,24 @@ void TruthNtuple::Particle::setParentBarcode(int val)
   m_parent_barcode = val;
 }
 
+// -----------------------------------------------------------------------------
+void TruthNtuple::Particle::setImmediateParentPdgid(int val)
+{
+  m_immediate_parent_pdgid = val;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Particle::setImmediateParentMCIndex(int val)
+{
+  m_immediate_parent_index = val;
+}
+
+// -----------------------------------------------------------------------------
+void TruthNtuple::Particle::setImmediateParentBarcode(int val)
+{
+  m_immediate_parent_barcode = val;
+}
+
 
 // -----------------------------------------------------------------------------
 int TruthNtuple::Particle::getMCIndex() const
@@ -188,6 +228,12 @@ int TruthNtuple::Particle::getPdgid() const
 int TruthNtuple::Particle::getStatus() const
 {
   return m_status;
+}
+
+// -----------------------------------------------------------------------------
+int TruthNtuple::Particle::getBarcode() const
+{
+  return m_barcode;
 }
 
 // -----------------------------------------------------------------------------
@@ -266,6 +312,24 @@ int TruthNtuple::Particle::getParentMCIndex() const
 int TruthNtuple::Particle::getParentBarcode() const
 {
   return m_parent_barcode;
+}
+
+// -----------------------------------------------------------------------------
+int TruthNtuple::Particle::getImmediateParentPdgid() const
+{
+  return m_immediate_parent_pdgid;
+}
+
+// -----------------------------------------------------------------------------
+int TruthNtuple::Particle::getImmediateParentMCIndex() const
+{
+  return m_immediate_parent_index;
+}
+
+// -----------------------------------------------------------------------------
+int TruthNtuple::Particle::getImmediateParentBarcode() const
+{
+  return m_immediate_parent_barcode;
 }
 
 // -----------------------------------------------------------------------------
@@ -372,6 +436,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
   // set quantities directly from d3pd
   if (get_final_state) {
     setStatus(tnl->el_status->at(el_index));
+    setBarcode(tnl->el_barcode->at(el_index));
     setPt(    tnl->el_pt->at(el_index));
     setEta(   tnl->el_eta->at(el_index));
     setPhi(   tnl->el_phi->at(el_index));
@@ -389,6 +454,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
     if (m_mc_index >= 0) {
       if (verbose) std::cout << "getting electron quantities from MC truth block - mc index: " << m_mc_index << "\n";
       setStatus(tnl->mc_status->at(m_mc_index));
+      setBarcode(tnl->el_barcode->at(m_mc_index));
       setPt(    tnl->mc_pt->at(m_mc_index));
       setEta(   tnl->mc_eta->at(m_mc_index));
       setPhi(   tnl->mc_phi->at(m_mc_index));
@@ -398,6 +464,7 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
     else {
       if (verbose) std::cout << "getting electron quantities from electron block - mc index: " << m_mc_index << "\n";
       setStatus(tnl->el_status->at(el_index));
+      setBarcode(tnl->el_barcode->at(el_index));
       setPt(    tnl->el_pt->at(el_index));
       setEta(   tnl->el_eta->at(el_index));
       setPhi(   tnl->el_phi->at(el_index));
@@ -425,7 +492,16 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
                                                       // , true, true
                                                       )
                   );
-  if (verbose) std::cout << "parent index: " << m_parent_index << "\n";
+  setImmediateParentMCIndex( TruthRecordHelpers::getImmediateParentIndex( m_mc_index
+                                                                        , tnl->mc_pdgId
+                                                                        , tnl->mc_parent_index
+                                                                        // , true
+                                                                        // , true, true
+                                                                        )
+                           );
+  if (verbose) std::cout << "parent index: " << m_parent_index
+                         << " -- immediate parent index: " << m_immediate_parent_index
+                         << "\n";
   if (m_parent_index >= 0) {
     setParentPdgid(tnl->mc_pdgId->at(m_parent_index));
     setParentBarcode(tnl->mc_barcode->at(m_parent_index));
@@ -433,6 +509,14 @@ TruthNtuple::Electron::Electron( const TruthNtuple::TruthNtupleLooper* tnl
   else {
     setParentPdgid(0);
     setParentBarcode(0);
+  }
+  if (m_immediate_parent_index >= 0) {
+    setImmediateParentPdgid(tnl->mc_pdgId->at(m_immediate_parent_index));
+    setImmediateParentBarcode(tnl->mc_barcode->at(m_immediate_parent_index));
+  }
+  else {
+    setImmediateParentPdgid(0);
+    setImmediateParentBarcode(0);
   }
 }
 
@@ -491,6 +575,7 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
   // set quantities directly from d3pd
   if (get_final_state) {
     setStatus(tnl->mu_status->at(mu_index));
+    setBarcode(tnl->mu_barcode->at(mu_index));
     setPt(    tnl->mu_pt->at(mu_index));
     setEta(   tnl->mu_eta->at(mu_index));
     setPhi(   tnl->mu_phi->at(mu_index));
@@ -507,6 +592,7 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
               );
     if (m_mc_index >= 0) {
       setStatus(tnl->mc_status->at(m_mc_index));
+      setBarcode(tnl->mc_barcode->at(m_mc_index));
       setPt(    tnl->mc_pt->at(m_mc_index));
       setEta(   tnl->mc_eta->at(m_mc_index));
       setPhi(   tnl->mc_phi->at(m_mc_index));
@@ -515,6 +601,7 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
     }
     else {
       setStatus(tnl->mu_status->at(mu_index));
+      setBarcode(tnl->mu_barcode->at(mu_index));
       setPt(    tnl->mu_pt->at(mu_index));
       setEta(   tnl->mu_eta->at(mu_index));
       setPhi(   tnl->mu_phi->at(mu_index));
@@ -543,6 +630,13 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
                                                      // , true, true
                                                      )
                   );
+  setImmediateParentMCIndex( TruthRecordHelpers::getImmediateParentIndex( m_mc_index
+                                                                        , tnl->mc_pdgId
+                                                                        , tnl->mc_parent_index
+                                                                        // , true
+                                                                        // , true, true
+                                                                        )
+                           );
   if (verbose) {
     std::cout << "muon parent index: " << m_parent_index << "\n";
   }
@@ -553,6 +647,14 @@ TruthNtuple::Muon::Muon( const TruthNtuple::TruthNtupleLooper* tnl
   else {
     setParentPdgid(0);
     setParentBarcode(0);
+  }
+  if (m_immediate_parent_index >= 0) {
+    setImmediateParentPdgid(tnl->mc_pdgId->at(m_immediate_parent_index));
+    setImmediateParentBarcode(tnl->mc_barcode->at(m_immediate_parent_index));
+  }
+  else {
+    setImmediateParentPdgid(0);
+    setImmediateParentBarcode(0);
   }
 }
 

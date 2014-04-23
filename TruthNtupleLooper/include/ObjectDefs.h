@@ -26,6 +26,7 @@ namespace TruthNtuple
       void setMCIndex(int);
       void setPdgid(int);
       void setStatus(int);
+      void setBarcode(int);
       void setPt(double);
       void setEta(double);
       void setTheta(double);
@@ -38,10 +39,14 @@ namespace TruthNtuple
       void setParentPdgid(int);
       void setParentMCIndex(int);
       void setParentBarcode(int);
+      void setImmediateParentPdgid(int);
+      void setImmediateParentMCIndex(int);
+      void setImmediateParentBarcode(int);
 
       int getMCIndex() const;
       int getPdgid() const;
       int getStatus() const;
+      int getBarcode() const;
       double getPt() const;
       double getP() const;
       double getEta() const;
@@ -55,6 +60,9 @@ namespace TruthNtuple
       int getParentPdgid() const;
       int getParentMCIndex() const;
       int getParentBarcode() const;
+      int getImmediateParentPdgid() const;
+      int getImmediateParentMCIndex() const;
+      int getImmediateParentBarcode() const;
 
       virtual void printGeneralInfo() const;
 
@@ -63,6 +71,7 @@ namespace TruthNtuple
       int          m_mc_index;
       double       m_pdgid;
       int          m_status;
+      int          m_barcode;
       double       m_pt;
       double       m_eta;
       double       m_theta;
@@ -75,6 +84,9 @@ namespace TruthNtuple
       int m_parent_pdgid;
       int m_parent_index;
       int m_parent_barcode;
+      int m_immediate_parent_pdgid;
+      int m_immediate_parent_index;
+      int m_immediate_parent_barcode;
   };
 
   // ===========================================================================
