@@ -16,27 +16,27 @@
 // =============================================================================
 HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle()
 {
-  const int e_bins   = 300;
+  const int e_bins   = 150;
   const double e_min = 0.;
   const double e_max = 3000.;
 
-  const int pt_bins   = 150;
+  const int pt_bins   = 75;
   const double pt_min = 0.;
   const double pt_max = 1500.;
 
-  const int p_bins   = 300;
+  const int p_bins   = 150;
   const double p_min = 0.;
   const double p_max = 3000.;
 
-  const int pz_bins   = 600;
+  const int pz_bins   = 300;
   const double pz_min = -3000.;
   const double pz_max = 3000.;
 
-  const int pt_ratio_bins   = 500;
+  const int pt_ratio_bins   = 250;
   const double pt_ratio_min = 0.;
   const double pt_ratio_max = 5.;
 
-  const int p_ratio_bins   = 1000;
+  const int p_ratio_bins   = 500;
   const double p_ratio_min = 0.;
   const double p_ratio_max = 10.;
 
@@ -840,7 +840,7 @@ void HistogramHandlers::StopKinematics::write(TFile* f)
 // =============================================================================
 HistogramHandlers::QuarkKinematics::QuarkKinematics() : HistogramHandlers::Handle()
 {
-  const int    pt_bins = 150;
+  const int    pt_bins = 75;
   const double pt_min  = 0.;
   const double pt_max  = 1500.;
 
@@ -1118,7 +1118,7 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
                                                         , m_b_from_stop(0)
                                                         , m_b_from_astp(0)
 {
-  const int    pt_bins = 150;
+  const int    pt_bins = 75;
   const double pt_min  = 0.;
   const double pt_max  = 1500.;
 
@@ -1146,15 +1146,15 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
   const double mbl_sq_sum_min  = 0.;
   const double mbl_sq_sum_max  = 3000.;
 
-  const int    ptbl_bins = 150;
+  const int    ptbl_bins = 75;
   const double ptbl_min  = 0.;
   const double ptbl_max  = 1500.;
 
-  const int    ptbl_sq_sum_bins = 300;
+  const int    ptbl_sq_sum_bins = 150;
   const double ptbl_sq_sum_min  = 0.;
   const double ptbl_sq_sum_max  = 3000.;
 
-  const int    ptbl_ratio_bins = 110;
+  const int    ptbl_ratio_bins = 55;
   const double ptbl_ratio_min  = 0.;
   const double ptbl_ratio_max  = 1.1;
 

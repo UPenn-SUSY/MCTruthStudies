@@ -7,7 +7,6 @@ import time
 import math
 
 import ROOT
-import rootlogon
 
 # ==============================================================================
 BUFFER = 1.15

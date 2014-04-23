@@ -5,3 +5,6 @@ lib/
 */obj/
 *.root
 AutoDict_*
+*.pdf
+*.dot
+*.eps
