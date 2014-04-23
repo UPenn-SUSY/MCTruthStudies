@@ -6,7 +6,7 @@ import optparse
 import time
 
 import ROOT
-import rootlogon
+#import rootlogon
 # import metaroot
 
 import yaml
