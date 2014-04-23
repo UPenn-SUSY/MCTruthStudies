@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <math.h>
+#include <algorithm>
 
 #include "TTree.h"
 #include "TH1D.h"
@@ -358,6 +359,24 @@ BMinusL::BMinusLStandAloneHistograms::BMinusLStandAloneHistograms()
                      , "m_{eff} ; m_{eff} [GeV] ; Entries"
                      , 500 , 0, 5000
                      );
+
+  m_h_pt_b1vsl1 = new TH2D( "pt_b1vsl1"
+		          , "p_{t} of subleading bl ; p_{t}^{l} [GeV] ; p_{t}^{b} [GeV]"
+			    , 150, 0, 1500
+			    , 150, 0, 1500
+			    );
+
+  m_h_pt_b1vse1 = new TH2D( "pt_b1vse1"
+			    , "p_{t} of subleading be ; p_{t}^{e} [GeV] ; p_{t}^{b} [GeV]"
+			    , 150, 0, 1500
+			    , 150, 0, 1500
+			    ); // for ee or me events
+
+  m_h_pt_b1vsm1 = new TH2D( "pt_b1vsm1"
+			    , "p_{t} of subleading bm ; p_{t}^{m} [GeV] ; p_{t}^{b} [GeV]"
+			    , 150, 0, 1500
+     			    , 150, 0, 1500
+			    ); // for mm or em events
 }
 
 // -----------------------------------------------------------------------------
@@ -384,6 +403,66 @@ void BMinusL::BMinusLStandAloneHistograms::Fill( const BMinusL::Cutflow* cutflow
 
   // Fill histograms based on this event
   m_h_meff->Fill(m_eff/1.e3);
+
+
+  // New histo
+  float pt_b1, pt_l1;
+  if (num_b == 2 && (num_el+num_mu) ==2) {
+    pt_b1 = cutflow->m_daughter_b_quarks.at(1)->getPt();
+    if (num_el ==2) {
+      pt_l1 = cutflow->m_daughter_el.at(1)->getPt();
+    }
+    else if (num_mu ==2) {
+      pt_l1 = cutflow->m_daughter_mu.at(1)->getPt();
+    }
+    else {
+      float pt_e = cutflow->m_daughter_el.at(0)->getPt();
+      float pt_mu = cutflow->m_daughter_mu.at(0)->getPt();
+      pt_l1 = std::min(pt_e,pt_mu);
+    }
+	
+    m_h_pt_b1vsl1->Fill(pt_l1/1.e3,pt_b1/1.e3);
+  }
+
+  // m_h_pt_b1vse1:
+  float pt_e1;
+  if (num_b ==2 && num_el+num_mu ==2 && num_el>=1) {
+    pt_b1 = cutflow->m_daughter_b_quarks.at(1)->getPt();
+    if (num_el == 2) {
+      pt_e1 = cutflow->m_daughter_el.at(1)->getPt();
+      m_h_pt_b1vse1->Fill(pt_e1/1.e3,pt_b1/1.e3);
+    }
+    else {
+      float pt_e = cutflow->m_daughter_el.at(0)->getPt();
+      float pt_m = cutflow->m_daughter_mu.at(0)->getPt();
+      if (pt_e < pt_m) {
+	pt_e1 = pt_e;
+	m_h_pt_b1vse1->Fill(pt_e1/1.e3,pt_b1/1.e3);
+      }
+    }
+  }
+
+  // m_h_pt_b1vsm1:
+  float pt_m1;
+  if (num_b ==2 && num_el+num_mu ==2 && num_mu>=1) {
+    pt_b1 = cutflow->m_daughter_b_quarks.at(1)->getPt();
+    if (num_mu == 2) {
+      pt_m1 = cutflow->m_daughter_mu.at(1)->getPt();
+      m_h_pt_b1vsm1->Fill(pt_m1/1.e3,pt_b1/1.e3);
+    }
+    else {
+      float pt_e = cutflow->m_daughter_el.at(0)->getPt();
+      float pt_m = cutflow->m_daughter_mu.at(0)->getPt();
+      if (pt_m < pt_e) {
+	pt_m1 = pt_m;
+	m_h_pt_b1vsm1->Fill(pt_m1/1.e3,pt_b1/1.e3);
+      }
+    }
+  }
+
+
+  
+
 }
 
 // -----------------------------------------------------------------------------
@@ -394,5 +473,43 @@ void BMinusL::BMinusLStandAloneHistograms::write(TFile* f)
 
   // write histograms to output histogram file
   m_h_meff->Write();
+  m_h_pt_b1vsl1->Write();
+  m_h_pt_b1vse1->Write();
+  m_h_pt_b1vsm1->Write();
+
+  
+
+
+  // This really shouldn't be done here, but...
+  // calculate efficiency of pt cuts from last 3 histos
+
+  // efficiency of b1vsl1:
+  m_h_pt_b1vsl1_eff = calcEff(m_h_pt_b1vsl1,"lep");
+  m_h_pt_b1vsl1_eff->Write();
+  m_h_pt_b1vse1_eff = calcEff(m_h_pt_b1vse1, "e");
+  m_h_pt_b1vse1_eff->Write();
+  m_h_pt_b1vsm1_eff = calcEff(m_h_pt_b1vsm1, "m");
+  m_h_pt_b1vsm1_eff->Write();
+
 }
 
+TH2D* BMinusL::BMinusLStandAloneHistograms::calcEff(TH2D* h, std::string tag)
+  {
+    TH2D* h_eff = new TH2D(("fc_all__eff_pt_bvl_"+tag).c_str()
+		     , " ; p_{t}^{b} [GeV}; p_{t}^{l} [GeV]"
+		     , 150, 0, 1500
+		     , 150, 0, 1500
+		     );
+
+  float denom = h->Integral();
+  for (int ix=0; ix!=h->GetXaxis()->GetNbins(); ix++) {
+    for (int iy=0; iy!=h->GetXaxis()->GetNbins(); iy++) {
+      float cutvaluex = h->GetXaxis()->GetBinLowEdge(ix+1);
+      float cutvaluey = h->GetYaxis()->GetBinLowEdge(iy+1);
+      float numer = h->Integral(ix+1, h->GetXaxis()->GetNbins(), iy+1, h->GetYaxis()->GetNbins());
+      float efficiency = numer/denom;
+      h_eff->Fill(cutvaluex,cutvaluey,efficiency);
+    }
+  }
+  return h_eff;
+  }

@@ -95,9 +95,17 @@ namespace BMinusL
 
       void write(TFile*);
 
+      TH2D* calcEff(TH2D*, std::string tag="");
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
       TH1D* m_h_meff;
+      TH2D* m_h_pt_b1vsl1;
+      TH2D* m_h_pt_b1vse1;
+      TH2D* m_h_pt_b1vsm1;
+      TH2D* m_h_pt_b1vsl1_eff;
+      TH2D* m_h_pt_b1vse1_eff;
+      TH2D* m_h_pt_b1vsm1_eff;
   };
 
 }
