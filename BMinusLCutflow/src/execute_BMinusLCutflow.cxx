@@ -17,20 +17,31 @@ int main(int argc, char** argv)
 {
   std::cout << "testing basic truth ntuple looper\n";
 
-  if (argc != 2) help();
+  if (argc < 2) {
+    help();
+    return 0;
+  }
 
-  std::cout << "input file name: " << argv[1] << "\n";
+  std::cout << "Number of input files: " << argc-1 << "\n";
+  std::cout << "\n";
 
-  TFile* f = new TFile(argv[1]);
-  TTree* t = static_cast<TTree*>(f->Get("truth"));
+  TChain t("truth");
+  std::cout << "input files:\n";
+  for (int it = 1; it != argc; ++it) {
+    std::cout << "\t" << it << " -- " << argv[it] << "\n";
+    t.Add(argv[1]);
+  }
+  std::cout << "\n";
 
-  std::cout << "retrieved tree from file. constructing Cutflow object\n";
-  BMinusL::Cutflow bmlcf(t);
+  std::cout << "Retrieved tree from input files. Constructing Cutflow object\n";
+  BMinusL::Cutflow bmlcf(&t);
+
   std::cout << "Preparing to loop over events!\n";
   bmlcf.Loop();
-  std::cout << "done!\n";
+
+  std::cout << "Done Looping! Writing to file!\n";
 
   bmlcf.writeToFile();
 
-  delete f;
+  std::cout << "\n\n";
 }

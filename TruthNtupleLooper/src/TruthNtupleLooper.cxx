@@ -296,7 +296,7 @@ void TruthNtuple::TruthNtupleLooper::Loop()
 {
   if (fChain == 0) return;
 
-  Long64_t nentries = fChain->GetEntriesFast();
+  Long64_t nentries = fChain->GetEntries();
 
   ProgressBar progress_bar(nentries, 100);
 
