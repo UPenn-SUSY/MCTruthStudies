@@ -54,7 +54,7 @@ def constructGraph(event, current_index, current_depth, max_depth):
         current_pdgid       = event.mc_pdgId.at(mc_index)
         current_status_code = event.mc_status.at(mc_index)
 
-        current_m = event.mc_m.at(mc_index)
+        current_m = event.mc_m.at(mc_index)/1000
         current_pt = event.mc_pt.at(mc_index)/1000
         current_eta = event.mc_eta.at(mc_index)
         current_phi = event.mc_phi.at(mc_index)

@@ -6,13 +6,13 @@
   line:  1
   xsec:  3.654257e-01
 
-# - label: '#tilde{t} production: MG #tilde{t} decay: Pythia'
-#   file:  output_hists.202632.BMinusL__100__np0__em__stop_mg__decay_pythia.root
-#   dir:   ""
-#   color: 633 # kRed+1
-#   shape: 20 # kFullCircle
-#   line:  1
-#   xsec:  3.654257e-01
+- label: '#tilde{t} production: MG #tilde{t} decay: Pythia'
+  file:  output_hists.202632.BMinusL__100__np0__em__stop_mg__decay_pythia.root
+  dir:   ""
+  color: 633 # kRed+1
+  shape: 20 # kFullCircle
+  line:  1
+  xsec:  3.654257e-01
 
 - label: 'Herwig++'
   file:  output_hists.999981.BMinusL__100__np0__em__herwig.root
