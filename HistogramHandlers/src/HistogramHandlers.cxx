@@ -148,7 +148,7 @@ void HistogramHandlers::ObjectMultiplicity::write(TFile* f)
 // =============================================================================
 HistogramHandlers::LeptonKinematics::LeptonKinematics() : HistogramHandlers::Handle()
 {
-  const int    pt_bins = 150;
+  const int    pt_bins = 75;
   const double pt_min  = 0.;
   const double pt_max  = 1500.;
 
@@ -456,7 +456,7 @@ void HistogramHandlers::LeptonKinematics::write(TFile* f)
 // =============================================================================
 HistogramHandlers::JetKinematics::JetKinematics() : HistogramHandlers::Handle()
 {
-  const int    pt_bins = 150;
+  const int    pt_bins = 75;
   const double pt_min  = 0.;
   const double pt_max  = 1500.;
 
@@ -738,7 +738,7 @@ void HistogramHandlers::JetKinematics::write(TFile* f)
 // =============================================================================
 HistogramHandlers::Mll::Mll() : HistogramHandlers::Handle()
 {
-  const int bins   = 150;
+  const int bins   = 75;
   const double min = 0;
   const double max = 1500;
 

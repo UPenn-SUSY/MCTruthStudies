@@ -16,6 +16,14 @@
 // =============================================================================
 HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle()
 {
+  const int e_com_bins   = 150;
+  const double e_com_min = 0.;
+  const double e_com_max = 3000.;
+
+  const int m_bins   = 300;
+  const double m_min = 0.;
+  const double m_max = 3000.;
+
   const int e_bins   = 150;
   const double e_min = 0.;
   const double e_max = 3000.;
@@ -28,15 +36,15 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
   const double p_min = 0.;
   const double p_max = 3000.;
 
-  const int pz_bins   = 300;
+  const int pz_bins   = 150;
   const double pz_min = -3000.;
   const double pz_max = 3000.;
 
-  const int pt_ratio_bins   = 250;
+  const int pt_ratio_bins   = 125;
   const double pt_ratio_min = 0.;
   const double pt_ratio_max = 5.;
 
-  const int p_ratio_bins   = 500;
+  const int p_ratio_bins   = 250;
   const double p_ratio_min = 0.;
   const double p_ratio_max = 10.;
 
@@ -61,9 +69,21 @@ HistogramHandlers::StopKinematics::StopKinematics() : HistogramHandlers::Handle(
                                     + TruthNtuple::FlavorChannelStrings[fc_it]
                                     + "; E [GeV] ; Entries"
                                     ).c_str()
-                                  , e_bins, e_min, e_max
+                                  , e_com_bins, e_com_min, e_com_max
                                   )
                         );
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    m_h_m.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                               + "__stop_m"
+                               ).c_str()
+                             , ( "m - "
+                               + TruthNtuple::FlavorChannelStrings[fc_it]
+                               + "; m [GeV] ; Entries"
+                               ).c_str()
+                             , m_bins, m_min, m_max
+                             )
+                   );
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_e_all.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -649,6 +669,10 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
       // fill E com
       m_h_e_com.at(fc)->Fill(e_com);
 
+      // fill stop m
+      m_h_m.at(fc)->Fill(m_stop);
+      m_h_m.at(fc)->Fill(m_astp);
+
       // fill E
       m_h_e_all.at(fc)->Fill(e_stop);
       m_h_e_all.at(fc)->Fill(e_astp);
@@ -779,6 +803,9 @@ void HistogramHandlers::StopKinematics::write(TFile* f)
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     m_h_e_com.at(fc_it)->Write();
+
+    m_h_m.at(fc_it)->Write();
+
     m_h_e_all.at(fc_it)->Write();
     m_h_e_stop.at(fc_it)->Write();
     m_h_e_astp.at(fc_it)->Write();
@@ -1134,11 +1161,11 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
   const double dr_min  = 0.;
   const double dr_max  = +5.;
 
-  const int    mbl_bins = 150;
+  const int    mbl_bins = 75;
   const double mbl_min  = 0.;
   const double mbl_max  = 1500.;
 
-  const int    mbl_ratio_bins = 110;
+  const int    mbl_ratio_bins = 55;
   const double mbl_ratio_min  = 0.;
   const double mbl_ratio_max  = 1.1;
 

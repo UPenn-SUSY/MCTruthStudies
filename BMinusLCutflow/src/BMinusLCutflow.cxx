@@ -1,5 +1,4 @@
-#include "BMinusLCutflow/include/BMinusLCutflow.h"
-
+#include "BMinusLCutflow/include/BMinusLCutflow.h" 
 #include <iostream>
 #include <math.h>
 #include <algorithm>
@@ -290,7 +289,8 @@ void BMinusL::Cutflow::doObjectSelection()
   }
 
   size_t num_stops_before_cleaning = m_truth_stops.size();
-  cleanParticleList(m_truth_stops);
+  // cleanParticleList(m_truth_stops);
+  cleanParticleList(m_truth_stops, false);
   size_t num_stops_after_cleaning = m_truth_stops.size();
   // std::cout << "num stops: " << m_truth_stops.size()
   // std::cout << "num stops before cleaning: " << num_stops_before_cleaning
@@ -444,22 +444,22 @@ BMinusL::BMinusLStandAloneHistograms::BMinusLStandAloneHistograms()
                      );
 
   m_h_pt_b1vsl1 = new TH2D( "pt_b1vsl1"
-		          , "p_{t} of subleading bl ; p_{t}^{l} [GeV] ; p_{t}^{b} [GeV]"
-			    , 150, 0, 1500
-			    , 150, 0, 1500
-			    );
+                          , "p_{t} of subleading bl ; p_{t}^{l} [GeV] ; p_{t}^{b} [GeV]"
+                          , 150, 0, 1500
+                          , 150, 0, 1500
+                          );
 
   m_h_pt_b1vse1 = new TH2D( "pt_b1vse1"
-			    , "p_{t} of subleading be ; p_{t}^{e} [GeV] ; p_{t}^{b} [GeV]"
-			    , 150, 0, 1500
-			    , 150, 0, 1500
-			    ); // for ee or me events
+                          , "p_{t} of subleading be ; p_{t}^{e} [GeV] ; p_{t}^{b} [GeV]"
+                          , 150, 0, 1500
+                          , 150, 0, 1500
+                          ); // for ee or me events
 
   m_h_pt_b1vsm1 = new TH2D( "pt_b1vsm1"
-			    , "p_{t} of subleading bm ; p_{t}^{m} [GeV] ; p_{t}^{b} [GeV]"
-			    , 150, 0, 1500
-     			    , 150, 0, 1500
-			    ); // for mm or em events
+                          , "p_{t} of subleading bm ; p_{t}^{m} [GeV] ; p_{t}^{b} [GeV]"
+                          , 150, 0, 1500
+                          , 150, 0, 1500
+                          ); // for mm or em events
 }
 
 // -----------------------------------------------------------------------------
@@ -503,7 +503,7 @@ void BMinusL::BMinusLStandAloneHistograms::Fill( const BMinusL::Cutflow* cutflow
       float pt_mu = cutflow->m_daughter_mu.at(0)->getPt();
       pt_l1 = std::min(pt_e,pt_mu);
     }
-	
+
     m_h_pt_b1vsl1->Fill(pt_l1/1.e3,pt_b1/1.e3);
   }
 
@@ -519,8 +519,8 @@ void BMinusL::BMinusLStandAloneHistograms::Fill( const BMinusL::Cutflow* cutflow
       float pt_e = cutflow->m_daughter_el.at(0)->getPt();
       float pt_m = cutflow->m_daughter_mu.at(0)->getPt();
       if (pt_e < pt_m) {
-	pt_e1 = pt_e;
-	m_h_pt_b1vse1->Fill(pt_e1/1.e3,pt_b1/1.e3);
+  pt_e1 = pt_e;
+  m_h_pt_b1vse1->Fill(pt_e1/1.e3,pt_b1/1.e3);
       }
     }
   }
@@ -537,15 +537,11 @@ void BMinusL::BMinusLStandAloneHistograms::Fill( const BMinusL::Cutflow* cutflow
       float pt_e = cutflow->m_daughter_el.at(0)->getPt();
       float pt_m = cutflow->m_daughter_mu.at(0)->getPt();
       if (pt_m < pt_e) {
-	pt_m1 = pt_m;
-	m_h_pt_b1vsm1->Fill(pt_m1/1.e3,pt_b1/1.e3);
+  pt_m1 = pt_m;
+  m_h_pt_b1vsm1->Fill(pt_m1/1.e3,pt_b1/1.e3);
       }
     }
   }
-
-
-  
-
 }
 
 // -----------------------------------------------------------------------------
@@ -559,9 +555,6 @@ void BMinusL::BMinusLStandAloneHistograms::write(TFile* f)
   m_h_pt_b1vsl1->Write();
   m_h_pt_b1vse1->Write();
   m_h_pt_b1vsm1->Write();
-
-  
-
 
   // This really shouldn't be done here, but...
   // calculate efficiency of pt cuts from last 3 histos
@@ -579,10 +572,10 @@ void BMinusL::BMinusLStandAloneHistograms::write(TFile* f)
 TH2D* BMinusL::BMinusLStandAloneHistograms::calcEff(TH2D* h, std::string tag)
   {
     TH2D* h_eff = new TH2D(("fc_all__eff_pt_bvl_"+tag).c_str()
-		     , " ; p_{t}^{b} [GeV}; p_{t}^{l} [GeV]"
-		     , 150, 0, 1500
-		     , 150, 0, 1500
-		     );
+         , " ; p_{t}^{b} [GeV}; p_{t}^{l} [GeV]"
+         , 150, 0, 1500
+         , 150, 0, 1500
+         );
 
   float denom = h->Integral();
   for (int ix=0; ix!=h->GetXaxis()->GetNbins(); ix++) {

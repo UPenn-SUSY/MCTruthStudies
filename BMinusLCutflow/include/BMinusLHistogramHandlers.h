@@ -41,6 +41,7 @@ namespace HistogramHandlers
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
       std::vector<TH1D*> m_h_e_com;
+      std::vector<TH1D*> m_h_m;
 
       std::vector<TH1D*> m_h_e_all;
       std::vector<TH1D*> m_h_e_stop;
