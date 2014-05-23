@@ -147,6 +147,7 @@ namespace HistogramHandlers
                               , const std::vector<TruthNtuple::Particle*>& el
                               , const std::vector<TruthNtuple::Particle*>& mu
                               , const std::vector<TruthNtuple::Particle*>& b
+                              , const std::vector<TruthNtuple::Particle*>& stop_list
                               );
       virtual void write(TFile*);
 
@@ -296,6 +297,30 @@ namespace HistogramHandlers
       std::vector<TH2D*> m_h_wrong_vs_right_ptbl_ratio;
       std::vector<TH2D*> m_h_wrong_vs_right_ptbl_sq_sum;
 
+      // pt of stop vs bl pair
+      std::vector<TH1D*> m_h_stop_vs_bl_px_all;
+      std::vector<TH1D*> m_h_stop_vs_bl_px_stop;
+      std::vector<TH1D*> m_h_stop_vs_bl_px_astp;
+      std::vector<TH2D*> m_h_stop_vs_bl_px_2d;
+      std::vector<TH1D*> m_h_stop_vs_bl_px_event;
+
+      std::vector<TH1D*> m_h_stop_vs_bl_py_all;
+      std::vector<TH1D*> m_h_stop_vs_bl_py_stop;
+      std::vector<TH1D*> m_h_stop_vs_bl_py_astp;
+      std::vector<TH2D*> m_h_stop_vs_bl_py_2d;
+      std::vector<TH1D*> m_h_stop_vs_bl_py_event;
+
+      std::vector<TH1D*> m_h_stop_vs_bl_pz_all;
+      std::vector<TH1D*> m_h_stop_vs_bl_pz_stop;
+      std::vector<TH1D*> m_h_stop_vs_bl_pz_astp;
+      std::vector<TH2D*> m_h_stop_vs_bl_pz_2d;
+      std::vector<TH1D*> m_h_stop_vs_bl_pz_event;
+
+      std::vector<TH1D*> m_h_stop_vs_bl_pt_all;
+      std::vector<TH1D*> m_h_stop_vs_bl_pt_stop;
+      std::vector<TH1D*> m_h_stop_vs_bl_pt_astp;
+      std::vector<TH2D*> m_h_stop_vs_bl_pt_2d;
+      std::vector<TH1D*> m_h_stop_vs_bl_pt_event;
   };
 
   // =============================================================================

@@ -352,6 +352,10 @@ void TruthNtuple::Particle::printGeneralInfo() const
             << "\t\tparent index: "   << m_parent_index
             << "\t\tparent pdg id: "  << m_parent_pdgid
             << "\t\tparent barcode: " << m_parent_barcode
+            << "\n"
+            << "\t\timmediate parent index: "   << m_immediate_parent_index
+            << "\t\timmediate parent pdg id: "  << m_immediate_parent_pdgid
+            << "\t\timmediate parent barcode: " << m_immediate_parent_barcode
             << "\n";
 }
 

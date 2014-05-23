@@ -155,6 +155,7 @@ void BMinusL::Cutflow::processEvent()
                                      , m_daughter_el
                                      , m_daughter_mu
                                      , m_daughter_b_quarks
+                                     , m_truth_stops
                                      );
   m_h_quark_kinematics->FillSpecial( m_flavor_channel
                                    , m_daughter_b_quarks
@@ -195,6 +196,7 @@ void BMinusL::Cutflow::doObjectSelection()
     if (fabs(m_particle_list.at(particle_it).getPdgid()) == 1e6+6) {
       m_truth_stops.push_back(&m_particle_list.at(particle_it));
     }
+
     if (  fabs(m_particle_list.at(particle_it).getPdgid()) == 11
        && (  m_particle_list.at(particle_it).getStatus() == 3
           || m_particle_list.at(particle_it).getStatus() == 1
@@ -223,9 +225,9 @@ void BMinusL::Cutflow::doObjectSelection()
   // pick electrons coming from a stop
   m_daughter_el.reserve(m_truth_electrons.size());
   for (size_t el_it = 0; el_it != m_truth_electrons.size(); ++el_it) {
-   //  std::cout << "\nfound a truth electron!\n";
-   //  std::cout << "\tstatus code: "  << m_truth_electrons.at(el_it)->getStatus() << "\n";
-   //  std::cout << "\tparent pdgid: " << m_truth_electrons.at(el_it)->getParentPdgid() << "\n";
+    //  std::cout << "\nfound a truth electron!\n";
+    //  std::cout << "\tstatus code: "  << m_truth_electrons.at(el_it)->getStatus() << "\n";
+    //  std::cout << "\tparent pdgid: " << m_truth_electrons.at(el_it)->getParentPdgid() << "\n";
 
     if (  (  m_truth_electrons.at(el_it)->getStatus() == 3
           || m_truth_electrons.at(el_it)->getStatus() == 11 // herwig++
@@ -389,6 +391,192 @@ void  BMinusL::Cutflow::print()
     m_daughter_b_quarks.at(q_it)->printGeneralInfo();
   }
   */
+
+  double stop_px = 0.;
+  double stop_py = 0.;
+  double stop_pz = 0.;
+
+  double astp_px = 0.;
+  double astp_py = 0.;
+  double astp_pz = 0.;
+
+  double stop_astp_px = 0.;
+  double stop_astp_py = 0.;
+  double stop_astp_pz = 0.;
+
+  double stop_bl_px = 0.;
+  double stop_bl_py = 0.;
+  double stop_bl_pz = 0.;
+
+  double astp_bl_px = 0.;
+  double astp_bl_py = 0.;
+  double astp_bl_pz = 0.;
+
+  double bbll_px = 0.;
+  double bbll_py = 0.;
+  double bbll_pz = 0.;
+
+  std::cout << "----------------------------------------"
+            << "\nstop and anti-stop"
+            << "\n----------------------------------------"
+            << "\n";
+  for (size_t stop_it = 0; stop_it != m_truth_stops.size(); ++stop_it) {
+    m_truth_stops.at(stop_it)->printGeneralInfo();
+
+    if (m_truth_stops.at(stop_it)->getPdgid() > 0) {
+      stop_px += m_truth_stops.at(stop_it)->getPx();
+      stop_py += m_truth_stops.at(stop_it)->getPy();
+      stop_pz += m_truth_stops.at(stop_it)->getPz();
+    }
+
+    if (m_truth_stops.at(stop_it)->getPdgid() < 0) {
+      astp_px += m_truth_stops.at(stop_it)->getPx();
+      astp_py += m_truth_stops.at(stop_it)->getPy();
+      astp_pz += m_truth_stops.at(stop_it)->getPz();
+    }
+
+    stop_astp_px += m_truth_stops.at(stop_it)->getPx();
+    stop_astp_py += m_truth_stops.at(stop_it)->getPy();
+    stop_astp_pz += m_truth_stops.at(stop_it)->getPz();
+  }
+
+  std::cout << "----------------------------------------"
+            << "\ndaughter electrons"
+            << "\n----------------------------------------"
+            << "\n";
+  for (size_t el_it = 0; el_it != num_el; ++el_it) {
+    // m_daughter_el.at(el_it)->print(this);
+    m_daughter_el.at(el_it)->printGeneralInfo();
+
+    if (m_daughter_el.at(el_it)->getPdgid() > 0) {
+      astp_bl_px += m_daughter_el.at(el_it)->getPx();
+      astp_bl_py += m_daughter_el.at(el_it)->getPy();
+      astp_bl_pz += m_daughter_el.at(el_it)->getPz();
+    }
+
+    if (m_daughter_el.at(el_it)->getPdgid() < 0) {
+      stop_bl_px += m_daughter_el.at(el_it)->getPx();
+      stop_bl_py += m_daughter_el.at(el_it)->getPy();
+      stop_bl_pz += m_daughter_el.at(el_it)->getPz();
+    }
+
+    bbll_px += m_daughter_el.at(el_it)->getPx();
+    bbll_py += m_daughter_el.at(el_it)->getPy();
+    bbll_pz += m_daughter_el.at(el_it)->getPz();
+  }
+
+  std::cout << "----------------------------------------"
+            << "\ndaughter muons"
+            << "\n----------------------------------------"
+            << "\n";
+  for (size_t mu_it = 0; mu_it != num_mu; ++mu_it) {
+    m_daughter_mu.at(mu_it)->printGeneralInfo();
+
+    if (m_daughter_mu.at(mu_it)->getPdgid() > 0) {
+      astp_bl_px += m_daughter_mu.at(mu_it)->getPx();
+      astp_bl_py += m_daughter_mu.at(mu_it)->getPy();
+      astp_bl_pz += m_daughter_mu.at(mu_it)->getPz();
+    }
+
+    if (m_daughter_mu.at(mu_it)->getPdgid() < 0) {
+      stop_bl_px += m_daughter_mu.at(mu_it)->getPx();
+      stop_bl_py += m_daughter_mu.at(mu_it)->getPy();
+      stop_bl_pz += m_daughter_mu.at(mu_it)->getPz();
+    }
+
+    bbll_px += m_daughter_mu.at(mu_it)->getPx();
+    bbll_py += m_daughter_mu.at(mu_it)->getPy();
+    bbll_pz += m_daughter_mu.at(mu_it)->getPz();
+  }
+
+  std::cout << "----------------------------------------"
+            << "\ndaughter b quarks"
+            << "\n----------------------------------------"
+            << "\n";
+  for (size_t q_it = 0; q_it != num_truth_b_quarks; ++q_it) {
+    m_daughter_b_quarks.at(q_it)->printGeneralInfo();
+
+    if (m_daughter_b_quarks.at(q_it)->getPdgid() > 0) {
+      stop_bl_px += m_daughter_b_quarks.at(q_it)->getPx();
+      stop_bl_py += m_daughter_b_quarks.at(q_it)->getPy();
+      stop_bl_pz += m_daughter_b_quarks.at(q_it)->getPz();
+    }
+
+    if (m_daughter_b_quarks.at(q_it)->getPdgid() < 0) {
+      astp_bl_px += m_daughter_b_quarks.at(q_it)->getPx();
+      astp_bl_py += m_daughter_b_quarks.at(q_it)->getPy();
+      astp_bl_pz += m_daughter_b_quarks.at(q_it)->getPz();
+    }
+
+    bbll_px += m_daughter_b_quarks.at(q_it)->getPx();
+    bbll_py += m_daughter_b_quarks.at(q_it)->getPy();
+    bbll_pz += m_daughter_b_quarks.at(q_it)->getPz();
+  }
+
+  double stop_pt      = sqrt( stop_px*stop_px           + stop_py*stop_py           );
+  double astp_pt      = sqrt( astp_px*astp_px           + astp_py*astp_py           );
+  double stop_astp_pt = sqrt( stop_astp_px*stop_astp_px + stop_astp_py*stop_astp_py );
+  double stop_bl_pt   = sqrt( stop_bl_px*stop_bl_px     + stop_bl_py*stop_bl_py     );
+  double astp_bl_pt   = sqrt( astp_bl_px*astp_bl_px     + astp_bl_py*astp_bl_py     );
+  double bbll_pt      = sqrt( bbll_px*bbll_px           + bbll_py*bbll_py           );
+
+  double stop_phi      = atan2( stop_py      , stop_px      );
+  double astp_phi      = atan2( astp_py      , astp_px      );
+  double stop_astp_phi = atan2( stop_astp_py , stop_astp_px );
+  double stop_bl_phi   = atan2( stop_bl_py   , stop_bl_px   );
+  double astp_bl_phi   = atan2( astp_bl_py   , astp_bl_px   );
+  double bbll_phi      = atan2( bbll_py      , bbll_px      );
+
+  std::cout << "----------------------------------------"
+            << "\nmomentum balance"
+            << "\n----------------------------------------"
+            << "\n";
+  std::cout << "stop:"
+            << "\tpx: " << stop_px/1.e3
+            << "\tpy: " << stop_py/1.e3
+            << "\tpz: " << stop_pz/1.e3
+            << "\tpt: " << stop_pt/1.e3
+            << "\tphi: " << stop_phi
+            << "\n";
+  std::cout << "bl from stop:"
+            << "\tpx: " << stop_bl_px/1.e3
+            << "\tpy: " << stop_bl_py/1.e3
+            << "\tpz: " << stop_bl_pz/1.e3
+            << "\tpt: " << stop_bl_pt/1.e3
+            << "\tphi: " << stop_bl_phi
+            << "\n";
+  std::cout << "\n";
+  std::cout << "astp:"
+            << "\tpx: " << astp_px/1.e3
+            << "\tpy: " << astp_py/1.e3
+            << "\tpz: " << astp_pz/1.e3
+            << "\tpt: " << astp_pt/1.e3
+            << "\tphi: " << astp_phi
+            << "\n";
+  std::cout << "bl from astp:"
+            << "\tpx: " << astp_bl_px/1.e3
+            << "\tpy: " << astp_bl_py/1.e3
+            << "\tpz: " << astp_bl_pz/1.e3
+            << "\tpt: " << astp_bl_pt/1.e3
+            << "\tphi: " << astp_bl_phi
+            << "\n";
+  std::cout << "\n";
+  std::cout << "stop + astp:"
+            << "\tpx: " << stop_astp_px/1.e3
+            << "\tpy: " << stop_astp_py/1.e3
+            << "\tpz: " << stop_astp_pz/1.e3
+            << "\tpt: " << stop_astp_pt/1.e3
+            << "\tphi: " << stop_astp_phi
+            << "\n";
+  std::cout << "bbll:"
+            << "\tpx: " << bbll_px/1.e3
+            << "\tpy: " << bbll_py/1.e3
+            << "\tpz: " << bbll_pz/1.e3
+            << "\tpt: " << bbll_pt/1.e3
+            << "\tphi: " << bbll_phi
+            << "\n";
+
+  std::cout << "\n\n";
 }
 
 // -----------------------------------------------------------------------------

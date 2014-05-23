@@ -23,6 +23,15 @@ namespace TruthNtuple
   double invariantMass( const TruthNtuple::Particle*
                       , const TruthNtuple::Particle*
                       );
+  double pxDiObject( const TruthNtuple::Particle*
+                   , const TruthNtuple::Particle*
+                   );
+  double pyDiObject( const TruthNtuple::Particle*
+                   , const TruthNtuple::Particle*
+                   );
+  double pzDiObject( const TruthNtuple::Particle*
+                   , const TruthNtuple::Particle*
+                   );
   double ptDiObject( const TruthNtuple::Particle*
                    , const TruthNtuple::Particle*
                    );

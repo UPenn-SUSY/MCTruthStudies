@@ -36,12 +36,36 @@ double TruthNtuple::invariantMass( const TruthNtuple::Particle* p1
 }
 
 // -----------------------------------------------------------------------------
+double TruthNtuple::pxDiObject( const TruthNtuple::Particle* p1
+                              , const TruthNtuple::Particle* p2
+                              )
+{
+  return p1->getPx() + p2->getPx();
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::pyDiObject( const TruthNtuple::Particle* p1
+                              , const TruthNtuple::Particle* p2
+                              )
+{
+  return p1->getPy() + p2->getPy();
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::pzDiObject( const TruthNtuple::Particle* p1
+                              , const TruthNtuple::Particle* p2
+                              )
+{
+  double pz = p1->getPz() + p2->getPz();
+}
+
+// -----------------------------------------------------------------------------
 double TruthNtuple::ptDiObject( const TruthNtuple::Particle* p1
                               , const TruthNtuple::Particle* p2
                               )
 {
-  double px = p1->getPx() + p2->getPx();
-  double py = p1->getPy() + p2->getPy();
+  double px = pxDiObject(p1, p2);
+  double py = pyDiObject(p1, p2);
 
   double pt2 = px*px + py*py;
   return sqrt(pt2)*pt2/fabs(pt2);
