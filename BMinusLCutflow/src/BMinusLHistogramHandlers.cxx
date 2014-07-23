@@ -679,6 +679,10 @@ void HistogramHandlers::StopKinematics::FillSpecial( const TruthNtuple::FLAVOR_C
       m_h_m.at(fc)->Fill(m_stop,m_event_weight);
       m_h_m.at(fc)->Fill(m_astp,m_event_weight);
 
+      // fill stop m
+      m_h_m.at(fc)->Fill(m_stop);
+      m_h_m.at(fc)->Fill(m_astp);
+
       // fill E
       m_h_e_all.at(fc)->Fill(e_stop,m_event_weight);
       m_h_e_all.at(fc)->Fill(e_astp,m_event_weight);

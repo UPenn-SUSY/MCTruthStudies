@@ -15,7 +15,7 @@
   xsec: 1.743343e-07
 
 - label: 'Herwig++'
-  file:  output_hists.999999.BMinusL__1000__np1__em__herwig.root
+  file:  output_hists.999999.BMinusL__1000__np0__em__herwig.root
   dir:   ""
   color: 419 # kGreen+3
   shape: 20 # kFullCircle

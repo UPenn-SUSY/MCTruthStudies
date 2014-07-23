@@ -1,5 +1,4 @@
-#include "BMinusLCutflow/include/BMinusLCutflow.h"
-
+#include "BMinusLCutflow/include/BMinusLCutflow.h" 
 #include <iostream>
 #include <math.h>
 #include <algorithm>
@@ -323,7 +322,8 @@ void BMinusL::Cutflow::doObjectSelection()
   broadenResolution();
 
   size_t num_stops_before_cleaning = m_truth_stops.size();
-  cleanParticleList(m_truth_stops);
+  // cleanParticleList(m_truth_stops);
+  cleanParticleList(m_truth_stops, false);
   size_t num_stops_after_cleaning = m_truth_stops.size();
   // std::cout << "num stops: " << m_truth_stops.size()
   // std::cout << "num stops before cleaning: " << num_stops_before_cleaning
@@ -481,6 +481,30 @@ double BMinusL::Cutflow::scalePDF()
   double tmp_pdf = pdfTool->weight(-1,14./13.);     if(tmp_pdf > 500.) tmp_pdf = 0.;
   m_event_weight *= tmp_pdf;
   return m_event_weight;
+
+  // initialize histograms here
+  m_h_meff = new TH1D( "meff"
+                     , "m_{eff} ; m_{eff} [GeV] ; Entries"
+                     , 500 , 0, 5000
+                     );
+
+  m_h_pt_b1vsl1 = new TH2D( "pt_b1vsl1"
+                          , "p_{t} of subleading bl ; p_{t}^{l} [GeV] ; p_{t}^{b} [GeV]"
+                          , 150, 0, 1500
+                          , 150, 0, 1500
+                          );
+
+  m_h_pt_b1vse1 = new TH2D( "pt_b1vse1"
+                          , "p_{t} of subleading be ; p_{t}^{e} [GeV] ; p_{t}^{b} [GeV]"
+                          , 150, 0, 1500
+                          , 150, 0, 1500
+                          ); // for ee or me events
+
+  m_h_pt_b1vsm1 = new TH2D( "pt_b1vsm1"
+                          , "p_{t} of subleading bm ; p_{t}^{m} [GeV] ; p_{t}^{b} [GeV]"
+                          , 150, 0, 1500
+                          , 150, 0, 1500
+                          ); // for mm or em events
 }
 
 // =============================================================================
@@ -917,6 +941,14 @@ void BMinusL::BMinusLStandAloneHistograms::Fill( const BMinusL::Cutflow* cutflow
 //     m_h_fc_all__lep_deltaRq_l0vl1->Fill(deltaRq1,deltaRq0);
 //     m_h_fc_all__lep_deltaRl->Fill(deltaRl);
 //   }
+
+//   size_t num_mu = cutflow->m_daughter_mu.size();
+//   for (size_t mu_it = 0; mu_it != num_mu; ++mu_it) {
+//     m_eff += cutflow->m_daughter_mu.at(mu_it)->getPt();
+//   }
+
+//   // Fill histograms based on this event
+//   m_h_meff->Fill(m_eff/1.e3);
 }
 
 // -----------------------------------------------------------------------------

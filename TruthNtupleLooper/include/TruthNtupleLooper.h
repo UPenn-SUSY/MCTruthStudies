@@ -36,7 +36,9 @@ namespace TruthNtuple
 
       // Clean multiple instances of same particle in std::vector
       // protect us from times when particle "decays" to itself many times
-      virtual void cleanParticleList( std::vector<TruthNtuple::Particle*>& );
+      virtual void cleanParticleList( std::vector<TruthNtuple::Particle*>&
+                                    , bool get_first_in_list = true
+                                    );
 
     protected:
       std::vector<TruthNtuple::Particle> m_particle_list;
