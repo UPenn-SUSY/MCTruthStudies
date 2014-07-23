@@ -13,10 +13,12 @@
 
 #include "HistogramHandlers/include/HistogramHandlers.h"
 #include "BMinusLCutflow/include/BMinusLHistogramHandlers.h"
-
+//#include "PDFTool_standalone/PDFTool.h"
 // -----------------------------------------------------------------------------
-BMinusL::Cutflow::Cutflow(TTree* tree) : TruthNtuple::TruthNtupleLooper(tree)
+BMinusL::Cutflow::Cutflow(TTree* tree, bool isSignal) : TruthNtuple::TruthNtupleLooper(tree)
 {
+   m_is_signal = isSignal;
+
   // construct histogram list
   m_histograms.push_back(new HistogramHandlers::FlavorChannel());
   m_histograms.push_back(new HistogramHandlers::ObjectMultiplicity());
@@ -97,6 +99,7 @@ void BMinusL::Cutflow::processEvent()
   //           << "\nEvent number: " << EventNumber
   //           << "\nchecking the flavor channel -- num_el: " << num_el << " -- num_mu: " << num_mu
   //           << "\n";
+
   if (num_el == 2 && num_mu == 0) {
     // std::cout << "\tthis event is EE\n";
     m_flavor_channel = TruthNtuple::FLAVOR_EE;
@@ -133,6 +136,17 @@ void BMinusL::Cutflow::processEvent()
   // }
 
   // print();
+
+  double m_event_weight = 1.;
+  // PDFTool* pdfTool = new PDFTool(7000000, 1, -1, 10042);                                                                                                                                            
+  // pdfTool->setEventInfo( pow(mcevt_pdf_scale->at(0),2)                                                                                                                                              
+  //                    ,mcevt_pdf_x1->at(0)                                                                                                                                                           
+  //                    ,mcevt_pdf_x2->at(0)                                                                                                                                                           
+  //                    ,mcevt_pdf_id1->at(0)                                                                                                                                                          
+  //                    ,mcevt_pdf_id2->at(0)                                                                                                                                                          
+  //                    );                                                                                                                                                                             
+  // double tmp_pdf = pdfTool->weight(-1,14./13.);     if(tmp_pdf > 500.) tmp_pdf = 0.;                                                                                                                
+  // m_event_weight *= tmp_pdf;   
 
   // Fill "normal histograms"
   size_t num_hists = m_histograms.size();
@@ -223,14 +237,16 @@ void BMinusL::Cutflow::doObjectSelection()
   // pick electrons coming from a stop
   m_daughter_el.reserve(m_truth_electrons.size());
   for (size_t el_it = 0; el_it != m_truth_electrons.size(); ++el_it) {
-   //  std::cout << "\nfound a truth electron!\n";
-   //  std::cout << "\tstatus code: "  << m_truth_electrons.at(el_it)->getStatus() << "\n";
-   //  std::cout << "\tparent pdgid: " << m_truth_electrons.at(el_it)->getParentPdgid() << "\n";
+     // std::cout << "\nfound a truth electron!\n";
+     // std::cout << "\tstatus code: "  << m_truth_electrons.at(el_it)->getStatus() << "\n";
+     // std::cout << "\tparent pdgid: " << m_truth_electrons.at(el_it)->getParentPdgid() << "\n";
 
     if (  (  m_truth_electrons.at(el_it)->getStatus() == 3
           || m_truth_electrons.at(el_it)->getStatus() == 11 // herwig++
           )
-       && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6
+	  && (fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 1e6+6
+	      || m_is_signal == false
+	      )
        ) {
       m_daughter_el.push_back(m_truth_electrons.at(el_it));
     }
@@ -238,7 +254,7 @@ void BMinusL::Cutflow::doObjectSelection()
                || m_truth_electrons.at(el_it)->getStatus() == 3
                || true
                )
-            && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
+	       && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
             ) {
       // std::cout << "\nthis leptons has a tau parent -- checking the tau's parents\n";
 
@@ -252,14 +268,16 @@ void BMinusL::Cutflow::doObjectSelection()
   m_daughter_mu.reserve(m_truth_muons.size());
   for (size_t mu_it = 0; mu_it != m_truth_muons.size(); ++mu_it) {
 
-    // std::cout << "\nfound a truth muon!\n";
-    // std::cout << "\tstatus code: " << m_truth_muons.at(mu_it)->getStatus() << "\n";
-    // std::cout << "\tparent pdgid: " << m_truth_muons.at(mu_it)->getParentPdgid() << "\n";
+     // std::cout << "\nfound a truth muon!\n";
+     // std::cout << "\tstatus code: " << m_truth_muons.at(mu_it)->getStatus() << "\n";
+     // std::cout << "\tparent pdgid: " << m_truth_muons.at(mu_it)->getParentPdgid() << "\n";
 
     if (  (  m_truth_muons.at(mu_it)->getStatus() == 3
           || m_truth_muons.at(mu_it)->getStatus() == 11 // herwig++
           )
-       && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6 
+	  && (fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 1e6+6 
+	      || m_is_signal == false
+	      )
        ) {
       m_daughter_mu.push_back(m_truth_muons.at(mu_it));
     }
@@ -267,9 +285,9 @@ void BMinusL::Cutflow::doObjectSelection()
                || m_truth_muons.at(mu_it)->getStatus() == 3
                || true
                )
-            && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
+	       && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
             ) {
-      // std::cout << "\nthis leptons has a tau parent -- checking the tau's parents\n";
+      //       std::cout << "\nthis leptons has a tau parent -- checking the tau's parents\n";
 
       if (isLeptonFromTauFromStop(m_truth_muons.at(mu_it))) {
         m_daughter_mu.push_back(m_truth_muons.at(mu_it));
@@ -284,7 +302,9 @@ void BMinusL::Cutflow::doObjectSelection()
   // pick b quarks coming from a stop
   m_daughter_b_quarks.reserve(m_truth_b_quarks.size());
   for (size_t b_quarks_it = 0; b_quarks_it != m_truth_b_quarks.size(); ++b_quarks_it) {
-    if (fabs(m_truth_b_quarks.at(b_quarks_it)->getParentPdgid()) == 1e6+6)
+        if (fabs(m_truth_b_quarks.at(b_quarks_it)->getParentPdgid()) == 1e6+6
+	    || m_is_signal == false
+	    )
       m_daughter_b_quarks.push_back(m_truth_b_quarks.at(b_quarks_it));
   }
 

@@ -38,7 +38,7 @@ namespace BMinusL
   {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
-      Cutflow(TTree *tree=0);
+      Cutflow(TTree *tree=0, bool isSignal = true);
       ~Cutflow();
 
       virtual void clearObjects();
@@ -48,6 +48,7 @@ namespace BMinusL
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
+      bool m_is_signal;
       void doObjectSelection();
       void print();
 
