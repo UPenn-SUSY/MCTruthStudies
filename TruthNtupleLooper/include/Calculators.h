@@ -49,8 +49,14 @@ namespace TruthNtuple
                , double eta2
                , double phi2
                );
+  double ht(  const std::vector<TruthNtuple::Particle*>&
+	    , const std::vector<TruthNtuple::Particle*>&
+	    , const std::vector<TruthNtuple::Particle*>&
+	    );
 
   double thetaFromEta(double eta);
+  double pFromEM(double e, double m);
+  double ptFromPTheta(double p, double theta);
   double pxFromPtPhi(double pt, double phi);
   double pyFromPtPhi(double pt, double phi);
   double pzFromPtTheta(double pt, double theta);

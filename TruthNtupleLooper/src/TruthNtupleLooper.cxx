@@ -296,14 +296,13 @@ void TruthNtuple::TruthNtupleLooper::Loop()
 {
   if (fChain == 0) return;
 
-  Long64_t nentries = fChain->GetEntries();
+  nentries = fChain->GetEntries();
 
   ProgressBar progress_bar(nentries, 100);
 
   Long64_t nbytes = 0, nb = 0;
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     progress_bar.checkProgress(jentry);
-
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;

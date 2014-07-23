@@ -20,8 +20,10 @@ void HistogramHandlers::Handle::Fill( const TruthNtuple::FLAVOR_CHANNEL
                                     , const std::vector<TruthNtuple::Particle*>&
                                     , const std::vector<TruthNtuple::Particle*>&
                                     , const std::vector<TruthNtuple::Particle*>&
+				    , const std::vector<TruthNtuple::Particle*>& /*quark_list*/
                                     , const TruthNtuple::Met&
-                                    )
+				      , double m_event_weight                                    
+				      )
 {
   // do nothing
 }
@@ -61,13 +63,15 @@ void HistogramHandlers::FlavorChannel::Fill( const TruthNtuple::FLAVOR_CHANNEL f
                                            , const std::vector<TruthNtuple::Particle*>&
                                            , const std::vector<TruthNtuple::Particle*>&
                                            , const std::vector<TruthNtuple::Particle*>&
+					   , const std::vector<TruthNtuple::Particle*>& /*quark_list*/
                                            , const TruthNtuple::Met&
+					     , double m_event_weight
                                            )
 {
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
-      m_h_flavor_channel.at(fc)->Fill(flavor_channel);
+      m_h_flavor_channel.at(fc)->Fill(flavor_channel,m_event_weight);
     }
   }
 }
@@ -117,7 +121,9 @@ void HistogramHandlers::ObjectMultiplicity::Fill( const TruthNtuple::FLAVOR_CHAN
          , const std::vector<TruthNtuple::Particle*>& el_list
          , const std::vector<TruthNtuple::Particle*>& mu_list
          , const std::vector<TruthNtuple::Particle*>& jet_list
+         , const std::vector<TruthNtuple::Particle*>& /*quark_list*/
          , const TruthNtuple::Met&
+						  , double m_event_weight
          )
 {
   size_t num_lep = el_list.size()+mu_list.size();
@@ -126,8 +132,8 @@ void HistogramHandlers::ObjectMultiplicity::Fill( const TruthNtuple::FLAVOR_CHAN
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
-      m_h_num_lep.at(fc)->Fill(num_lep);
-      m_h_num_jet.at(fc)->Fill(num_jet);
+      m_h_num_lep.at(fc)->Fill(num_lep,m_event_weight);
+      m_h_num_jet.at(fc)->Fill(num_jet,m_event_weight);
     }
   }
 }
@@ -148,9 +154,9 @@ void HistogramHandlers::ObjectMultiplicity::write(TFile* f)
 // =============================================================================
 HistogramHandlers::LeptonKinematics::LeptonKinematics() : HistogramHandlers::Handle()
 {
-  const int    pt_bins = 75;
+  const int    pt_bins = 250;
   const double pt_min  = 0.;
-  const double pt_max  = 1500.;
+  const double pt_max  = 3500.;
 
   const int    eta_bins = 50;
   const double eta_min  = -5.;
@@ -331,7 +337,9 @@ void HistogramHandlers::LeptonKinematics::Fill( const TruthNtuple::FLAVOR_CHANNE
          , const std::vector<TruthNtuple::Particle*>& el_list
          , const std::vector<TruthNtuple::Particle*>& mu_list
          , const std::vector<TruthNtuple::Particle*>& /*jet_list*/
+         , const std::vector<TruthNtuple::Particle*>& /*quark_list*/
          , const TruthNtuple::Met&
+						, double m_event_weight
          )
 {
   double pt_0 = 0;
@@ -392,34 +400,34 @@ void HistogramHandlers::LeptonKinematics::Fill( const TruthNtuple::FLAVOR_CHANNE
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
       // fill pt histograms
-      m_h_pt_all.at(fc)->Fill(pt_0);
-      m_h_pt_all.at(fc)->Fill(pt_1);
+      m_h_pt_all.at(fc)->Fill(pt_0,m_event_weight);
+      m_h_pt_all.at(fc)->Fill(pt_1,m_event_weight);
 
-      m_h_pt_0.at(fc)->Fill(pt_0);
-      m_h_pt_1.at(fc)->Fill(pt_1);
+      m_h_pt_0.at(fc)->Fill(pt_0,m_event_weight);
+      m_h_pt_1.at(fc)->Fill(pt_1,m_event_weight);
 
-      m_h_pt_diff.at(fc)->Fill(pt_0 - pt_1);
-      m_h_pt_2d.at(fc)->Fill(pt_0, pt_1);
+      m_h_pt_diff.at(fc)->Fill(pt_0 - pt_1,m_event_weight);
+      m_h_pt_2d.at(fc)->Fill(pt_0, pt_1,m_event_weight);
 
       // fill eta histograms
-      m_h_eta_all.at(fc)->Fill(eta_0);
-      m_h_eta_all.at(fc)->Fill(eta_1);
+      m_h_eta_all.at(fc)->Fill(eta_0,m_event_weight);
+      m_h_eta_all.at(fc)->Fill(eta_1,m_event_weight);
 
-      m_h_eta_0.at(fc)->Fill(eta_0);
-      m_h_eta_1.at(fc)->Fill(eta_1);
+      m_h_eta_0.at(fc)->Fill(eta_0,m_event_weight);
+      m_h_eta_1.at(fc)->Fill(eta_1,m_event_weight);
 
-      m_h_eta_diff.at(fc)->Fill(TruthNtuple::deltaEta(eta_0, eta_1));
-      m_h_eta_2d.at(fc)->Fill(eta_0, eta_1);
+      m_h_eta_diff.at(fc)->Fill(TruthNtuple::deltaEta(eta_0, eta_1),m_event_weight);
+      m_h_eta_2d.at(fc)->Fill(eta_0, eta_1,m_event_weight);
 
       // fill phi histograms
-      m_h_phi_all.at(fc)->Fill(phi_0);
-      m_h_phi_all.at(fc)->Fill(phi_1);
+      m_h_phi_all.at(fc)->Fill(phi_0,m_event_weight);
+      m_h_phi_all.at(fc)->Fill(phi_1,m_event_weight);
 
-      m_h_phi_0.at(fc)->Fill(phi_0);
-      m_h_phi_1.at(fc)->Fill(phi_1);
+      m_h_phi_0.at(fc)->Fill(phi_0,m_event_weight);
+      m_h_phi_1.at(fc)->Fill(phi_1,m_event_weight);
 
-      m_h_phi_diff.at(fc)->Fill(TruthNtuple::deltaPhi(phi_0, phi_1));
-      m_h_phi_2d.at(fc)->Fill(phi_0, phi_1);
+      m_h_phi_diff.at(fc)->Fill(TruthNtuple::deltaPhi(phi_0, phi_1),m_event_weight);
+      m_h_phi_2d.at(fc)->Fill(phi_0, phi_1,m_event_weight);
     }
   }
 }
@@ -456,9 +464,9 @@ void HistogramHandlers::LeptonKinematics::write(TFile* f)
 // =============================================================================
 HistogramHandlers::JetKinematics::JetKinematics() : HistogramHandlers::Handle()
 {
-  const int    pt_bins = 75;
+  const int    pt_bins = 250;
   const double pt_min  = 0.;
-  const double pt_max  = 1500.;
+  const double pt_max  = 3500.;
 
   const int    eta_bins = 50;
   const double eta_min  = -5.;
@@ -637,7 +645,9 @@ void HistogramHandlers::JetKinematics::Fill( const TruthNtuple::FLAVOR_CHANNEL f
          , const std::vector<TruthNtuple::Particle*>& /*el_list*/
          , const std::vector<TruthNtuple::Particle*>& /*mu_list*/
          , const std::vector<TruthNtuple::Particle*>& jet_list
+         , const std::vector<TruthNtuple::Particle*>& /*quark_list*/
          , const TruthNtuple::Met&
+					     , double m_event_weight
          )
 {
   size_t num_jet = jet_list.size();
@@ -677,31 +687,31 @@ void HistogramHandlers::JetKinematics::Fill( const TruthNtuple::FLAVOR_CHANNEL f
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
       // always fill entries for leading jet
-      m_h_pt_all.at(fc)->Fill(pt_0);
-      m_h_pt_0.at(fc)->Fill(pt_0);
+      m_h_pt_all.at(fc)->Fill(pt_0,m_event_weight);
+      m_h_pt_0.at(fc)->Fill(pt_0,m_event_weight);
 
-      m_h_eta_all.at(fc)->Fill(eta_0);
-      m_h_eta_0.at(fc)->Fill(eta_0);
+      m_h_eta_all.at(fc)->Fill(eta_0,m_event_weight);
+      m_h_eta_0.at(fc)->Fill(eta_0,m_event_weight);
 
-      m_h_phi_all.at(fc)->Fill(phi_0);
-      m_h_phi_0.at(fc)->Fill(phi_0);
+      m_h_phi_all.at(fc)->Fill(phi_0,m_event_weight);
+      m_h_phi_0.at(fc)->Fill(phi_0,m_event_weight);
 
       // only fill entries for subleading jet if there are more than one
       if (num_jet > 1) {
-        m_h_pt_all.at(fc)->Fill(pt_1);
-        m_h_pt_1.at(fc)->Fill(pt_1);
-        m_h_pt_diff.at(fc)->Fill(pt_0 - pt_1);
-        m_h_pt_2d.at(fc)->Fill(pt_0, pt_1);
+        m_h_pt_all.at(fc)->Fill(pt_1,m_event_weight);
+        m_h_pt_1.at(fc)->Fill(pt_1,m_event_weight);
+        m_h_pt_diff.at(fc)->Fill(pt_0 - pt_1,m_event_weight);
+        m_h_pt_2d.at(fc)->Fill(pt_0, pt_1,m_event_weight);
 
-        m_h_eta_all.at(fc)->Fill(eta_1);
-        m_h_eta_1.at(fc)->Fill(eta_1);
-        m_h_eta_diff.at(fc)->Fill(TruthNtuple::deltaEta(eta_0, eta_1));
-        m_h_eta_2d.at(fc)->Fill(eta_0, eta_1);
+        m_h_eta_all.at(fc)->Fill(eta_1,m_event_weight);
+        m_h_eta_1.at(fc)->Fill(eta_1,m_event_weight);
+        m_h_eta_diff.at(fc)->Fill(TruthNtuple::deltaEta(eta_0, eta_1),m_event_weight);
+        m_h_eta_2d.at(fc)->Fill(eta_0, eta_1,m_event_weight);
 
-        m_h_phi_all.at(fc)->Fill(phi_1);
-        m_h_phi_1.at(fc)->Fill(phi_1);
-        m_h_phi_diff.at(fc)->Fill(TruthNtuple::deltaPhi(phi_0, phi_1));
-        m_h_phi_2d.at(fc)->Fill(phi_0, phi_1);
+        m_h_phi_all.at(fc)->Fill(phi_1,m_event_weight);
+        m_h_phi_1.at(fc)->Fill(phi_1,m_event_weight);
+        m_h_phi_diff.at(fc)->Fill(TruthNtuple::deltaPhi(phi_0, phi_1),m_event_weight);
+        m_h_phi_2d.at(fc)->Fill(phi_0, phi_1,m_event_weight);
       }
     }
   }
@@ -761,7 +771,9 @@ void HistogramHandlers::Mll::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_chan
          , const std::vector<TruthNtuple::Particle*>& el_list
          , const std::vector<TruthNtuple::Particle*>& mu_list
          , const std::vector<TruthNtuple::Particle*>& /*jet_list*/
+         , const std::vector<TruthNtuple::Particle*>& /*quark_list*/
          , const TruthNtuple::Met&
+				   , double m_event_weight
          )
 {
   if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
@@ -783,7 +795,7 @@ void HistogramHandlers::Mll::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_chan
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
-      m_h_mll.at(fc)->Fill(mll);
+      m_h_mll.at(fc)->Fill(mll,m_event_weight);
     }
   }
 }
@@ -795,6 +807,62 @@ void HistogramHandlers::Mll::write(TFile* f)
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
       m_h_mll.at(fc_it)->Write();
+  }
+}
+
+// =============================================================================
+// = Ht
+// =============================================================================
+HistogramHandlers::Ht::Ht() : HistogramHandlers::Handle()
+{
+  const int   bins = 500;
+  const float max = 0.;
+  const float min = 5000.;
+
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    m_h_ht.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+                                 + "__ht"
+                                 ).c_str()
+                               , ( "h_{T} - "
+                                 + TruthNtuple::FlavorChannelStrings[fc_it]
+                                 + "; h_{T} [GeV] ; Entries"
+                                 ).c_str()
+                               , bins, min, max
+                               )
+                     );
+  }
+}
+// ------------------------------------------------------------------------------
+void HistogramHandlers::Ht::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
+         , const std::vector<TruthNtuple::Particle*>& el_list
+         , const std::vector<TruthNtuple::Particle*>& mu_list
+         , const std::vector<TruthNtuple::Particle*>& jet_list
+         , const std::vector<TruthNtuple::Particle*>& /*quark_list*/
+         , const TruthNtuple::Met&
+				   , double m_event_weight
+         )
+{
+  if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
+  
+  float ht = TruthNtuple::ht( el_list
+			     ,mu_list
+			     ,jet_list);
+    ht = ht/1.e3;
+
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
+    if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
+      m_h_ht.at(fc)->Fill(ht, m_event_weight);
+    }
+  }
+}
+// ------------------------------------------------------------------------------
+void HistogramHandlers::Ht::write(TFile* f)
+{
+  f->cd();
+
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+      m_h_ht.at(fc_it)->Write();
   }
 }
 
@@ -828,15 +896,27 @@ HistogramHandlers::Met::Met() : HistogramHandlers::Handle()
                                   , bins, min, max
                                   )
                         );
+    m_h_met_sig.push_back( new TH1F( (TruthNtuple::FlavorChannelStrings[fc_it]
+				      +"__met_sig"
+				      ).c_str()
+				     , ( "E_{T}^{miss}/#sqrt{H_{T}} - "
+					 + TruthNtuple::FlavorChannelStrings[fc_it]
+					 + "; E_{T}^{miss}/#sqrt{H_{T}} ; Entries"
+					 ).c_str()
+				     , bins, min, max
+				     )
+			   );
   }
 }
 
 // -----------------------------------------------------------------------------
 void HistogramHandlers::Met::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
-         , const std::vector<TruthNtuple::Particle*>& /*el_list*/
-         , const std::vector<TruthNtuple::Particle*>& /*mu_list*/
-         , const std::vector<TruthNtuple::Particle*>& /*jet_list*/
+         , const std::vector<TruthNtuple::Particle*>& el_list
+         , const std::vector<TruthNtuple::Particle*>& mu_list
+         , const std::vector<TruthNtuple::Particle*>& jet_list
+         , const std::vector<TruthNtuple::Particle*>& /*quark_list*/
          , const TruthNtuple::Met& met
+				   , double m_event_weight
          )
 {
   if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
@@ -844,8 +924,13 @@ void HistogramHandlers::Met::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_chan
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
-      m_h_met.at(fc)->Fill(met.getMetNoint()/1.e3);
-      m_h_metrel.at(fc)->Fill(met.getMetRelNoint()/1.e3);
+      m_h_met.at(fc)->Fill(met.getMetNoint()/1.e3,m_event_weight);
+      m_h_metrel.at(fc)->Fill(met.getMetRelNoint()/1.e3,m_event_weight);
+      double metsig = met.getMetSig(el_list,
+				    mu_list,
+				    jet_list);
+
+      m_h_met_sig.at(fc)->Fill(metsig, m_event_weight);
     }
   }
 }
@@ -858,6 +943,7 @@ void HistogramHandlers::Met::write(TFile* f)
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
       m_h_met.at(fc_it)->Write();
       m_h_metrel.at(fc_it)->Write();
+      m_h_met_sig.at(fc_it)->Write();
   }
 }
 
@@ -909,7 +995,9 @@ void HistogramHandlers::Mjl::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_chan
          , const std::vector<TruthNtuple::Particle*>& el_list
          , const std::vector<TruthNtuple::Particle*>& mu_list
          , const std::vector<TruthNtuple::Particle*>& jet_list
+         , const std::vector<TruthNtuple::Particle*>& /*quark_list*/
          , const TruthNtuple::Met&
+				   ,double m_event_weight
          )
 {
   if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
@@ -931,15 +1019,15 @@ void HistogramHandlers::Mjl::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_chan
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
       // fill mjl truth histogram
       for (size_t mjl_it = 0; mjl_it != mjl_list_truth.size(); ++mjl_it) {
-        m_h_mjl_truth.at(fc)->Fill(mjl_list_truth.at(mjl_it)/1.e3);
+        m_h_mjl_truth.at(fc)->Fill(mjl_list_truth.at(mjl_it)/1.e3,m_event_weight);
       }
       // fill mjl dphi matching histogram
       for (size_t mjl_it = 0; mjl_it != mjl_list_dphi_matching.size(); ++mjl_it) {
-        m_h_mjl_dphi_matching.at(fc)->Fill(mjl_list_dphi_matching.at(mjl_it)/1.e3);
+        m_h_mjl_dphi_matching.at(fc)->Fill(mjl_list_dphi_matching.at(mjl_it)/1.e3,m_event_weight);
       }
       // fill mjl dr matching histogram
       for (size_t mjl_it = 0; mjl_it != mjl_list_dr_matching.size(); ++mjl_it) {
-        m_h_mjl_dr_matching.at(fc)->Fill(mjl_list_dr_matching.at(mjl_it)/1.e3);
+        m_h_mjl_dr_matching.at(fc)->Fill(mjl_list_dr_matching.at(mjl_it)/1.e3,m_event_weight);
       }
     }
   }
@@ -956,3 +1044,174 @@ void HistogramHandlers::Mjl::write(TFile* f)
       m_h_mjl_dr_matching.at(fc_it)->Write();
   }
 }
+
+// -----------------------------------------------------------------------------
+HistogramHandlers::Dr::Dr() : HistogramHandlers::Handle()
+{
+
+  // TODO:
+  // fill them, write them
+  // copy-paste to 13 TeV as well
+
+  int bin = 100;
+  int min = 0;
+  int max = 10;
+
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    m_h_dr_ll.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+					       + "__dr_ll"
+					       ).c_str()
+					     , ("#DeltaR_ll - "
+						+ TruthNtuple::FlavorChannelStrings[fc_it]
+						+ " ; #DeltaR ; Events"
+						).c_str()
+					     , bin, min, max)
+				   );
+    m_h_dr_qq.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+					       + "__dr_qq"
+					       ).c_str()
+					     , ("#DeltaR_qq - "
+						+ TruthNtuple::FlavorChannelStrings[fc_it]
+						+ " ; #DeltaR ; Events"
+						).c_str()
+					     , bin, min, max)
+				   );
+    m_h_dr_l0q0.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+						 + "__dr_l0q0"
+						 ).c_str()
+					       , ("#DeltaR_l0q0 - "
+						  + TruthNtuple::FlavorChannelStrings[fc_it]
+						  + " ; #DeltaR ; Events"
+						  ).c_str()
+					       , bin, min, max)
+				     );
+    m_h_dr_l0q1.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+						 + "__dr_l0q1"
+						 ).c_str()
+					       , ("#DeltaR_l0q1 - "
+						  + TruthNtuple::FlavorChannelStrings[fc_it]
+						  + " ; #DeltaR ; Events"
+						  ).c_str()
+					       , bin, min, max)
+				     );
+    m_h_dr_l1q0.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+						 + "__dr_l1q0"
+						 ).c_str()
+					       , ("#DeltaR_l1q0 - "
+						  + TruthNtuple::FlavorChannelStrings[fc_it]
+						  + " ; #DeltaR ; Events"
+						  ).c_str()
+					       , bin, min, max)
+				     );
+    m_h_dr_l1q1.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+						 + "__dr_l1q1"
+						 ).c_str()
+					       , ("#DeltaR_l1q1 - "
+						  + TruthNtuple::FlavorChannelStrings[fc_it]
+						  + " ; #DeltaR ; Events"
+						  ).c_str()
+					       , bin, min, max)
+				     );
+//     m_h_dr_lq0vlq1.push_back( new TH2F( ( TruthNtuple::FlavorChannelStrings[fc_it]
+// 						    + "__dr_lq0vlq1"
+// 						    ).c_str()
+// 						  ,("#DeltaR_lq0vlq1"
+// 						    + TruthNtuple::FlavorChannelStrings[fc_it]
+// 						    + " ; #DeltaR_lq_0 ; #DeltaR_lq_1"
+// 						    ).c_str()
+// 						  , bin, min, max
+// 						  , bin, min, max)
+// 					);
+//     m_h_dr_lsameq0.push_back( new TH1F( (TruthNtuple::FlavorChannelStrings[fc_it]
+// 						   + "__dr_lsameq0"
+// 						   ).c_str()
+// 						  , "How often are leps closer to the leading b? ; Diff (0), Same (1) ; Events"
+// 						  ,2,0,2)
+// 					);
+//     m_h_dr_lsameq1.push_back( new TH1F( (TruthNtuple::FlavorChannelStrings[fc_it]
+// 						   + "__dr_lsameq1"
+// 						   ).c_str()
+// 						  , "How often are leps closer to the subleading b? ; Diff (0), Same (1) ; Events"
+// 						  ,2,0,2)
+// 					);
+  }
+}
+
+// -----------------------------------------------------------------------------
+void HistogramHandlers::Dr::Fill( const TruthNtuple::FLAVOR_CHANNEL flavor_channel
+         , const std::vector<TruthNtuple::Particle*>& el_list
+         , const std::vector<TruthNtuple::Particle*>& mu_list
+         , const std::vector<TruthNtuple::Particle*>& /*jet_list*/
+         , const std::vector<TruthNtuple::Particle*>& quark_list
+         , const TruthNtuple::Met&
+				  ,double m_event_weight
+         )
+
+// PUT SAME ARGUMENTS AS OTHER FILL FUNCTIONS
+{
+  if (flavor_channel == TruthNtuple::FLAVOR_NONE) return;
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    if (fc_it == TruthNtuple::FLAVOR_ALL || fc_it == flavor_channel) {
+      int num_el = el_list.size();
+      int num_mu = mu_list.size();
+      if (num_el + num_mu != 2) return;
+      
+      float dr_ll, dr_qq, dr_l0q0, dr_l1q0, dr_l0q1, dr_l1q1;
+      
+      if (num_el==2) {
+	dr_ll = TruthNtuple::deltaR(el_list.at(0), el_list.at(1));
+	dr_l0q0 = TruthNtuple::deltaR(el_list.at(0), quark_list.at(0));
+	dr_l1q0 = TruthNtuple::deltaR(el_list.at(1), quark_list.at(0));
+	dr_l0q1 = TruthNtuple::deltaR(el_list.at(0), quark_list.at(1));
+	dr_l1q1 = TruthNtuple::deltaR(el_list.at(1), quark_list.at(1));
+      }
+      else if (num_el==1) {
+	dr_ll = TruthNtuple::deltaR(el_list.at(0), mu_list.at(0));
+	float pt_0 = el_list.at(0)->getPt();
+	float pt_1 = mu_list.at(0)->getPt();
+	if (pt_0 > pt_1) {
+	  dr_l0q0 = TruthNtuple::deltaR(el_list.at(0), quark_list.at(0));
+	  dr_l1q0 = TruthNtuple::deltaR(mu_list.at(0), quark_list.at(0));
+	  dr_l0q1 = TruthNtuple::deltaR(el_list.at(0), quark_list.at(1));
+	  dr_l1q1 = TruthNtuple::deltaR(mu_list.at(0), quark_list.at(1));
+	}
+	else {
+	  dr_l0q0 = TruthNtuple::deltaR(mu_list.at(0), quark_list.at(0));
+	  dr_l1q0 = TruthNtuple::deltaR(el_list.at(0), quark_list.at(0));
+	  dr_l0q1 = TruthNtuple::deltaR(mu_list.at(0), quark_list.at(1));
+	  dr_l1q1 = TruthNtuple::deltaR(el_list.at(0), quark_list.at(1));
+	}
+      }
+      else {
+	dr_ll = TruthNtuple::deltaR(mu_list.at(0), mu_list.at(1));
+	dr_l0q0 = TruthNtuple::deltaR(mu_list.at(0), quark_list.at(0));
+	dr_l1q0 = TruthNtuple::deltaR(mu_list.at(1), quark_list.at(0));
+	dr_l0q1 = TruthNtuple::deltaR(mu_list.at(0), quark_list.at(1));
+	dr_l1q1 = TruthNtuple::deltaR(mu_list.at(1), quark_list.at(1));
+      }
+      dr_qq = TruthNtuple::deltaR(quark_list.at(0), quark_list.at(1));
+      
+      m_h_dr_ll.at(fc_it)->Fill(dr_ll,m_event_weight);
+      m_h_dr_qq.at(fc_it)->Fill(dr_qq,m_event_weight);
+      m_h_dr_l0q0.at(fc_it)->Fill(dr_l0q0,m_event_weight);
+      m_h_dr_l1q0.at(fc_it)->Fill(dr_l1q0,m_event_weight);
+      m_h_dr_l0q1.at(fc_it)->Fill(dr_l0q1,m_event_weight);
+      m_h_dr_l1q1.at(fc_it)->Fill(dr_l1q1,m_event_weight);
+    }
+  }
+}
+// -----------------------------------------------------------------------------
+void HistogramHandlers::Dr::write(TFile* f)
+{
+  f->cd();
+
+  for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+    m_h_dr_ll.at(fc_it)->Write();
+    m_h_dr_qq.at(fc_it)->Write();
+    m_h_dr_l0q0.at(fc_it)->Write();
+    m_h_dr_l1q0.at(fc_it)->Write();
+    m_h_dr_l0q1.at(fc_it)->Write();
+    m_h_dr_l1q1.at(fc_it)->Write();
+  }
+}
+

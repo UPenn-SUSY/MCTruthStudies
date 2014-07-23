@@ -19,6 +19,8 @@ namespace TruthNtuple
   // ===========================================================================
   class TruthNtupleLooper {
     public :
+    Long64_t nentries;
+
       TruthNtupleLooper(TTree *tree=0);
       virtual ~TruthNtupleLooper();
       virtual Int_t    GetEntry(Long64_t entry);

@@ -207,6 +207,10 @@ namespace TruthNtuple
       double getMetNoint() const;
       double getMetPhiNoint() const;
       double getMetRelNoint() const;
+      double getMetSig(const std::vector<TruthNtuple::Particle*>&
+		       ,const std::vector<TruthNtuple::Particle*>&
+		       ,const std::vector<TruthNtuple::Particle*>&
+		       ) const;
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     protected:

@@ -35,6 +35,7 @@ namespace HistogramHandlers
 
       virtual void FillSpecial( const TruthNtuple::FLAVOR_CHANNEL
                               , const std::vector<TruthNtuple::Particle*>&
+				, double m_event_weight
                               );
       virtual void write(TFile*);
 
@@ -109,7 +110,8 @@ namespace HistogramHandlers
 
       virtual void FillSpecial( const TruthNtuple::FLAVOR_CHANNEL
                               , const std::vector<TruthNtuple::Particle*>&
-                              );
+      				, double m_event_weight
+                        );
       virtual void write(TFile*);
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -147,6 +149,7 @@ namespace HistogramHandlers
                               , const std::vector<TruthNtuple::Particle*>& el
                               , const std::vector<TruthNtuple::Particle*>& mu
                               , const std::vector<TruthNtuple::Particle*>& b
+				, double m_event_weight
                               );
       virtual void write(TFile*);
 
@@ -154,6 +157,11 @@ namespace HistogramHandlers
                       , const std::vector<TruthNtuple::Particle*>& mu
                       , const std::vector<TruthNtuple::Particle*>& b
                       );
+
+      void calcEff2d(TH2D* pt,
+		     TH2D* pt_eff,
+		     TH2D* pt_num
+		     );
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
@@ -235,6 +243,7 @@ namespace HistogramHandlers
       std::vector<TH1D*> m_h_right_pair_mbl_ratio;
       std::vector<TH1D*> m_h_right_pair_mbl_sq_sum;
       std::vector<TH2D*> m_h_right_pair_mbl_2d;
+      std::vector<TH1D*> m_h_right_pair_mbl_asym;
 
       std::vector<TH1D*> m_h_wrong_pair_mbl_all;
       std::vector<TH1D*> m_h_wrong_pair_mbl_0;
@@ -296,6 +305,10 @@ namespace HistogramHandlers
       std::vector<TH2D*> m_h_wrong_vs_right_ptbl_ratio;
       std::vector<TH2D*> m_h_wrong_vs_right_ptbl_sq_sum;
 
+      // 2d subleading b-pt vs l-pt histograms
+      std::vector<TH2D*> m_h_pt_b1vl1;
+      std::vector<TH2D*> m_h_pt_b1vl1_eff;
+      std::vector<TH2D*> m_h_pt_b1vl1_num;
   };
 
   // =============================================================================
@@ -311,6 +324,7 @@ namespace HistogramHandlers
                               , const std::vector<TruthNtuple::Particle*>& el
                               , const std::vector<TruthNtuple::Particle*>& mu
                               , const std::vector<TruthNtuple::Particle*>& b_jets
+				, double m_event_weight
                               );
       virtual void write(TFile*);
 
