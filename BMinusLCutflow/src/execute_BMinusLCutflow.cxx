@@ -26,15 +26,27 @@ int main(int argc, char** argv)
   std::cout << "\n";
 
   TChain t("truth");
+  bool isSignal = true;
   std::cout << "input files:\n";
   for (int it = 1; it != argc; ++it) {
     std::cout << "\t" << it << " -- " << argv[it] << "\n";
-    t.Add(argv[1]);
+    if (strcmp(argv[it],"-s") == 0) {
+    std::cout << strcmp(argv[it],"-s") << "\n";
+      isSignal = true;
+    }
+    else if (strcmp(argv[it],"-b") == 0) {
+    std::cout << strcmp(argv[it],"-b") << "\n";
+      isSignal = false;
+    }
+    else {
+      std::cout << "\t" << it << " -- " << argv[it] << "\n";
+    t.Add(argv[it]);
+    }
   }
   std::cout << "\n";
 
   std::cout << "Retrieved tree from input files. Constructing Cutflow object\n";
-  BMinusL::Cutflow bmlcf(&t);
+  BMinusL::Cutflow bmlcf(&t, isSignal);
 
   std::cout << "Preparing to loop over events!\n";
   bmlcf.Loop();

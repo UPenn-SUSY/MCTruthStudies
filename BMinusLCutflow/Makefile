@@ -8,6 +8,7 @@ LOCAL_LIBS_PATH += $(SH_LIB_PATH)/libProgressBar.so
 LOCAL_LIBS_PATH += $(SH_LIB_PATH)/libTruthNtupleLooper.so
 LOCAL_LIBS_PATH += $(SH_LIB_PATH)/libTruthRecordHelpers.so
 LOCAL_LIBS_PATH += $(SH_LIB_PATH)/libHistogramHandlers.so
+#LOCAL_LIBS_PATH += $(SH_LIB_PATH)/../PDFTool_standalone/libLHAPDF.so
 
 INCLUDES += -I../
 INCLUDES += -I./

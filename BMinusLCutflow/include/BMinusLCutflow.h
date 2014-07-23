@@ -3,11 +3,12 @@
 
 #include "TruthNtupleLooper/include/TruthNtupleLooper.h"
 #include "TruthNtupleLooper/include/TruthNtupleEnums.h"
-
+#include "BMinusLCutflow/include/PDFTool.h"
 // =============================================================================
 class TTree;
 class TH1D;
 class TH2D;
+class TRandom;
 
 namespace TruthNtuple
 {
@@ -38,7 +39,7 @@ namespace BMinusL
   {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     public:
-      Cutflow(TTree *tree=0);
+    Cutflow(TTree *tree=0, bool isSignal = true);
       ~Cutflow();
 
       virtual void clearObjects();
@@ -48,10 +49,13 @@ namespace BMinusL
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     private:
+      bool m_is_signal;
       void doObjectSelection();
       void print();
 
       bool isLeptonFromTauFromStop(const TruthNtuple::Particle*);
+      double scalePDF();
+      void broadenResolution();
 
       TruthNtuple::FLAVOR_CHANNEL m_flavor_channel;
 
@@ -95,19 +99,59 @@ namespace BMinusL
 
       void Fill( const BMinusL::Cutflow* );
 
+      void deltaRCalc(const TruthNtuple::Particle*
+		      ,const TruthNtuple::Particle*
+		      ,const TruthNtuple::Particle*
+		      ,const TruthNtuple::Particle*
+		      ,double&
+		      ,double&
+		      ,double&
+		      ,double&
+		      );
+
       void write(TFile*);
 
-      TH2D* calcEff(TH2D*, std::string tag="");
-
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    private:
+      TH2D* calcEffPt(TH2D*, std::string tag="");
+      TH2D* calcEffFid(TH2D*, TH2D*);
       TH1D* m_h_meff;
-      TH2D* m_h_pt_b1vsl1;
-      TH2D* m_h_pt_b1vse1;
-      TH2D* m_h_pt_b1vsm1;
-      TH2D* m_h_pt_b1vsl1_eff;
-      TH2D* m_h_pt_b1vse1_eff;
-      TH2D* m_h_pt_b1vsm1_eff;
+      TH2D* m_h_fc_all__pt_event_b1vl1;
+      TH2D* m_h_fc_all__pt_event_b1ve1;
+      TH2D* m_h_fc_all__pt_event_b1vm1;
+      TH2D* m_h_fc_all__pt_event_b1vl1_eff;
+      TH2D* m_h_fc_all__pt_event_b1ve1_eff;
+      TH2D* m_h_fc_all__pt_event_b1vm1_eff;
+      TH1D* m_h_fc_all__eta_event_eff;
+      TH1D* m_h_fc_ee__eta_event_eff;
+      TH1D* m_h_fc_em__eta_event_eff;
+      TH1D* m_h_fc_me__eta_event_eff;
+      TH1D* m_h_fc_mm__eta_event_eff;
+      TH1D* m_h_fc_all__lep_eta_event_eff;
+      TH1D* m_h_fc_all__quark_eta_event_eff;
+      TH1D* m_h_fc_all__lep_fiducial_eventall_pass;
+      TH1D* m_h_fc_all__lep_fiducial_eventall_fail;
+      TH1D* m_h_fc_all__lep_fiducial_eventlep_pass;
+      TH1D* m_h_fc_all__lep_fiducial_eventlep_fail;
+      TH1D* m_h_fc_all__lep_fiducial_single_pass;
+      TH1D* m_h_fc_all__lep_fiducial_single_fail;
+      TH1D* m_h_fc_all__quark_fiducial_eventall_pass;
+      TH1D* m_h_fc_all__quark_fiducial_eventall_fail;
+      TH1D* m_h_fc_all__quark_fiducial_eventquark_pass;
+      TH1D* m_h_fc_all__quark_fiducial_eventquark_fail;
+      TH1D* m_h_fc_all__quark_fiducial_single_pass;
+      TH1D* m_h_fc_all__quark_fiducial_single_fail;
+      //TH1D* m_h_fc_all__fiducial_event_e_pass;
+      //TH1D* m_h_fc_all__fiducial_event_e_fail;
+      //TH1D* m_h_fc_all__fiducial_event_m_pass;
+      //TH1D* m_h_fc_all__fiducial_event_m_fail;
+      TH2D* m_h_fc_all__fiducial_event_b1vl1_pass;
+      TH2D* m_h_fc_all__fiducial_event_b1vl1_fail;
+      TH2D* m_h_fc_all__fiducial_event_b1vl1_eff;
+      TH1D* m_h_fc_all__lep_deltaRq;
+      TH2D* m_h_fc_all__lep_deltaRq_l0vl1;
+      TH1D* m_h_fc_all__lep_deltaRsameq0;
+      TH1D* m_h_fc_all__lep_deltaRsameq1;
+      TH1D* m_h_fc_all__lep_deltaRl;
+      TH1D* m_h_fc_all__quark_deltaRq;
   };
 
 }

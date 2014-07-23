@@ -35,7 +35,9 @@ namespace HistogramHandlers
                        , const std::vector<TruthNtuple::Particle*>& el
                        , const std::vector<TruthNtuple::Particle*>& mu
                        , const std::vector<TruthNtuple::Particle*>& jet
+                       , const std::vector<TruthNtuple::Particle*>& quark
                        , const TruthNtuple::Met&
+		       , double m_event_weight
                        );
       virtual void write(TFile*);
 
@@ -56,7 +58,9 @@ namespace HistogramHandlers
                        , const std::vector<TruthNtuple::Particle*>& el
                        , const std::vector<TruthNtuple::Particle*>& mu
                        , const std::vector<TruthNtuple::Particle*>& jet
+                       , const std::vector<TruthNtuple::Particle*>& quark
                        , const TruthNtuple::Met&
+		       , double m_event_weight
                        );
       virtual void write(TFile*);
 
@@ -78,7 +82,9 @@ namespace HistogramHandlers
                        , const std::vector<TruthNtuple::Particle*>& el
                        , const std::vector<TruthNtuple::Particle*>& mu
                        , const std::vector<TruthNtuple::Particle*>& jet
+                       , const std::vector<TruthNtuple::Particle*>& quark
                        , const TruthNtuple::Met&
+		       , double m_event_weight
                        );
       virtual void write(TFile*);
 
@@ -101,7 +107,9 @@ namespace HistogramHandlers
                        , const std::vector<TruthNtuple::Particle*>& el
                        , const std::vector<TruthNtuple::Particle*>& mu
                        , const std::vector<TruthNtuple::Particle*>& jet
+                       , const std::vector<TruthNtuple::Particle*>& quark
                        , const TruthNtuple::Met&
+		       , double m_event_weight
                        );
       virtual void write(TFile*);
 
@@ -140,7 +148,9 @@ namespace HistogramHandlers
                        , const std::vector<TruthNtuple::Particle*>& el
                        , const std::vector<TruthNtuple::Particle*>& mu
                        , const std::vector<TruthNtuple::Particle*>& jet
+                       , const std::vector<TruthNtuple::Particle*>& quark
                        , const TruthNtuple::Met&
+		       , double m_event_weight
                        );
       virtual void write(TFile*);
 
@@ -178,7 +188,9 @@ namespace HistogramHandlers
                        , const std::vector<TruthNtuple::Particle*>& el
                        , const std::vector<TruthNtuple::Particle*>& mu
                        , const std::vector<TruthNtuple::Particle*>& jet
+                       , const std::vector<TruthNtuple::Particle*>& quark
                        , const TruthNtuple::Met&
+		       , double m_event_weight
                        );
       virtual void write(TFile*);
 
@@ -186,6 +198,7 @@ namespace HistogramHandlers
     private:
       std::vector<TH1F*> m_h_met;
       std::vector<TH1F*> m_h_metrel;
+      std::vector<TH1F*> m_h_met_sig;
   };
 
   // =============================================================================
@@ -201,7 +214,9 @@ namespace HistogramHandlers
                        , const std::vector<TruthNtuple::Particle*>& el
                        , const std::vector<TruthNtuple::Particle*>& mu
                        , const std::vector<TruthNtuple::Particle*>& jet
+                       , const std::vector<TruthNtuple::Particle*>& quark
                        , const TruthNtuple::Met&
+		       , double m_event_weight
                        );
       virtual void write(TFile*);
 
@@ -216,14 +231,16 @@ namespace HistogramHandlers
   class Mjl : public Handle
   {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    public:
-      Mjl();
+  public:
+    Mjl();
 
       virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
                        , const std::vector<TruthNtuple::Particle*>& el
                        , const std::vector<TruthNtuple::Particle*>& mu
                        , const std::vector<TruthNtuple::Particle*>& jet
+                       , const std::vector<TruthNtuple::Particle*>& quark
                        , const TruthNtuple::Met&
+		       , double m_event_weight
                        );
       virtual void write(TFile*);
 
@@ -233,6 +250,61 @@ namespace HistogramHandlers
       std::vector<TH1F*> m_h_mjl_dphi_matching;
       std::vector<TH1F*> m_h_mjl_dr_matching;
   };
-}
 
+  // =============================================================================
+  // = Ht
+  // =============================================================================
+  class Ht : public Handle
+  {
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  public:
+    Ht();
+    
+    virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
+                       , const std::vector<TruthNtuple::Particle*>& el
+                       , const std::vector<TruthNtuple::Particle*>& mu
+                       , const std::vector<TruthNtuple::Particle*>& jet
+                       , const std::vector<TruthNtuple::Particle*>& quark
+                       , const TruthNtuple::Met&
+		       , double m_event_weight
+                       );
+      virtual void write(TFile*);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    private:
+      std::vector<TH1F*> m_h_ht;
+  };
+
+  // =============================================================================
+  // = Dr
+  // =============================================================================
+  class Dr : public Handle
+  {
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  public:
+    Dr();
+    
+    virtual void Fill( const TruthNtuple::FLAVOR_CHANNEL
+                       , const std::vector<TruthNtuple::Particle*>& el
+                       , const std::vector<TruthNtuple::Particle*>& mu
+                       , const std::vector<TruthNtuple::Particle*>& jet
+                       , const std::vector<TruthNtuple::Particle*>& quark
+                       , const TruthNtuple::Met&
+		       , double m_event_weight
+                       );
+      virtual void write(TFile*);
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    private:
+      std::vector<TH1F*> m_h_dr_ll;
+      std::vector<TH1F*> m_h_dr_qq;
+      std::vector<TH1F*> m_h_dr_l0q0;
+      std::vector<TH1F*> m_h_dr_l0q1;
+      std::vector<TH1F*> m_h_dr_l1q0;
+      std::vector<TH1F*> m_h_dr_l1q1;
+/*       std::vector<TH2F*> m_h_dr_lq0vlq1; */
+/*       std::vector<TH1F*> m_h_dr_lsameq0; */
+/*       std::vector<TH1F*> m_h_dr_lsameq1; */
+  };
+}
 #endif
