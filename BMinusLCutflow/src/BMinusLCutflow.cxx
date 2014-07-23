@@ -142,12 +142,11 @@ void BMinusL::Cutflow::processEvent()
   double m_event_weight = 1./nentries;
   if (m_is_signal == false) {
     // only need to scale bkgd samples
-    m_event_weight = scalePDF();
+    m_event_weight = scalePDF(m_event_weight);
   }
-  std::cout<<"About to fill normal histograms.\n";
+
   // Fill "normal histograms"
   size_t num_hists = m_histograms.size();
-  std::cout<<"num_hists = "<<num_hists<<"\n";
   for (size_t hist_it = 0; hist_it != num_hists; ++hist_it) {
     m_histograms.at(hist_it)->Fill( m_flavor_channel
                                   , m_daughter_el
@@ -157,9 +156,7 @@ void BMinusL::Cutflow::processEvent()
                                   , m_met
                                   , m_event_weight
                                   );
-    std::cout<<"Filling the "<<hist_it<<"th histogram\n";
   }
-  std::cout<<"About to fill special histograms.\n";
   // fill special histograms
   m_h_mbl->FillSpecial( m_flavor_channel
                       , m_daughter_el
@@ -167,26 +164,21 @@ void BMinusL::Cutflow::processEvent()
                       , m_leading_b_jets
 		      , m_event_weight
                       );
-  std::cout<<"Filled mbl histos.\n";
   m_h_bl_pair_kinematics->FillSpecial( m_flavor_channel
                                      , m_daughter_el
                                      , m_daughter_mu
                                      , m_daughter_b_quarks
 				       , m_event_weight
                                      );
-  std::cout<<"Filled blpair histos.\n";
   m_h_quark_kinematics->FillSpecial( m_flavor_channel
                                    , m_daughter_b_quarks
 				     , m_event_weight
                                    );
-  std::cout<<"Filled quark histos.\n";
   m_h_stop_kinematics->FillSpecial( m_flavor_channel
                                   , m_truth_stops
 				    , m_event_weight
                                   );
-  std::cout<<"Filled stop histos.\n";
   m_sa_hists->Fill(this);
-  std::cout<<"Fill the special histograms successfully.\n";
 }
 
 // -----------------------------------------------------------------------------
@@ -468,9 +460,8 @@ bool BMinusL::Cutflow::isLeptonFromTauFromStop(const TruthNtuple::Particle* part
 // =============================================================================
 // = scalePDF
 // =============================================================================
-double BMinusL::Cutflow::scalePDF()
+double BMinusL::Cutflow::scalePDF(double m_event_weight)
 {
-  double m_event_weight = 1.;
   PDFTool* pdfTool = new PDFTool(7000000, 1, -1, 10042);
   pdfTool->setEventInfo( pow(mcevt_pdf_scale->at(0),2)
 			,mcevt_pdf_x1->at(0)
@@ -481,30 +472,6 @@ double BMinusL::Cutflow::scalePDF()
   double tmp_pdf = pdfTool->weight(-1,14./13.);     if(tmp_pdf > 500.) tmp_pdf = 0.;
   m_event_weight *= tmp_pdf;
   return m_event_weight;
-
-  // initialize histograms here
-  m_h_meff = new TH1D( "meff"
-                     , "m_{eff} ; m_{eff} [GeV] ; Entries"
-                     , 500 , 0, 5000
-                     );
-
-  m_h_pt_b1vsl1 = new TH2D( "pt_b1vsl1"
-                          , "p_{t} of subleading bl ; p_{t}^{l} [GeV] ; p_{t}^{b} [GeV]"
-                          , 150, 0, 1500
-                          , 150, 0, 1500
-                          );
-
-  m_h_pt_b1vse1 = new TH2D( "pt_b1vse1"
-                          , "p_{t} of subleading be ; p_{t}^{e} [GeV] ; p_{t}^{b} [GeV]"
-                          , 150, 0, 1500
-                          , 150, 0, 1500
-                          ); // for ee or me events
-
-  m_h_pt_b1vsm1 = new TH2D( "pt_b1vsm1"
-                          , "p_{t} of subleading bm ; p_{t}^{m} [GeV] ; p_{t}^{b} [GeV]"
-                          , 150, 0, 1500
-                          , 150, 0, 1500
-                          ); // for mm or em events
 }
 
 // =============================================================================
@@ -1024,29 +991,29 @@ void BMinusL::BMinusLStandAloneHistograms::write(TFile* f)
 //   m_h_fc_all__fiducial_event_b1vl1_eff->Write();
  }
 
-// TH2D* BMinusL::BMinusLStandAloneHistograms::calcEffPt(TH2D* h, std::string tag)
-// {
-//   std::string histo_name = "fc_all__pt_event_b1v";
-//   histo_name += tag;
-//   histo_name += "1_eff";
-//   TH2D* h_eff = new TH2D((histo_name).c_str()
-// 			 , " ; p_{t}^{b} [GeV}; p_{t}^{l} [GeV]"
-// 			 , 150, 0, 1500
-// 			 , 150, 0, 1500
-// 			 );
+TH2D* BMinusL::BMinusLStandAloneHistograms::calcEffPt(TH2D* h, std::string tag)
+{
+  std::string histo_name = "fc_all__pt_event_b1v";
+  histo_name += tag;
+  histo_name += "1_eff";
+  TH2D* h_eff = new TH2D((histo_name).c_str()
+			 , " ; p_{t}^{b} [GeV}; p_{t}^{l} [GeV]"
+			 , 150, 0, 1500
+			 , 150, 0, 1500
+			 );
   
-//   float denom = h->Integral();
-//   for (int ix=0; ix!=h->GetXaxis()->GetNbins(); ix++) {
-//     for (int iy=0; iy!=h->GetXaxis()->GetNbins(); iy++) {
-//       float cutvaluex = h->GetXaxis()->GetBinLowEdge(ix+1);
-//       float cutvaluey = h->GetYaxis()->GetBinLowEdge(iy+1);
-//       float numer = h->Integral(ix+1, h->GetXaxis()->GetNbins(), iy+1, h->GetYaxis()->GetNbins());
-//       float efficiency = numer/denom;
-//       h_eff->Fill(cutvaluex,cutvaluey,efficiency);
-//     }
-//   }
-//   return h_eff;
-// }
+  float denom = h->Integral();
+  for (int ix=0; ix!=h->GetXaxis()->GetNbins(); ix++) {
+    for (int iy=0; iy!=h->GetXaxis()->GetNbins(); iy++) {
+      float cutvaluex = h->GetXaxis()->GetBinLowEdge(ix+1);
+      float cutvaluey = h->GetYaxis()->GetBinLowEdge(iy+1);
+      float numer = h->Integral(ix+1, h->GetXaxis()->GetNbins(), iy+1, h->GetYaxis()->GetNbins());
+      float efficiency = numer/denom;
+      h_eff->Fill(cutvaluex,cutvaluey,efficiency);
+    }
+  }
+  return h_eff;
+}
 
 // TH2D* BMinusL::BMinusLStandAloneHistograms::calcEffFid(TH2D* h_pass, TH2D* h_fail)
 // {
