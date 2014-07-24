@@ -15,7 +15,8 @@
 
 #include "HistogramHandlers/include/HistogramHandlers.h"
 #include "BMinusLCutflow/include/BMinusLHistogramHandlers.h"
-//#include "PDFTool_standalone/PDFTool.h"
+
+#include "TruthNtupleLooper/include/PDFTool.h"
 
 // -----------------------------------------------------------------------------
 BMinusL::Cutflow::Cutflow(TTree* tree, bool isSignal) : TruthNtuple::TruthNtupleLooper(tree)
