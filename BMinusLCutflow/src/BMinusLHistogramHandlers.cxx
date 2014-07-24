@@ -1195,8 +1195,9 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
   const int    ptbl_ratio_bins = 55;
   const double ptbl_ratio_min  = 0.;
   const double ptbl_ratio_max  = 1.1;
-  std::cout<<"About to initialize blpair histos.\n";
+
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     m_h_l_pt_all.push_back( new TH1D( ( TruthNtuple::FlavorChannelStrings[fc_it]
                                       + "__l_pt_all" // name suffix
@@ -2496,7 +2497,6 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
 						       , double m_event_weight
          )
 {
-  std::cout<<"Entering Fill function for blpair.\n";
   if (flavor_channel == TruthNtuple::FLAVOR_NONE) {
     // std::cout << "\nflavor channel = NONE -- skipping event for the b-l kinematics plot"
     //           << "\n\t-- num el: " << el_list.size()
@@ -2505,11 +2505,11 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
     //           << "\n";
     return;
   }
-  // std::cout << "\nflavor channel = " << TruthNtuple::FlavorChannelStrings[flavor_channel]
-  //           << "\n\t-- num el: " << el_list.size()
-  //           << "\n\t-- num mu: " << mu_list.size()
-  //           << "\n\t-- num quark: " << quark_list.size()
-  //           << "\n";
+//  std::cout << "\nflavor channel = " << TruthNtuple::FlavorChannelStrings[flavor_channel]
+//             << "\n\t-- num el: " << el_list.size()
+//             << "\n\t-- num mu: " << mu_list.size()
+//             << "\n\t-- num quark: " << quark_list.size()
+//             << "\n";
 
   // sort objects based on parent particle - if sorting fails, exis the function
   if (sortObjects(el_list, mu_list, quark_list) == false) {
@@ -2528,7 +2528,6 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
                             : mbl_astp/mbl_stop
                             );
   double mbl_right_sq_sum = sqrt(mbl_stop*mbl_stop + mbl_astp*mbl_astp);
-
   double mbl_asym = mbl_right_diff / (mbl_stop + mbl_astp);
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2654,7 +2653,6 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     TruthNtuple::FLAVOR_CHANNEL fc = TruthNtuple::FLAVOR_CHANNEL(fc_it);
     if (fc == TruthNtuple::FLAVOR_ALL || fc == flavor_channel) {
-      std::cout<<"Looping through flavor channels.\n";
       // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       // fill lepton kinematic plots
       m_h_l_pt_all.at(fc)->Fill(m_l_from_stop->getPt()/1.e3,m_event_weight);
@@ -2698,7 +2696,7 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
                                , m_l_from_astp->getPhi()
 				 ,m_event_weight
                                );
-      std::cout<<"Filled lepton kinematics plots";
+
       // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       // fill b quark kinematic plots
       m_h_b_pt_all.at(fc)->Fill(m_b_from_stop->getPt()/1.e3,m_event_weight);
@@ -2742,7 +2740,7 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
                                , m_b_from_astp->getPhi()
 				 ,m_event_weight
                                );
-      std::cout<<"Filled quark kinematics plots";
+
       // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       // fill b-vs-l histograms for right pairing
       m_h_right_pair_bl_dpt.at(fc)->Fill( m_l_from_stop->getPt()/1.e3
@@ -2810,7 +2808,7 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
                                            , m_b_from_astp->getPhi()
 					   ,m_event_weight
                                            );
-      std::cout<<"Filled bvl right pairing kinematics plots";
+
       // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       // fill b-vs-l histograms for wrong pairing
       m_h_wrong_pair_bl_dpt.at(fc)->Fill( m_l_from_stop->getPt()/1.e3
@@ -2878,7 +2876,7 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
                                            , m_b_from_stop->getPhi()
 					   ,m_event_weight
                                            );
-      std::cout<<"Filled bvl wrong pairing kinematics plots";
+
       // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       // fill mbl histograms for right pairing
       m_h_right_pair_mbl_all.at(fc)->Fill(mbl_stop,m_event_weight);
@@ -2890,7 +2888,7 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
       m_h_right_pair_mbl_sq_sum.at(fc)->Fill(mbl_right_sq_sum,m_event_weight);
       m_h_right_pair_mbl_2d.at(fc)->Fill(mbl_stop, mbl_astp,m_event_weight);
       m_h_right_pair_mbl_asym.at(fc)->Fill(mbl_asym, m_event_weight);
-      std::cout<<"Filled mbl right pairing kinematics plots";
+
       // fill mbl histograms for wrong pairing
       m_h_wrong_pair_mbl_all.at(fc)->Fill(mbl_wrong_0,m_event_weight);
       m_h_wrong_pair_mbl_all.at(fc)->Fill(mbl_wrong_1,m_event_weight);
@@ -2930,12 +2928,12 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
       m_h_sq_sum_pair_mbl_sq_sum.at(fc)->Fill(mbl_sq_sum_sq_sum,m_event_weight);
       m_h_sq_sum_pair_mbl_2d.at(fc)->Fill(mbl_sq_sum_0, mbl_sq_sum_1,m_event_weight);
       m_h_sq_sum_pair_cor_pairing.at(fc)->Fill(sq_sum_pariing,m_event_weight);
-      std::cout<<"Filled mbl wrong pairing kinematics plots";
+
       // fill mbl histograms wrong vs right pairing
       m_h_wrong_vs_right_mbl_diff.at(fc)->Fill(  mbl_right_diff  , mbl_wrong_diff  ,m_event_weight);
       m_h_wrong_vs_right_mbl_ratio.at(fc)->Fill( mbl_right_ratio , mbl_wrong_ratio ,m_event_weight);
       m_h_wrong_vs_right_mbl_sq_sum.at(fc)->Fill(mbl_right_sq_sum, mbl_wrong_sq_sum,m_event_weight);
-      std::cout<<"Filled mbl wrong v right pairing kinematics plots";
+
       // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       // fill ptbl histograms for right pairing
       m_h_right_pair_ptbl_all.at(fc)->Fill(ptbl_stop,m_event_weight);
@@ -2946,7 +2944,7 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
       m_h_right_pair_ptbl_ratio.at(fc)->Fill(right_ptbl_ratio,m_event_weight);
       m_h_right_pair_ptbl_sq_sum.at(fc)->Fill(right_ptbl_sq_sum,m_event_weight);
       m_h_right_pair_ptbl_2d.at(fc)->Fill(ptbl_stop, ptbl_astp,m_event_weight);
-      std::cout<<"Filled ptbl right pairing kinematics plots";
+
       // fill ptbl histograms for wrong pairing
       m_h_wrong_pair_ptbl_all.at(fc)->Fill(ptbl_wrong_0,m_event_weight);
       m_h_wrong_pair_ptbl_all.at(fc)->Fill(ptbl_wrong_1,m_event_weight);
@@ -2956,38 +2954,35 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
       m_h_wrong_pair_ptbl_ratio.at(fc)->Fill(wrong_ptbl_ratio,m_event_weight);
       m_h_wrong_pair_ptbl_sq_sum.at(fc)->Fill(wrong_ptbl_sq_sum,m_event_weight);
       m_h_wrong_pair_ptbl_2d.at(fc)->Fill(ptbl_wrong_0, ptbl_wrong_1,m_event_weight);
-      std::cout<<"Filled ptbl wrong pairing kinematics plots";
+
       // fill ptbl histograms wrong vs right pairing
       m_h_wrong_vs_right_ptbl_diff.at(fc)->Fill(  right_ptbl_diff  , wrong_ptbl_diff  ,m_event_weight);
       m_h_wrong_vs_right_ptbl_ratio.at(fc)->Fill( right_ptbl_ratio , wrong_ptbl_ratio ,m_event_weight);
       m_h_wrong_vs_right_ptbl_sq_sum.at(fc)->Fill(right_ptbl_sq_sum, wrong_ptbl_sq_sum,m_event_weight);
-      std::cout<<"Filled ptbl wrong v right pairing kinematics plots";
+
       // fill 2d pt histograms
       float pt_b_0, pt_b_1, pt_l_0, pt_l_1;
-      std::cout<< "\n is the problem with the number of quarks?\n";
-      std::cout<<"num quarks = "<< quark_list.size();
       pt_b_0 = quark_list.at(0)->getPt()/1.e3;
       pt_b_1 = quark_list.at(1)->getPt()/1.e3;
       if (pt_b_1 > pt_b_0) {
 	std::swap(pt_b_0, pt_b_1);
       }
-      if (fc == TruthNtuple::FLAVOR_EE) {
+      if (flavor_channel == TruthNtuple::FLAVOR_EE) {
 	pt_l_0 = el_list.at(0)->getPt()/1.e3;
 	pt_l_1 = el_list.at(1)->getPt()/1.e3;
       }
-      else if (fc == TruthNtuple::FLAVOR_MM) {
+      else if (flavor_channel == TruthNtuple::FLAVOR_MM) {
 	pt_l_0 = mu_list.at(0)->getPt()/1.e3;
 	pt_l_1 = mu_list.at(1)->getPt()/1.e3;
       }	
       else {
 	pt_l_0 = el_list.at(0)->getPt()/1.e3;
-	pt_l_1 = mu_list.at(1)->getPt()/1.e3;
+	pt_l_1 = mu_list.at(0)->getPt()/1.e3;
       }
       if (pt_l_1 > pt_l_0) {
 	std::swap(pt_l_0, pt_l_1);
       }
       m_h_pt_b1vl1.at(fc_it)->Fill(pt_l_1, pt_b_1, m_event_weight);
-      std::cout<<"Filled 2d pt kinematics plots";
     }
   }
 }
@@ -2995,10 +2990,9 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
 // -----------------------------------------------------------------------------
 void HistogramHandlers::BLPairKinematics::write(TFile* f)
 {
-  std::cout<<"Entering write function for blpair.\n";
   f->cd();
-
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
+
     m_h_l_pt_all.at(fc_it)->Write();
     m_h_l_pt_stop.at(fc_it)->Write();
     m_h_l_pt_astp.at(fc_it)->Write();
@@ -3234,7 +3228,7 @@ bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNt
 }
 
 // -----------------------------------------------------------------------------
-void calcEff2d(TH2D* pt, TH2D* pt_eff, TH2D* pt_num)
+void HistogramHandlers::BLPairKinematics::calcEff2d(TH2D* pt, TH2D* pt_eff, TH2D* pt_num)
 {
   float denom = pt->Integral();
   for (int ix=0 ; ix != pt->GetNbinsX(); ix++) {

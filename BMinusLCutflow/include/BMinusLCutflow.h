@@ -54,7 +54,7 @@ namespace BMinusL
       void print();
 
       bool isLeptonFromTauFromStop(const TruthNtuple::Particle*);
-      double scalePDF();
+      double scalePDF(double m_event_weight);
       void broadenResolution();
 
       TruthNtuple::FLAVOR_CHANNEL m_flavor_channel;
