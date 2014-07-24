@@ -1176,6 +1176,10 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
   const double mbl_min  = 0.;
   const double mbl_max  = 1500.;
 
+  const int    mbl_asym_bins = 21;
+  const double mbl_asym_min  = 0.;
+  const double mbl_asym_max  = 1.05;
+
   const int    mbl_ratio_bins = 55;
   const double mbl_ratio_min  = 0.;
   const double mbl_ratio_max  = 1.1;
@@ -1806,7 +1810,7 @@ HistogramHandlers::BLPairKinematics::BLPairKinematics() : m_l_from_stop(0)
 						     + "; m_{bl} asymmetry"
 						     + "; Entries"
 						     ).c_str()
-						 , mbl_bins, mbl_min, mbl_max
+						 , mbl_asym_bins, mbl_asym_min, mbl_asym_max
 						 )
 				       );
 

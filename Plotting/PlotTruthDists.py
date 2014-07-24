@@ -12,8 +12,6 @@ import yaml
 import HistMerger
 import FileHandle
 
-import rootlogon
-
 # ------------------------------------------------------------------------------
 def main():
     config_file_name = sys.argv[1]
