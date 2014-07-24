@@ -1,3 +1,4 @@
+tar xzvf lhapdf-5.9.1.tar.gz LHAPDF
 cd LHAPDF
 ./configure --prefix=${PWD}/..
 make
