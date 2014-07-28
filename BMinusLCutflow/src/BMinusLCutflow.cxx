@@ -491,10 +491,10 @@ void BMinusL::Cutflow::broadenResolution()
 
     double old_e  = m_daughter_b_quarks.at(b_quark_it)->getE();
     double new_e  = old_e * (1. + rand_scale*b_quark_resolution);
-    double new_p  = TruthNtuple::pFromEM(new_e, mass);
-    double new_pt = TruthNtuple::ptFromPTheta(new_p, theta);
-    double new_px = TruthNtuple::pxFromPtPhi(new_pt, phi);
-    double new_py = TruthNtuple::pyFromPtPhi(new_pt, phi);
+    double new_p  = TruthNtuple::pFromEM(      new_e, mass);
+    double new_pt = TruthNtuple::ptFromPTheta( new_p, theta);
+    double new_px = TruthNtuple::pxFromPtPhi(  new_pt, phi);
+    double new_py = TruthNtuple::pyFromPtPhi(  new_pt, phi);
     double new_pz = TruthNtuple::pzFromPtTheta(new_pt, theta);
 
     m_daughter_b_quarks.at(b_quark_it)->setE(new_e);
@@ -502,6 +502,54 @@ void BMinusL::Cutflow::broadenResolution()
     m_daughter_b_quarks.at(b_quark_it)->setPx(new_px);
     m_daughter_b_quarks.at(b_quark_it)->setPy(new_py);
     m_daughter_b_quarks.at(b_quark_it)->setPz(new_pz);
+  }
+
+  double electron_resolution = 0.3; // THIS IS A GUESS--???
+
+  for (size_t electron_it = 0; electron_it != m_daughter_electrons.size(); electron_it++) {
+    double rand_scale = gRandom->Gaus(); //default: mean=0., sigma=1.
+
+    double mass  = m_daughter_el.at(electron_it)->getM();
+    double theta = m_daughter_el.at(electron_it)->getTheta();
+    double phi   = m_daughter_el.at(electron_it)->getPhi();
+
+    double old_e  = m_daughter_el.at(electron_it)->getE();
+    double new_e  = old_e * (1. + rand_scale*electron_resolution);
+    double new_p  = TruthNtuple::pFromEM(      new_e, mass);
+    double new_pt = TruthNtuple::ptFromPTheta( new_p, theta);
+    double new_px = TruthNtuple::pxFromPtPhi(  new_pt, phi);
+    double new_py = TruthNtuple::pyFromPtPhi(  new_pt, phi);
+    double new_pz = TruthNtuple::pzFromPtTheta(new_pt, theta);
+
+    m_daughter_el.at(electron_it)->setE(new_e);
+    m_daughter_el.at(electron_it)->setPt(new_pt);
+    m_daughter_el.at(electron_it)->setPx(new_px);
+    m_daughter_el.at(electron_it)->setPy(new_py);
+    m_daughter_el.at(electron_it)->setPz(new_pz);
+  }
+
+  double muon_resolution = 0.3; // THIS IS A GUESS--???
+
+  for (size_t muon_it = 0; muon_it != m_daughter_mu.size(); muon_it++) {
+    double rand_scale = gRandom->Gaus(); //default: mean=0., sigma=1.
+
+    double mass  = m_daughter_mu.at(muon_it)->getM();
+    double theta = m_daughter_mu.at(muon_it)->getTheta();
+    double phi   = m_daughter_mu.at(muon_it)->getPhi();
+
+    double old_e  = m_daughter_mu.at(muon_it)->getE();
+    double new_e  = old_e * (1. + rand_scale*muon_resolution);
+    double new_p  = TruthNtuple::pFromEM(      new_e, mass);
+    double new_pt = TruthNtuple::ptFromPTheta( new_p, theta);
+    double new_px = TruthNtuple::pxFromPtPhi(  new_pt, phi);
+    double new_py = TruthNtuple::pyFromPtPhi(  new_pt, phi);
+    double new_pz = TruthNtuple::pzFromPtTheta(new_pt, theta);
+
+    m_daughter_mu.at(muon_it)->setE(new_e);
+    m_daughter_mu.at(muon_it)->setPt(new_pt);
+    m_daughter_mu.at(muon_it)->setPx(new_px);
+    m_daughter_mu.at(muon_it)->setPy(new_py);
+    m_daughter_mu.at(muon_it)->setPz(new_pz);
   }
 }
 

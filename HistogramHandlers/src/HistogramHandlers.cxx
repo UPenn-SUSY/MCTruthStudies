@@ -816,8 +816,8 @@ void HistogramHandlers::Mll::write(TFile* f)
 HistogramHandlers::Ht::Ht() : HistogramHandlers::Handle()
 {
   const int   bins = 500;
-  const float max = 0.;
-  const float min = 5000.;
+  const float min = 0.;
+  const float max = 5000.;
 
   for (unsigned int fc_it = 0; fc_it != TruthNtuple::FLAVOR_N; ++fc_it) {
     m_h_ht.push_back( new TH1F( ( TruthNtuple::FlavorChannelStrings[fc_it]
@@ -901,9 +901,9 @@ HistogramHandlers::Met::Met() : HistogramHandlers::Handle()
 				      ).c_str()
 				     , ( "E_{T}^{miss}/#sqrt{H_{T}} - "
 					 + TruthNtuple::FlavorChannelStrings[fc_it]
-					 + "; E_{T}^{miss}/#sqrt{H_{T}} ; Entries"
+					 + "; E_{T}^{miss}/#sqrt{H_{T}} [#sqrt{GeV}] ; Entries"
 					 ).c_str()
-				     , bins, min, max
+				     , bins, min, 200.
 				     )
 			   );
   }
