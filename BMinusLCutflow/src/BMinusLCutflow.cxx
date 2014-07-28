@@ -104,6 +104,7 @@ void BMinusL::Cutflow::processEvent()
   //           << "\nEvent number: " << EventNumber
   //           << "\nchecking the flavor channel -- num_el: " << num_el << " -- num_mu: " << num_mu
   //           << "\n";
+
   if (num_el == 2 && num_mu == 0) {
     // std::cout << "\tthis event is EE\n";
     m_flavor_channel = TruthNtuple::FLAVOR_EE;
@@ -140,6 +141,7 @@ void BMinusL::Cutflow::processEvent()
   // }
 
   // print();
+
   double m_event_weight = 1./nentries;
   if (m_is_signal == false) {
     // only need to scale bkgd samples
@@ -239,9 +241,9 @@ void BMinusL::Cutflow::doObjectSelection()
   // pick electrons coming from a stop
   m_daughter_el.reserve(m_truth_electrons.size());
   for (size_t el_it = 0; el_it != m_truth_electrons.size(); ++el_it) {
-   //  std::cout << "\nfound a truth electron!\n";
-   //  std::cout << "\tstatus code: "  << m_truth_electrons.at(el_it)->getStatus() << "\n";
-   //  std::cout << "\tparent pdgid: " << m_truth_electrons.at(el_it)->getParentPdgid() << "\n";
+     // std::cout << "\nfound a truth electron!\n";
+     // std::cout << "\tstatus code: "  << m_truth_electrons.at(el_it)->getStatus() << "\n";
+     // std::cout << "\tparent pdgid: " << m_truth_electrons.at(el_it)->getParentPdgid() << "\n";
 
     if (  (  m_truth_electrons.at(el_it)->getStatus() == 3
           || m_truth_electrons.at(el_it)->getStatus() == 11 // herwig++
@@ -256,7 +258,7 @@ void BMinusL::Cutflow::doObjectSelection()
                || m_truth_electrons.at(el_it)->getStatus() == 3
                || true
                )
-            && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
+	       && fabs(m_truth_electrons.at(el_it)->getParentPdgid()) == 15
             ) {
       // std::cout << "\nthis leptons has a tau parent -- checking the tau's parents\n";
 
@@ -270,9 +272,9 @@ void BMinusL::Cutflow::doObjectSelection()
   m_daughter_mu.reserve(m_truth_muons.size());
   for (size_t mu_it = 0; mu_it != m_truth_muons.size(); ++mu_it) {
 
-    // std::cout << "\nfound a truth muon!\n";
-    // std::cout << "\tstatus code: " << m_truth_muons.at(mu_it)->getStatus() << "\n";
-    // std::cout << "\tparent pdgid: " << m_truth_muons.at(mu_it)->getParentPdgid() << "\n";
+     // std::cout << "\nfound a truth muon!\n";
+     // std::cout << "\tstatus code: " << m_truth_muons.at(mu_it)->getStatus() << "\n";
+     // std::cout << "\tparent pdgid: " << m_truth_muons.at(mu_it)->getParentPdgid() << "\n";
 
     if (  (  m_truth_muons.at(mu_it)->getStatus() == 3
           || m_truth_muons.at(mu_it)->getStatus() == 11 // herwig++
@@ -287,9 +289,9 @@ void BMinusL::Cutflow::doObjectSelection()
                || m_truth_muons.at(mu_it)->getStatus() == 3
                || true
                )
-            && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
+	       && fabs(m_truth_muons.at(mu_it)->getParentPdgid()) == 15
             ) {
-      // std::cout << "\nthis leptons has a tau parent -- checking the tau's parents\n";
+      //       std::cout << "\nthis leptons has a tau parent -- checking the tau's parents\n";
 
       if (isLeptonFromTauFromStop(m_truth_muons.at(mu_it))) {
         m_daughter_mu.push_back(m_truth_muons.at(mu_it));

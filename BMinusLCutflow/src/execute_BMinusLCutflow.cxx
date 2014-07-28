@@ -40,7 +40,7 @@ int main(int argc, char** argv)
     }
     else {
       std::cout << "\t" << it << " -- " << argv[it] << "\n";
-    t.Add(argv[it]);
+      t.Add(argv[it]);
     }
   }
   std::cout << "\n";
