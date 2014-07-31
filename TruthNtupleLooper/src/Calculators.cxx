@@ -144,7 +144,7 @@ double TruthNtuple::ht(  const std::vector<TruthNtuple::Particle*>& el_list
 // -----------------------------------------------------------------------------
 double TruthNtuple::thetaFromEta(double eta)
 {
-  return 2*atan( exp( -fabs(eta))) * eta/fabs(eta);
+  return 2*atan( exp( -eta));
 }
 
 // -----------------------------------------------------------------------------
@@ -157,6 +157,12 @@ double TruthNtuple::pFromEM(double e, double m)
 double TruthNtuple::ptFromPTheta(double p, double theta)
 {
   return p*sin(theta);
+}
+
+// -----------------------------------------------------------------------------
+double TruthNtuple::ptFromPEta(double p, double eta)
+{
+  return p/cosh(eta);
 }
 
 // -----------------------------------------------------------------------------

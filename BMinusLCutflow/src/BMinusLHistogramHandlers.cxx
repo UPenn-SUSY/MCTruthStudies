@@ -1066,7 +1066,6 @@ void HistogramHandlers::QuarkKinematics::FillSpecial( const TruthNtuple::FLAVOR_
     std::cout << "ERROR! Number quarks (" << quark_list.size() << " != 2\n";
     return;
   }
-
   double pt_0 = quark_list.at(0)->getPt()/1.e3;
   double pt_1 = quark_list.at(1)->getPt()/1.e3;
 
@@ -2498,7 +2497,8 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
          , const std::vector<TruthNtuple::Particle*>& el_list
          , const std::vector<TruthNtuple::Particle*>& mu_list
          , const std::vector<TruthNtuple::Particle*>& quark_list
-						       , double m_event_weight
+	 , double m_event_weight
+	 , bool m_is_signal
          )
 {
   if (flavor_channel == TruthNtuple::FLAVOR_NONE) {
@@ -2516,9 +2516,27 @@ void HistogramHandlers::BLPairKinematics::FillSpecial( const TruthNtuple::FLAVOR
 //             << "\n";
 
   // sort objects based on parent particle - if sorting fails, exis the function
-  if (sortObjects(el_list, mu_list, quark_list) == false) {
+  if (( m_is_signal == true
+     && sortObjects(el_list, mu_list, quark_list) == false)
+   ) {
     std::cout << "\nfailed to sort objects -- skipping event for the b-l kinematics plot\n";
     return;
+  }
+  if (m_is_signal == false) {
+    // assign "from stop", "from anti-stop" arbitrarily
+    // merge el and mu lists to lepton list
+    m_l_list.clear();
+    m_l_list.reserve(el_list.size() + mu_list.size());
+    m_l_list.insert(m_l_list.end(), el_list.begin(), el_list.end());
+    m_l_list.insert(m_l_list.end(), mu_list.begin(), mu_list.end());
+
+    m_l_from_stop = m_l_list.at(0);
+    m_l_from_astp = m_l_list.at(1);
+
+    m_b_list = quark_list;
+    m_b_from_stop = m_b_list.at(0);
+    m_b_from_astp = m_b_list.at(1);
+
   }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -3161,28 +3179,28 @@ bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNt
        || m_l_list.at(lep_it)->getParentPdgid() == -15
        )  {
       if (m_l_from_stop == 0)
-        m_l_from_stop = m_l_list.at(lep_it);
+	m_l_from_stop = m_l_list.at(lep_it);
       else
-        std::cout << "WARNING! Found multiple leptons paired to stop!\n";
+	std::cout << "WARNING! Found multiple leptons paired to stop!\n";
     }
     // if parent is anti-stop (or tau)
     if (  m_l_list.at(lep_it)->getParentPdgid() == -(1e6+6)
        || m_l_list.at(lep_it)->getParentPdgid() == +15
        ) {
       if (m_l_from_astp == 0)
-        m_l_from_astp = m_l_list.at(lep_it);
+	m_l_from_astp = m_l_list.at(lep_it);
       else
-        std::cout << "WARNING! Found multiple leptons paired to anti-stop!\n";
+	std::cout << "WARNING! Found multiple leptons paired to anti-stop!\n";
     }
   }
   if (m_l_from_stop == 0 || m_l_from_astp == 0) {
     std::cout << "ERROR!"
-              << "\tLepton from stop: "      << (m_l_from_stop == 0 ? "not found" : "found")
-              << "\tLepton from anti-stop: " << (m_l_from_astp == 0 ? "not found" : "found")
-              << "\n";
+	      << "\tLepton from stop: "      << (m_l_from_stop == 0 ? "not found" : "found")
+	      << "\tLepton from anti-stop: " << (m_l_from_astp == 0 ? "not found" : "found")
+	      << "\n";
     return false;
   }
-
+  
   // Find b quark from stop and anti-stop
   m_b_list = quark_list;
   m_b_from_stop = 0;
@@ -3194,20 +3212,20 @@ bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNt
     if (quark_list.at(quark_it)->getParentPdgid() == +(1e6+6))  {
       if (m_b_from_stop == 0) m_b_from_stop = quark_list.at(quark_it);
       else
-        std::cout << "WARNING! Found multiple quarks paired to stop!\n";
+	std::cout << "WARNING! Found multiple quarks paired to stop!\n";
     }
     // if parent is anti-stop
     if (quark_list.at(quark_it)->getParentPdgid() == -(1e6+6)) {
       if (m_b_from_astp == 0) m_b_from_astp = quark_list.at(quark_it);
       else
-        std::cout << "WARNING! Found multiple quarks paired to anti-stop!\n";
+	std::cout << "WARNING! Found multiple quarks paired to anti-stop!\n";
     }
   }
   if (m_b_from_stop == 0 || m_b_from_astp == 0) {
     std::cout << "ERROR!"
-              << "\tB quark from stop: "      << (m_b_from_stop == 0 ? "not found" : "found")
-              << "\tB quark from anti-stop: " << (m_b_from_astp == 0 ? "not found" : "found")
-              << "\n";
+	      << "\tB quark from stop: "      << (m_b_from_stop == 0 ? "not found" : "found")
+	      << "\tB quark from anti-stop: " << (m_b_from_astp == 0 ? "not found" : "found")
+	      << "\n";
     return false;
   }
 
@@ -3227,7 +3245,7 @@ bool HistogramHandlers::BLPairKinematics::sortObjects( const std::vector<TruthNt
     std::cout << "lep parent: " << m_l_from_astp->getParentPdgid() << "\n";
     return false;
   }
-
+  
   return true;
 }
 

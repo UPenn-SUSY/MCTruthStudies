@@ -149,7 +149,8 @@ namespace HistogramHandlers
                               , const std::vector<TruthNtuple::Particle*>& el
                               , const std::vector<TruthNtuple::Particle*>& mu
                               , const std::vector<TruthNtuple::Particle*>& b
-				, double m_event_weight
+			      , double m_event_weight
+			      , bool m_is_signal
                               );
       virtual void write(TFile*);
 

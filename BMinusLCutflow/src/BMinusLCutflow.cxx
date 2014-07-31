@@ -171,7 +171,8 @@ void BMinusL::Cutflow::processEvent()
                                      , m_daughter_el
                                      , m_daughter_mu
                                      , m_daughter_b_quarks
-				       , m_event_weight
+				     , m_event_weight
+				     , m_is_signal
                                      );
   m_h_quark_kinematics->FillSpecial( m_flavor_channel
                                    , m_daughter_b_quarks
@@ -305,9 +306,10 @@ void BMinusL::Cutflow::doObjectSelection()
 
   // pick b quarks coming from a stop
   m_daughter_b_quarks.reserve(m_truth_b_quarks.size());
+
   for (size_t b_quarks_it = 0; b_quarks_it != m_truth_b_quarks.size(); ++b_quarks_it) {
     if ( fabs(m_truth_b_quarks.at(b_quarks_it)->getParentPdgid()) == 1e6+6
-	 || m_is_signal == false
+	 || (  m_is_signal == false)
 	 ) {
       m_daughter_b_quarks.push_back(m_truth_b_quarks.at(b_quarks_it));
     }
@@ -482,29 +484,96 @@ double BMinusL::Cutflow::scalePDF(double m_event_weight)
 // =============================================================================
 void BMinusL::Cutflow::broadenResolution()
 {
-  double b_quark_resolution = 0.3; // THIS IS A GUESS--???
-
   for (size_t b_quark_it = 0; b_quark_it != m_daughter_b_quarks.size(); b_quark_it++) {
-    double rand_scale = gRandom->Gaus(); //default: mean=0., sigma=1.
-
     double mass  = m_daughter_b_quarks.at(b_quark_it)->getM();
-    double theta = m_daughter_b_quarks.at(b_quark_it)->getTheta();
     double phi   = m_daughter_b_quarks.at(b_quark_it)->getPhi();
+    double eta   = m_daughter_b_quarks.at(b_quark_it)->getEta();
 
     double old_e  = m_daughter_b_quarks.at(b_quark_it)->getE();
-    double new_e  = old_e * (1. + rand_scale*b_quark_resolution);
+    double mean = 0.;
+    double sigma = findQuarkSigma(old_e);
+    double rand_scale = gRandom->Gaus(mean, sigma);
+
+    double new_e  = old_e * (1. + rand_scale);
     double new_p  = TruthNtuple::pFromEM(new_e, mass);
-    double new_pt = TruthNtuple::ptFromPTheta(new_p, theta);
+    double new_pt = TruthNtuple::ptFromPEta(new_p, eta);
     double new_px = TruthNtuple::pxFromPtPhi(new_pt, phi);
     double new_py = TruthNtuple::pyFromPtPhi(new_pt, phi);
-    double new_pz = TruthNtuple::pzFromPtTheta(new_pt, theta);
+    double new_pz = TruthNtuple::pzFromPtEta(new_pt, eta);
 
     m_daughter_b_quarks.at(b_quark_it)->setE(new_e);
     m_daughter_b_quarks.at(b_quark_it)->setPt(new_pt);
     m_daughter_b_quarks.at(b_quark_it)->setPx(new_px);
     m_daughter_b_quarks.at(b_quark_it)->setPy(new_py);
     m_daughter_b_quarks.at(b_quark_it)->setPz(new_pz);
+
   }
+
+  for (size_t el_it = 0; el_it != m_daughter_el.size(); el_it++) {
+    double mass  = m_daughter_el.at(el_it)->getM();
+    double phi   = m_daughter_el.at(el_it)->getPhi();
+    double eta   = m_daughter_el.at(el_it)->getEta();
+
+    double old_e  = m_daughter_el.at(el_it)->getE();
+    double mean = 0.;
+    double sigma = findElSigma(old_e);
+    double rand_scale = gRandom->Gaus(mean, sigma);
+
+    double new_e  = old_e * (1. + rand_scale);
+    double new_p  = TruthNtuple::pFromEM(new_e, mass);
+    double new_pt = TruthNtuple::ptFromPEta(new_p, eta);
+    double new_px = TruthNtuple::pxFromPtPhi(new_pt, phi);
+    double new_py = TruthNtuple::pyFromPtPhi(new_pt, phi);
+    double new_pz = TruthNtuple::pzFromPtEta(new_pt, eta);
+
+    m_daughter_el.at(el_it)->setE(new_e);
+    m_daughter_el.at(el_it)->setPt(new_pt);
+    m_daughter_el.at(el_it)->setPx(new_px);
+    m_daughter_el.at(el_it)->setPy(new_py);
+    m_daughter_el.at(el_it)->setPz(new_pz);
+
+  }
+
+  for (size_t mu_it = 0; mu_it != m_daughter_mu.size(); mu_it++) {
+    double mass  = m_daughter_mu.at(mu_it)->getM();
+    double phi   = m_daughter_mu.at(mu_it)->getPhi();
+    double eta   = m_daughter_mu.at(mu_it)->getEta();
+
+    double old_pt  = m_daughter_mu.at(mu_it)->getPt();
+    double mean = 0.;
+    double sigma = findMuSigma(old_pt);
+    double rand_scale = gRandom->Gaus(mean, sigma);
+
+    double new_pt  = old_pt * (1. + rand_scale);
+    double new_px = TruthNtuple::pxFromPtPhi(new_pt, phi);
+    double new_py = TruthNtuple::pyFromPtPhi(new_pt, phi);
+    double new_pz = TruthNtuple::pzFromPtEta(new_pt, eta);
+    double new_e  = TruthNtuple::eFromPxPyPzM(new_px, new_py, new_pz, mass);
+
+    m_daughter_mu.at(mu_it)->setE(new_e);
+    m_daughter_mu.at(mu_it)->setPt(new_pt);
+    m_daughter_mu.at(mu_it)->setPx(new_px);
+    m_daughter_mu.at(mu_it)->setPy(new_py);
+    m_daughter_mu.at(mu_it)->setPz(new_pz);
+
+  }
+}
+// -----------------------------------------------------------------------------
+// x is energy for quarks, electrons; pt for muons
+// these numbers taken from fitting std. dev(energy) and std.dev(1/pt) from reco runs
+double BMinusL::Cutflow::findQuarkSigma(double x)
+{
+  return  -2.77449 + 2.79651e+1/(sqrt(8.56837e-03*x/1.e3 + 8.79214e+01));
+}
+
+double BMinusL::Cutflow::findElSigma(double x)
+{
+  return 0.0250537 - 2.39661e-06*x/1.e3;
+}
+
+double BMinusL::Cutflow::findMuSigma(double x)
+{
+  return 0.0226284 + 0.000138404*x/1.e3;
 }
 
 // =============================================================================

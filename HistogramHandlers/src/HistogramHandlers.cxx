@@ -20,7 +20,7 @@ void HistogramHandlers::Handle::Fill( const TruthNtuple::FLAVOR_CHANNEL
                                     , const std::vector<TruthNtuple::Particle*>&
                                     , const std::vector<TruthNtuple::Particle*>&
                                     , const std::vector<TruthNtuple::Particle*>&
-				    , const std::vector<TruthNtuple::Particle*>& /*quark_list*/
+				      , const std::vector<TruthNtuple::Particle*>& /*quark_list*/
                                     , const TruthNtuple::Met&
 				      , double m_event_weight                                    
 				      )

@@ -57,6 +57,7 @@ namespace TruthNtuple
   double thetaFromEta(double eta);
   double pFromEM(double e, double m);
   double ptFromPTheta(double p, double theta);
+  double ptFromPEta(double p, double eta);
   double pxFromPtPhi(double pt, double phi);
   double pyFromPtPhi(double pt, double phi);
   double pzFromPtTheta(double pt, double theta);
