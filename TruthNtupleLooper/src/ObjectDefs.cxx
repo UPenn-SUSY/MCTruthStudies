@@ -936,6 +936,7 @@ double TruthNtuple::Met::getMetSig(  const std::vector<TruthNtuple::Particle*>& 
 			       ,mu_list
 			       ,jet_list
 			    );
+
   if (ht == 0.) return (m_met_et_noint == 0.) ? 0. : 999999.;
-  return (m_met_et_noint/1.e3)/(sqrt(ht)/1.e3);
+  return (m_met_et_noint/1.e3)/(sqrt(ht/1.e3));
 }
